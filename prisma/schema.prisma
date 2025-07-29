@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                      String    @id @default(cuid())
+  fullName                String
+  username                String    @unique
+  email                   String    @unique
+  phone                   String
+  password                String
+  referral                String?
+  tier                    Tier      @default(BASIC)
+
+  subscriptionId          String?
+  subscriptionStartDate   DateTime?
+  subscriptionExpiryDate  DateTime?
+
+  emailVerified           DateTime?
+  verificationToken       String?   @unique
+  verificationTokenExpiry DateTime?
+
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  transactions            Transaction[]
+  withdrawalDetails       WithdrawalDetails?
+  withdrawalRequests      WithdrawalRequest[]
+  saveRequests            SaveRequest[]
+  upliner                 User?         @relation("Referrals", fields: [uplinerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  uplinerId               String?
+  referredUsers           User[]        @relation("Referrals")
+  
+  generatedCommissions    Transaction[] @relation("CommissionSource")
+}
+
+
+
+model WithdrawalDetails {
+  id            String @id @default(cuid())
+  bankName      String
+  firstName     String
+  lastName      String
+  accountNumber String
+  user          User   @relation(fields: [userId], references: [id], onDelete: Restrict, onUpdate: Restrict)
+  userId        String @unique
+}
+
+model WithdrawalRequest {
+  id        String   @id @default(cuid())
+  amount    Float    // The requested amount
+  status    String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  
+  // Link to the user who made the request
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SaveRequest {
+  id        String   @id @default(cuid())
+  amount    Float
+  purpose   String   // The reason for saving
+  status    String   @default("PENDING") // PENDING, COMPLETED, CANCELLED
+  
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  type      String
+  amount    Float
+  status    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String  
+  sourceUser   User?    @relation("CommissionSource", fields: [sourceUserId], references: [id], onDelete: SetNull, onUpdate: Cascade)
+  sourceUserId String?
+}
+enum Tier {
+  PLATINUM
+  GOLD
+  SILVER
+  BRONZE
+  BASIC
+}
