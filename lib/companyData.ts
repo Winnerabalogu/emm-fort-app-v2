@@ -10,7 +10,6 @@ export interface CompanyPageData {
   gradientFrom?: string;
   gradientTo?: string; 
 }
-
 export const companyPagesData: CompanyPageData[] = [
   {
     slug: 'realty',
