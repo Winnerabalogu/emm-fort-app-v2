@@ -13,7 +13,7 @@ export default function AddDownlineModal() {
   const [isCopied, setIsCopied] = useState(false);
   
   const username = (session?.user as any)?.username || 'your_username';
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://emm-fort-app-v2.vercel.app';
   const referralLink = `${siteUrl}/auth/register?ref=${username}`;
 
   const handleCopy = () => {
