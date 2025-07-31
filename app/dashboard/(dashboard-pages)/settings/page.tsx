@@ -86,20 +86,22 @@ function SettingsPageContent() {
   };
 
   return (
-    <div className="bg-gray-50 sm:p-8 sm:py-8">
-      <div className="w-full sm:px-6 lg:px-8">
-        <div className="space-y-8 sm:p-8">
+    <div className="">
+      <div className="w-full">
+        <div className="space-y-8">
           {/* Header */}
+          <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg p-6">
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-3 mb-4">
-              <div className="p-2 bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg">
+              <div className="p-2 bg-gradient-to-r from-orange-400 to-amber-500 rounded-lg">
                 <Settings className="h-6 w-6 text-white" />
               </div>
-              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Account Settings</h1>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white">Account Settings</h1>
             </div>
-            <p className="text-gray-600 text-sm sm:text-base max-w-2xl">
+            <p className="text-white text-sm sm:text-base max-w-2xl">
               Manage your profile, security, and preferences to keep your account secure and up-to-date.
             </p>
+          </div>
           </div>
 
           <div className="flex flex-col xl:flex-row gap-8">

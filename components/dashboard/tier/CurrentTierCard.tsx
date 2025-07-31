@@ -11,9 +11,11 @@ interface CurrentTierCardProps {
 
 export default function CurrentTierCard({ tier, expiryDate, imageUrl }: CurrentTierCardProps) {
   return (
-    <div>
-      <h1 className="text-2xl font-bold text-text-primary mb-4">Your Current Plan</h1>
-      <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-orange-500 to-yellow-500 text-white shadow-lg flex flex-col sm:flex-row justify-between items-center overflow-hidden">
+      <div className="space-y-6">      
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg p-2">
+      <h1 className="text-2xl font-bold text-white p-2">Your Current Plan</h1>
+      </div>
+      <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-lg flex flex-col sm:flex-row justify-between items-center overflow-hidden">
         <div className="text-center sm:text-left">
           <h2 className="text-3xl font-bold">{tier}</h2>
           <p className="opacity-80 mt-1">Your subscription is active and provides exclusive benefits.</p>

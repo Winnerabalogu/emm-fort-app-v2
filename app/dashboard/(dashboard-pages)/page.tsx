@@ -36,47 +36,7 @@ function DashboardContent() {
   
   
   if (status === 'loading' || !profileData && !error) {
-  return (
-    <div className="flex h-dvh bg-orange-400">
-      {/* Sidebar Skeleton */}
-      <div className="hidden lg:flex">
-        <div className="w-64 bg-white border-r border-gray-200 flex flex-col">
-          {/* Sidebar Header */}
-          <div className="p-6 border-b border-gray-200">
-            <div className="animate-pulse">
-              <div className="h-8 bg-gray-200 rounded w-32"></div>
-            </div>
-          </div>
-          
-          {/* Sidebar Navigation */}
-          <div className="flex-1 p-4 space-y-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="animate-pulse flex items-center space-x-3 p-3">
-                <div className="h-5 w-5 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded w-20"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header Skeleton */}
-        <div className="bg-white border-b border-gray-200 px-4 sm:px-6 py-4">
-          <div className="animate-pulse flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="lg:hidden h-6 w-6 bg-gray-200 rounded"></div>
-              <div className="h-6 bg-gray-200 rounded w-32"></div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Content Skeleton */}
+  return (                      
         <main className="flex-1 overflow-y-auto p-4 sm:p-6">
           <div className="animate-pulse space-y-6">
             {/* Page Title */}
@@ -120,9 +80,7 @@ function DashboardContent() {
               </div>
             </div>
           </div>
-        </main>
-      </div>
-    </div>
+        </main>          
   );
 }
  
@@ -153,25 +111,6 @@ function DashboardContent() {
       </div>
     );
   }
-  
-  
-  return (    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
-        <div className="animate-pulse space-y-6">
-          <div className="space-y-3">
-            <div className="h-6 bg-gray-200 rounded-md w-1/3"></div>
-            <div className="h-4 bg-gray-100 rounded-md w-2/3"></div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="space-y-2">
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
-                <div className="h-10 bg-gray-100 rounded-md"></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
 }
 
 export default function DashboardPage() {

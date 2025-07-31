@@ -75,15 +75,88 @@ export default function TransactionTable({ transactions, title }: TransactionTab
 
     if (!transactions || transactions.length === 0) {
         return (
-            <div className="bg-white rounded-2xl shadow-soft p-6">
-                <h2 className="text-lg font-semibold text-text-primary mb-4">{title}</h2>
-                <EmptyState 
-                    Icon={Receipt}
-                    message="No Transaction History"
-                    description="Your transactions will appear here as you earn and withdraw."
-                />
+    <div className="space-y-8">          
+    <div className="bg-white rounded-2xl shadow-soft overflow-hidden">
+        <div className="p-6 border-b border-gray-100">
+          <div className="animate-pulse">
+            <div className="h-6 bg-gray-200 rounded w-32"></div>
+          </div>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-4 text-left">
+                  <div className="animate-pulse h-4 bg-gray-200 rounded w-16"></div>
+                </th>
+                <th className="px-6 py-4 text-left">
+                  <div className="animate-pulse h-4 bg-gray-200 rounded w-20"></div>
+                </th>
+                <th className="px-6 py-4 text-left">
+                  <div className="animate-pulse h-4 bg-gray-200 rounded w-12"></div>
+                </th>
+                <th className="px-6 py-4 text-left">
+                  <div className="animate-pulse h-4 bg-gray-200 rounded w-16"></div>
+                </th>
+                <th className="px-6 py-4 text-left">
+                  <div className="animate-pulse h-4 bg-gray-200 rounded w-14"></div>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gray-200 rounded"></div>
+                      <div className="space-y-1">
+                        <div className="h-4 bg-gray-200 rounded w-24"></div>
+                        <div className="h-3 bg-gray-100 rounded w-16"></div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-20"></div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-16"></div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded w-18"></div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <div className="animate-pulse">
+                      <div className="h-6 bg-green-100 rounded-full w-16"></div>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        
+        {/* Pagination Skeleton */}
+        <div className="px-6 py-4 border-t border-gray-100">
+          <div className="animate-pulse flex items-center justify-between">
+            <div className="h-4 bg-gray-200 rounded w-32"></div>
+            <div className="flex items-center gap-2">
+              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              <div className="h-8 w-8 bg-gray-200 rounded"></div>
             </div>
-        )
+          </div>
+        </div>
+    </div>   
+    </div>   
+        );
     }
 
     // If there are transactions, render the full component with the table.

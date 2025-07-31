@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Bell, ChevronDown, Menu, Search, Settings, LogOut } from 'lucide-react';
 import Image from 'next/image';
 import { useSession, signOut } from 'next-auth/react';
-
+import { usePathname } from 'next/navigation';
 interface HeaderProps {
   toggleSidebar: () => void;
 }
@@ -15,6 +15,10 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);    
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const pathParts = pathname.split('/').filter(Boolean);
+  const breadcrumbPage = pathParts[pathParts.length - 1] || 'Dashboard';
+  const breadcrumb = `Pages / ${breadcrumbPage}`;
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/auth/login' });
@@ -45,7 +49,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
           <Menu className="h-6 w-6" />
         </button>
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-text-primary">Dashboard</h1>          
+          <h1 className="text-lg sm:text-xl font-bold text-brand-dark">{breadcrumb}</h1>                  
           <p className="text-xs sm:text-sm text-text-secondary">{currentDate}</p>
         </div>
       </div>

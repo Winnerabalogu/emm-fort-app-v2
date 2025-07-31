@@ -31,10 +31,10 @@ export default async function TransactionsPage() {
   }));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-text-primary">Transaction History</h1>
-        <p className="text-text-secondary mt-1">View all your financial activities, including earnings and withdrawals.</p>
+    <div className="space-y-6 sm:space-y-6 sm:space-x-6">      
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg p-6">
+        <h1 className="text-2xl font-bold text-white">Transaction History</h1>
+        <p className="text-white mt-1">View all your financial activities, including earnings and withdrawals.</p>
       </div>         
       <TransactionsTable initialTransactions={formattedTransactions} />
     </div>

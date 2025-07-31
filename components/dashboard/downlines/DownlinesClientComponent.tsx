@@ -59,16 +59,21 @@ const filteredDownlines = useMemo(() => {
 
    if (initialDownlines.length === 0) {
     return (
-        <div className="space-y-6">
-            <h1 className="text-2xl font-bold text-text-primary">Your Downlines</h1>
+       <div className="space-y-6">      
+              <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg p-2">
+                <h1 className="text-2xl font-bold text-white p-4">No Downlines Found</h1>
+                </div>
             <EmptyState Icon={Users} message="No Downlines Yet" description="Your referred users will appear here once they sign up." />
+        
         </div>
     );
   }
 
    return (
-     <div className="space-y-6 h-dvh sm:p-8">
-       <h1 className="text-2xl font-bold text-text-primary">Downline Performance</h1>
+     <div className="space-y-6">      
+        <div className="bg-gradient-to-r from-orange-500 to-amber-500 rounded-lg p-2">
+       <h1 className="text-2xl font-bold text-white p-4">Downline Performance</h1>
+       </div>
        
        <DownlineStats totalEarnings={totalEarningsFromDownlines} downlines={downlines} />
  
