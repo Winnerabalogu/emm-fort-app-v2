@@ -86,9 +86,9 @@ function SettingsPageContent() {
   };
 
   return (
-    <div className="bg-gray-50 sm:py-8">
+    <div className="bg-gray-50 sm:p-8 sm:py-8">
       <div className="w-full sm:px-6 lg:px-8">
-        <div className="space-y-8">
+        <div className="space-y-8 sm:p-8">
           {/* Header */}
           <div className="text-center sm:text-left">
             <div className="flex items-center justify-center sm:justify-start gap-3 mb-4">
