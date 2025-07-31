@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
      "build": "npm run prisma:generate && prisma migrate deploy && next build",
-    "start": "next start",
+    "start": "npm run prisma:generate && next start",
     "lint": "next lint",
     "prisma:generate": "npm run prisma:generate:app && npm run prisma:generate:wp",
     "prisma:generate:app": "prisma generate --schema=./prisma/schema.prisma",

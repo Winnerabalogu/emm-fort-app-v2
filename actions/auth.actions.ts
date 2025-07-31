@@ -2,11 +2,11 @@
 "use server";
 
 import { signIn } from "@/auth";
-import { AuthError } from "@auth/core/errors"; 
+import { AuthError } from "next-auth";
 
 const REDIRECT_ERROR_CODES = [
-  'NEXT_REDIRECT',
-  'NAVIGATION', 
+  "NEXT_REDIRECT",
+  "NAVIGATION",
 ];
 
 export async function authenticate(
@@ -15,12 +15,14 @@ export async function authenticate(
 ) {
   try {
     await signIn("credentials", formData);
-  } catch (error: any) { 
-    
-    const isRedirect = REDIRECT_ERROR_CODES.some(code => error.digest?.startsWith(code));
+  } catch (error: any) {
+    const isRedirect = REDIRECT_ERROR_CODES.some(code =>
+      error.digest?.startsWith(code)
+    );
     if (isRedirect) {
       throw error;
     }
+
     if (error instanceof AuthError) {
       if (error.type === "CredentialsSignin") {
         return "Invalid email or password.";

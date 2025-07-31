@@ -1,5 +1,7 @@
 import Image from 'next/image';
 import { Tier } from '@prisma/client';
+import Link from 'next/link';
+
 
 export interface TierCardProps {
   tier: Tier | null;
@@ -12,9 +14,11 @@ export default function TierCard({ tier, imageUrl }: TierCardProps) {
       <div>
         <h2 className="text-2xl font-bold">Tier {tier || 'N/A'}</h2>
         <p className="text-sm opacity-80">Current Plan</p>
+        <Link href="/dashboard/tier">
         <button className="mt-4 px-5 py-2 text-sm font-semibold bg-white/20 hover:bg-white/30 rounded-full transition-all">
           Upgrade Tier
         </button>
+        </Link>
       </div>
       <div className="relative -mr-8 -my-10 opacity-70">
          <Image 

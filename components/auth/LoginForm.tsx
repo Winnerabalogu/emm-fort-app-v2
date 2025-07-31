@@ -1,7 +1,8 @@
 "use client";
 
 import Link from 'next/link';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { authenticate } from '@/actions/auth.actions';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button'; 
@@ -20,7 +21,7 @@ function LoginButton() {
 
 export default function LoginForm() {
   // useFormState hook to manage form state and display errors from the server action.
-  const [errorMessage, dispatch] = useFormState(authenticate, undefined);
+  const [errorMessage, dispatch] = useActionState(authenticate, undefined);
 
   return (
     <div className="w-full bg-white rounded-lg shadow-md sm:max-w-md p-6 sm:p-8 space-y-6">
