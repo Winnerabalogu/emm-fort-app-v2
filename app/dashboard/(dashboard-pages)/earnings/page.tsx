@@ -175,12 +175,9 @@ function EarningsPageContent() {
             </div>
         </div>
       </div>
-
-      {/* --- THIS IS THE FIX --- */}
-      {/* Use the new TransactionTable component to display the history */}
       <TransactionTable 
         title="Earnings History" 
-        transactions={data.history}
+        transactions={data.history}        
       />
       
     </div>

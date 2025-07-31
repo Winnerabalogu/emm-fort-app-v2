@@ -2,7 +2,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession, SessionProvider } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { formatNaira } from '@/lib/utils/formatCurrency';
 import { Target, Gift } from 'lucide-react';
 import MonthlyTargetChart from '@/components/dashboard/index/MonthlyTargetChart'; 
@@ -126,8 +126,7 @@ function TargetsPageContent() {
 
 export default function TargetsPage() {
   return (
-    <SessionProvider>
-      <TargetsPageContent />
-    </SessionProvider>
+    
+      <TargetsPageContent />    
   );
 }

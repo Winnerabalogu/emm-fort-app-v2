@@ -1,15 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // app/api/dashboard/route.ts
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { tierQuarterlyTargets } from '@/lib/tierData';
 import { UserProfile, TransactionType, TransactionStatus } from '@/lib/types'; 
-import { startOfWeek } from 'date-fns/startOfWeek';
-import { format } from 'date-fns/format';
-import { subDays } from 'date-fns/subDays';
-import { eachDayOfInterval } from 'date-fns/eachDayOfInterval';
-import { subMonths } from 'date-fns/subMonths';
-import { eachMonthOfInterval } from 'date-fns/eachMonthOfInterval';
+import { startOfWeek, format, subDays, eachDayOfInterval, subMonths, eachMonthOfInterval } from 'date-fns';
 
 export async function GET() {
   try {
@@ -19,152 +15,132 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Use findUnique instead of findUniqueOrThrow for better error handling
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      include: {
-        withdrawalDetails: true,
-        transactions: {
-          orderBy: { createdAt: 'desc' },
+    const userId = session.user.id;
+    const now = new Date();
+    const yearlyStart = subMonths(now, 11);
+
+    // OPTIMIZATION 1: Parallel queries for maximum performance
+    const [
+      user,
+      earningsData,
+      withdrawalsData,
+      chartTransactions,
+      downlineCommissions,
+      recentTransactions
+    ] = await Promise.all([
+      // Basic user info with referrals
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          fullName: true,
+          username: true,
+          email: true,
+          phone: true,
+          tier: true,
+          subscriptionStartDate: true,
+          subscriptionExpiryDate: true,
+          referredUsers: {
+            select: { 
+              id: true, 
+              fullName: true, 
+              tier: true 
+            }
+          },
+          withdrawalDetails: true
+        }
+      }),
+
+      // OPTIMIZATION 2: Aggregate earnings (COMMISSION + BONUS)
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          status: 'COMPLETED',
+          type: { in: ['COMMISSION', 'BONUS'] }
         },
-        referredUsers: {
-          select: { id: true, fullName: true, tier: true },
+        _sum: { amount: true }
+      }),
+
+      // OPTIMIZATION 3: Aggregate withdrawals separately
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          status: 'COMPLETED',
+          type: 'WITHDRAWAL'
         },
-      },
-    });
+        _sum: { amount: true }
+      }),
+
+      // OPTIMIZATION 4: Chart data with date filtering at DB level
+      prisma.transaction.findMany({
+        where: {
+          userId: userId,
+          status: 'COMPLETED',
+          type: { in: ['COMMISSION', 'BONUS'] },
+          createdAt: { gte: yearlyStart }
+        },
+        select: {
+          amount: true,
+          createdAt: true
+        },
+        orderBy: { createdAt: 'asc' }
+      }),
+
+      // OPTIMIZATION 5: Single query for all downline commissions
+      prisma.transaction.groupBy({
+        by: ['sourceUserId'],
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: { not: null }
+        },
+        _sum: { amount: true }
+      }),
+
+      // OPTIMIZATION 6: Recent transactions for UI (limited)
+      prisma.transaction.findMany({
+        where: { userId: userId },
+        select: {
+          id: true,
+          type: true,
+          amount: true,
+          createdAt: true,
+          status: true
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 5
+      })
+    ]);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // --- Core Business Logic Calculations ---
-    const now = new Date();
-    
-    let totalEarned = 0;
-    let totalWithdrawn = 0;
-    
-    // Filter for completed transactions for accurate financial calculations
-    const completedTransactions = user.transactions.filter(tx => tx.status === 'COMPLETED');
-
-    for (const tx of completedTransactions) {
-      if (tx.type === 'COMMISSION' || tx.type === 'BONUS') {
-        totalEarned += tx.amount;
-      } else if (tx.type === 'WITHDRAWAL') {
-        totalWithdrawn += tx.amount;
-      }
-    }
+    // Calculate financial summary
+    const totalEarned = earningsData._sum.amount || 0;
+    const totalWithdrawn = withdrawalsData._sum.amount || 0;
     const balance = totalEarned - totalWithdrawn;
-    
-    // Use only completed earning transactions for charts
-    const earningTransactions = completedTransactions.filter(tx => 
-      tx.type === 'COMMISSION' || tx.type === 'BONUS'
+
+    // OPTIMIZATION 7: Efficient chart data generation
+    const chartDataObject = generateOptimizedChartData(chartTransactions, now);
+
+    // OPTIMIZATION 8: Map downline commissions efficiently
+    const commissionMap = new Map(
+      downlineCommissions.map(item => [
+        item.sourceUserId!, 
+        item._sum.amount || 0
+      ])
     );
 
-    // 1. Monthly View: Last 30 days
-    const monthlyInterval = { start: subDays(now, 29), end: now };
-    const monthlyDataMap = new Map<string, number>();
-    
-    // Initialize all days with 0
-    const monthlyDays = eachDayOfInterval(monthlyInterval);
-    monthlyDays.forEach(day => {
-      monthlyDataMap.set(format(day, 'MMM d'), 0);
-    });
+    const downlinesWithEarnings = user.referredUsers.map(downline => ({
+      id: downline.id,
+      name: downline.fullName,
+      tier: downline.tier,
+      benefit: commissionMap.get(downline.id) || 0
+    }));
 
-    // Add transaction amounts to respective days
-    earningTransactions
-      .filter(t => t.createdAt >= monthlyInterval.start)
-      .forEach(tx => {
-        const dayKey = format(tx.createdAt, 'MMM d');
-        if (monthlyDataMap.has(dayKey)) {
-          monthlyDataMap.set(dayKey, (monthlyDataMap.get(dayKey) || 0) + tx.amount);
-        }
-      });
-
-    const monthlyChartData = Array.from(monthlyDataMap, ([name, value]) => ({ name, value }));
-    
-    // 2. Quarterly View: Last 13 weeks
-    const quarterlyInterval = { start: subDays(now, 90), end: now };
-    const quarterlyDataMap = new Map<string, number>();
-    
-    // Initialize weeks
-    for (let i = 12; i >= 0; i--) {
-      const weekStart = startOfWeek(subDays(now, i * 7));
-      quarterlyDataMap.set(`W${format(weekStart, 'w')}`, 0);
-    }
-
-    // Add transaction amounts to respective weeks
-    earningTransactions
-      .filter(t => t.createdAt >= quarterlyInterval.start)
-      .forEach(tx => {
-        const weekStart = startOfWeek(tx.createdAt);
-        const weekKey = `W${format(weekStart, 'w')}`;
-        if (quarterlyDataMap.has(weekKey)) {
-          quarterlyDataMap.set(weekKey, (quarterlyDataMap.get(weekKey) || 0) + tx.amount);
-        }
-      });
-
-    const quarterlyChartData = Array.from(quarterlyDataMap, ([name, value]) => ({ name, value }));
-
-    // 3. Yearly View: Last 12 months
-    const yearlyInterval = { start: subMonths(now, 11), end: now };
-    const yearlyDataMap = new Map<string, number>();
-    
-    // Initialize months
-    const yearlyMonths = eachMonthOfInterval(yearlyInterval);
-    yearlyMonths.forEach(month => {
-      yearlyDataMap.set(format(month, 'MMM'), 0);
-    });
-
-    // Add transaction amounts to respective months
-    earningTransactions
-      .filter(t => t.createdAt >= yearlyInterval.start)
-      .forEach(tx => {
-        const monthKey = format(tx.createdAt, 'MMM');
-        if (yearlyDataMap.has(monthKey)) {
-          yearlyDataMap.set(monthKey, (yearlyDataMap.get(monthKey) || 0) + tx.amount);
-        }
-      });
-
-    const yearlyChartData = Array.from(yearlyDataMap, ([name, value]) => ({ name, value }));
-    
-    const chartDataObject = {
-      monthly: monthlyChartData,
-      quarterly: quarterlyChartData,
-      yearly: yearlyChartData,
-    };
-
-    // Calculate earnings from each downline (for the sidebar)
-    const downlinesWithEarnings = await Promise.all(
-      user.referredUsers.map(async (downline) => {
-        try {
-          const commissions = await prisma.transaction.findMany({
-            where: { 
-              userId: user.id, 
-              type: 'COMMISSION', 
-              sourceUserId: downline.id, 
-              status: 'COMPLETED' 
-            },
-            select: { amount: true },
-          });
-          const earnings = commissions.reduce((sum, t) => sum + t.amount, 0);
-          return { 
-            id: downline.id, 
-            name: downline.fullName, 
-            tier: downline.tier, 
-            benefit: earnings 
-          };
-        } catch (error) {
-          console.error(`Error calculating earnings for downline ${downline.id}:`, error);
-          return { 
-            id: downline.id, 
-            name: downline.fullName, 
-            tier: downline.tier, 
-            benefit: 0 
-          };
-        }
-      })
-    );
-    
+    // Construct response
     const userProfile: UserProfile = {
       id: user.id,
       fullName: user.fullName,
@@ -179,8 +155,8 @@ export async function GET() {
       monthlyTarget: {
         target: tierQuarterlyTargets[user.tier] || 0,
         history: chartDataObject,
-      },    
-      transactions: user.transactions.slice(0, 5).map(tx => ({
+      },
+      transactions: recentTransactions.map(tx => ({
         id: tx.id,
         type: tx.type as TransactionType,
         amount: tx.amount,
@@ -191,24 +167,102 @@ export async function GET() {
       withdrawalDetails: user.withdrawalDetails || null,
     };
 
-    return NextResponse.json(userProfile);
-
-  } catch (error) {
-    console.error("API_DASHBOARD_ERROR: ", error);
+    // OPTIMIZATION 9: Cache response
+    const response = NextResponse.json(userProfile);
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=60');
     
-    // More specific error handling
-    if (error instanceof Error) {
-      if (error.message.includes('P2025')) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
-      }
-      if (error.message.includes('auth')) {
-        return NextResponse.json({ error: 'Authentication error' }, { status: 401 });
+    return response;
+
+  }catch (error: unknown) {
+  console.error("API_DASHBOARD_ERROR: ", error);
+
+  if (error instanceof Error) {
+    // Prisma-specific error handling
+    if (error.message.includes('P2025')) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+    if (error.message.includes('P2002')) {
+      return NextResponse.json({ error: 'Database constraint error' }, { status: 400 });
+    }
+    if (error.message.includes('auth')) {
+      return NextResponse.json({ error: 'Authentication error' }, { status: 401 });
+    }
+
+    return NextResponse.json(
+      {
+        error: 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      },
+      { status: 500 }
+    );
+  }
+  
+  return NextResponse.json(
+    {
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? JSON.stringify(error) : undefined,
+    },
+    { status: 500 }
+  );
+}
+}
+
+// OPTIMIZATION 10: Streamlined chart data generation
+function generateOptimizedChartData(transactions: any[], now: Date) {
+  const monthlyStart = subDays(now, 29);
+  const quarterlyStart = subDays(now, 90);
+  const yearlyStart = subMonths(now, 11);
+
+  // Create efficient data structures
+  const monthlyMap = new Map<string, number>();
+  const quarterlyMap = new Map<string, number>();
+  const yearlyMap = new Map<string, number>();
+
+  // Initialize time periods
+  eachDayOfInterval({ start: monthlyStart, end: now })
+    .forEach(day => monthlyMap.set(format(day, 'MMM d'), 0));
+  
+  for (let i = 12; i >= 0; i--) {
+    const weekStart = startOfWeek(subDays(now, i * 7));
+    quarterlyMap.set(`W${format(weekStart, 'w')}`, 0);
+  }
+  
+  eachMonthOfInterval({ start: yearlyStart, end: now })
+    .forEach(month => yearlyMap.set(format(month, 'MMM'), 0));
+
+  // Single pass through transactions to populate all charts
+  transactions.forEach(tx => {
+    const txDate = new Date(tx.createdAt);
+    const amount = tx.amount;
+
+    // Monthly data
+    if (txDate >= monthlyStart) {
+      const dayKey = format(txDate, 'MMM d');
+      if (monthlyMap.has(dayKey)) {
+        monthlyMap.set(dayKey, monthlyMap.get(dayKey)! + amount);
       }
     }
-    
-    return NextResponse.json({ 
-      error: 'An internal error occurred',
-      details: process.env.NODE_ENV === 'development' ? error : undefined
-    }, { status: 500 });
-  }
+
+    // Quarterly data
+    if (txDate >= quarterlyStart) {
+      const weekKey = `W${format(startOfWeek(txDate), 'w')}`;
+      if (quarterlyMap.has(weekKey)) {
+        quarterlyMap.set(weekKey, quarterlyMap.get(weekKey)! + amount);
+      }
+    }
+
+    // Yearly data
+    if (txDate >= yearlyStart) {
+      const monthKey = format(txDate, 'MMM');
+      if (yearlyMap.has(monthKey)) {
+        yearlyMap.set(monthKey, yearlyMap.get(monthKey)! + amount);
+      }
+    }
+  });
+
+  return {
+    monthly: Array.from(monthlyMap, ([name, value]) => ({ name, value })),
+    quarterly: Array.from(quarterlyMap, ([name, value]) => ({ name, value })),
+    yearly: Array.from(yearlyMap, ([name, value]) => ({ name, value }))
+  };
 }
