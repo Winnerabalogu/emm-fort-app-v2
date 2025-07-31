@@ -135,9 +135,9 @@ function DashboardContent() {
     const tierImage = `/tiers/${profileData.tier.toLowerCase()}.png`;
 
     return (
-      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 sm:p-6 fade-in">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 sm:gap-12 fade-in">
         {/* Main Content Column */}
-        <div className="flex-1 space-y-6 lg:space-y-8 sm:p-8">
+        <div className="flex-1 space-y-6 lg:space-y-8 sm:space-y-12">
           <TierCard tier={profileData.tier} imageUrl={tierImage} />
           <BalanceCard balance={profileData.balance} />
           <MonthlyTargetChart chartData={profileData.monthlyTarget.history} />
