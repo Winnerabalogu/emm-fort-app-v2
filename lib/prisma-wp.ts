@@ -1,5 +1,5 @@
 // lib/prisma-wp.ts
-import { PrismaClient } from '.prisma/wordpress-client';
+import { PrismaClient } from '../generated/wordpress-client';
 
 declare global {  
   var prismaWp: PrismaClient | undefined;

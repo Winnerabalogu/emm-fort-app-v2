@@ -18,11 +18,18 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".", 
     "paths": {
       "@/*": ["./*"],
-     ".prisma/wordpress-client": ["./node_modules/.prisma/wordpress-client"]
+      "@wp-client": ["generated/wordpress-client"] 
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "declarations.d.ts" ],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "declarations.d.ts"
+  ],
   "exclude": ["node_modules"]
 }
