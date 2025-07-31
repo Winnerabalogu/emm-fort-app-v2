@@ -67,7 +67,7 @@ const filteredDownlines = useMemo(() => {
   }
 
    return (
-     <div className="space-y-6">
+     <div className="space-y-6 h-dvh sm:p-8">
        <h1 className="text-2xl font-bold text-text-primary">Downline Performance</h1>
        
        <DownlineStats totalEarnings={totalEarningsFromDownlines} downlines={downlines} />
