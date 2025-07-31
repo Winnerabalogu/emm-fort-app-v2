@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { clearUserCache } from '@/auth'; 
 
 const UpdateProfileSchema = z.object({
   fullName: z.string().min(2, 'Full name must be at least 2 characters.'),
@@ -59,7 +60,7 @@ export async function PATCH(request: Request) {
         phone,
       },
     });
-    
+    clearUserCache(session.user.id);
     return NextResponse.json({ message: "Profile updated successfully." });
 
   } catch (error) {    

@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ 
       message: 'Email verified successfully.',
-      email: updatedUser.email // Send the email back to the client
+      email: updatedUser.email 
     }, { status: 200 });
 
   } catch (error) {

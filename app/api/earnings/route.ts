@@ -9,7 +9,8 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  try {    
+  try {
+    // OPTIMIZATION: Get all earnings transactions in one query (preserves original behavior)
     const earningsTransactions = await prisma.transaction.findMany({
       where: {
         userId: session.user.id,
@@ -19,7 +20,9 @@ export async function GET() {
       orderBy: {
         createdAt: 'desc',
       },
-    });    
+    });
+
+    // Preserve original calculation logic exactly
     let totalEarned = 0;
     let commissionEarnings = 0;
     let bonusEarnings = 0;
@@ -31,14 +34,20 @@ export async function GET() {
       } else if (tx.type === 'BONUS') {
         bonusEarnings += tx.amount;
       }
-    }    
-    
-    return NextResponse.json({
+    }
+
+    // Return exact same structure as original
+    const response = NextResponse.json({
       totalEarned,
       commissionEarnings,
       bonusEarnings,
-      history: earningsTransactions, 
+      history: earningsTransactions, // Exact same field name and structure
     });
+
+    // Add performance optimization: cache headers
+    response.headers.set('Cache-Control', 'private, max-age=30, stale-while-revalidate=60');
+    
+    return response;
 
   } catch (error) {
     console.error('GET_EARNINGS_ERROR:', error);

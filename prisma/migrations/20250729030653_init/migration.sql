@@ -130,3 +130,22 @@ CREATE INDEX "SaveRequest_userId_status_idx" ON "SaveRequest"("userId", "status"
 
 -- Partial index for active subscriptions
 CREATE INDEX "User_subscriptionExpiryDate_idx" ON "User"("subscriptionExpiryDate") WHERE "subscriptionExpiryDate" IS NOT NULL;
+
+
+-- Auth Performance Indexes
+-- Add these indexes to optimize authentication queries
+
+-- CRITICAL: Email lookup optimization (case-insensitive)
+CREATE INDEX "User_email_lower_idx" ON "User" (LOWER("email"));
+
+-- Email verification status (for login checks)
+CREATE INDEX "User_emailVerified_idx" ON "User" ("emailVerified") WHERE "emailVerified" IS NOT NULL;
+
+-- Composite index for login queries (email + verification)
+CREATE INDEX "User_email_verified_idx" ON "User" ("email", "emailVerified");
+
+-- Username lookup (if you have username login)
+CREATE INDEX "User_username_lower_idx" ON "User" (LOWER("username"));
+
+-- Session-related user lookups (for JWT updates)
+CREATE INDEX "User_id_tier_subscription_idx" ON "User" ("id", "tier", "subscriptionStartDate");

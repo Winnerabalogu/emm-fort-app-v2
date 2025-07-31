@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { tierQuarterlyTargets } from '@/lib/tierData'; // Ensure this is correctly named/imported
+import { tierQuarterlyTargets } from '@/lib/tierData'; 
 
 export async function GET() {
   const session = await auth();
@@ -17,7 +17,7 @@ export async function GET() {
         tier: true,
         transactions: {
           where: { 
-            type: { in: ['COMMISSION', 'BONUS'] }, // Only include earnings
+            type: { in: ['COMMISSION', 'BONUS'] }, 
             status: 'COMPLETED' 
           },
           orderBy: { createdAt: 'desc' },

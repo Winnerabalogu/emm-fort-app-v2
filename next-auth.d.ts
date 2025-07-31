@@ -1,22 +1,25 @@
-import { type DefaultSession } from "next-auth"
+import { type DefaultSession } from "next-auth";
 import { Tier } from '@prisma/client';
 
 declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
+      fullName: string;
+      username: string;
       tier: Tier;
+      emailVerified: Date | null;
       subscriptionStartDate: Date | null;
-      username: string; 
     } & DefaultSession['user']; 
   }
- 
-  interface User { 
+
+  interface User {
     id: string;
     email: string;
     fullName: string;
-    username: string; 
+    username: string;
     tier: Tier;
+    emailVerified: Date | null;
     subscriptionStartDate: Date | null;
   }
 }
@@ -24,8 +27,11 @@ declare module 'next-auth' {
 declare module 'next-auth/jwt' {
   interface JWT {
     id: string;
-    tier: Tier;
-    subscriptionStartDate: Date | null;
+    name: string;
     username: string;
+    tier: Tier;
+    emailVerified: Date | null;
+    subscriptionStartDate: Date | null;
+    lastUpdated?: number; 
   }
 }

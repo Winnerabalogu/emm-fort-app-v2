@@ -5,8 +5,6 @@ import crypto from 'crypto';
 import { PasswordHash } from 'phpass';
 import { RegisterSchema } from '@/lib/schemas';
 import { sendVerificationEmail } from '@/lib/email';
-
-// Import BOTH Prisma client services
 import { prisma } from '@/lib/prisma';
 import { prismaWp } from '@/lib/prisma-wp';
 

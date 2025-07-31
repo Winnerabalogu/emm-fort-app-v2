@@ -3,10 +3,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useSession, SessionProvider } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { formatNaira } from '@/lib/utils/formatCurrency';
 import { Users, Award } from 'lucide-react';
 import TransactionTable from '@/components/dashboard/TransactionTable';
+import { useRouter } from 'next/navigation';
 
 interface EarningsData {
   totalEarned: number;
@@ -15,19 +16,8 @@ interface EarningsData {
   history: any[]; 
 }
 
-function EarningsPageContent() {
-  const { status } = useSession({ required: true });
-  const [data, setData] = useState<EarningsData | null>(null);
-
-  useEffect(() => {
-    if (status === 'authenticated') {
-      fetch('/api/earnings')
-        .then(res => res.json())
-        .then(setData);
-    }
-  }, [status]);
-
-  if (!data) {
+// Loading skeleton component
+function EarningsPageSkeleton() {
   return (
     <div className="space-y-8">
       {/* Hero Section Skeleton */}
@@ -76,21 +66,11 @@ function EarningsPageContent() {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-4 text-left">
-                  <div className="animate-pulse h-4 bg-gray-200 rounded w-16"></div>
-                </th>
-                <th className="px-6 py-4 text-left">
-                  <div className="animate-pulse h-4 bg-gray-200 rounded w-20"></div>
-                </th>
-                <th className="px-6 py-4 text-left">
-                  <div className="animate-pulse h-4 bg-gray-200 rounded w-12"></div>
-                </th>
-                <th className="px-6 py-4 text-left">
-                  <div className="animate-pulse h-4 bg-gray-200 rounded w-16"></div>
-                </th>
-                <th className="px-6 py-4 text-left">
-                  <div className="animate-pulse h-4 bg-gray-200 rounded w-14"></div>
-                </th>
+                {['Type', 'Amount', 'Date', 'Source', 'Status'].map((header, i) => (
+                  <th key={i} className="px-6 py-4 text-left">
+                    <div className="animate-pulse h-4 bg-gray-200 rounded w-16"></div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -105,26 +85,13 @@ function EarningsPageContent() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <div className="animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-20"></div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-16"></div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded w-18"></div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="animate-pulse">
-                      <div className="h-6 bg-green-100 rounded-full w-16"></div>
-                    </div>
-                  </td>
+                  {[1, 2, 3, 4].map((j) => (
+                    <td key={j} className="px-6 py-4">
+                      <div className="animate-pulse">
+                        <div className="h-4 bg-gray-200 rounded w-20"></div>
+                      </div>
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
@@ -136,10 +103,9 @@ function EarningsPageContent() {
           <div className="animate-pulse flex items-center justify-between">
             <div className="h-4 bg-gray-200 rounded w-32"></div>
             <div className="flex items-center gap-2">
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
-              <div className="h-8 w-8 bg-gray-200 rounded"></div>
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="h-8 w-8 bg-gray-200 rounded"></div>
+              ))}
             </div>
           </div>
         </div>
@@ -147,6 +113,92 @@ function EarningsPageContent() {
     </div>
   );
 }
+
+export default function EarningsPage() {
+  const { data: session, status } = useSession();
+  const [data, setData] = useState<EarningsData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Handle authentication states
+    if (status === 'loading') return; // Still checking session
+    
+    if (status === 'unauthenticated') {
+      router.push('/auth/signin');
+      return;
+    }
+
+    if (status === 'authenticated' && session?.user?.id) {
+      const fetchEarningsData = async () => {
+        try {
+          setIsLoading(true);
+          setError(null);
+          
+          // Add timeout to prevent hanging
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 10000);
+          
+          const response = await fetch('/api/earnings', {
+            signal: controller.signal,
+            cache: 'no-store'
+          });
+          
+          clearTimeout(timeoutId);
+          
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to fetch earnings data');
+          }
+          
+          const earningsData = await response.json();
+          setData(earningsData);
+        } catch (err: unknown) {
+          if (err instanceof DOMException && err.name === 'AbortError') {
+            setError('Request timed out. Please try again.');
+          } else if (err instanceof Error) {
+            setError(err.message);
+          } else {
+            setError('An unknown error occurred');
+          }
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchEarningsData();
+    }
+  }, [status, session, router]);
+
+  // Show loading skeleton while checking session or fetching data
+  if (status === 'loading' || isLoading) {
+    return <EarningsPageSkeleton />;
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <div className="text-red-500 text-lg font-semibold">Error loading earnings</div>
+          <div className="text-gray-600">{error}</div>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Show skeleton if no data yet
+  if (!data) {
+    return <EarningsPageSkeleton />;
+  }
+
   return (
     <div className="space-y-8">
       <div className="relative p-10 text-center bg-gradient-to-tr from-gray-900 to-gray-700 text-white rounded-2xl shadow-2xl overflow-hidden">
@@ -175,19 +227,11 @@ function EarningsPageContent() {
             </div>
         </div>
       </div>
+      
       <TransactionTable 
         title="Earnings History" 
         transactions={data.history}        
       />
-      
     </div>
-  );
-}
-
-export default function EarningsPage() {
-  return (
-    <SessionProvider>
-      <EarningsPageContent />
-    </SessionProvider>
   );
 }

@@ -50,3 +50,14 @@ export interface UserProfile {
     accountNumber: string;
   } | null;
 }
+
+export type CachedUserData = {
+  id: string;
+  fullName: string;
+  email?: string;
+  username: string;
+  tier: Tier;
+  emailVerified: Date | null;
+  subscriptionStartDate: Date | null;
+  image?: string | null;
+};;
