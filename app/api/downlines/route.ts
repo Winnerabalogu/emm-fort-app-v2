@@ -1,4 +1,5 @@
 // app/api/downlines/route.ts
+export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';

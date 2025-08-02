@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-     "build": "npm run prisma:generate && prisma migrate deploy && next build",
-    "start": "npm run prisma:generate && next start",
+    "build": "npm run prisma:generate && prisma migrate deploy && next build",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "prisma:generate": "npm run prisma:generate:app && npm run prisma:generate:wp",
     "prisma:generate:app": "prisma generate --schema=./prisma/schema.prisma",
@@ -42,11 +42,12 @@
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.4",
+    "eslint-plugin-next": "^0.0.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   },
-   "prisma": {
+  "prisma": {
     "seed": "ts-node --project tsconfig.seed.json prisma/seed.ts"
   }
 }
