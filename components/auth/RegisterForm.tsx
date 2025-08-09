@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { signOut } from 'next-auth/react'; 
-import { ChevronLeft } from 'lucide-react';
 import { RegisterStep1Form } from '@/lib/form-types';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
@@ -58,48 +57,79 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md sm:max-w-md p-6 sm:p-8 space-y-6">
-      <Link href="/" className="flex items-center text-sm font-semibold text-orange-600 hover:text-orange-800">
-        <ChevronLeft className="w-4 h-4 mr-1" />
-        Back to Home
-      </Link>
-      
-      <div className="text-left">
-        <h1 className="text-2xl sm:text-3xl font-bold">Create an Account</h1>
-        <p className="text-gray-500 mt-1">Let&apos;s get you started on your journey.</p>
+    <div className="w-full space-y-8">
+      <div className="text-center">
+        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">Create Account</h1>
+        <p className="text-gray-600 mt-2">Join us and start your journey today</p>
       </div>      
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">        
-        <Input label="FULL NAME" {...register("fullName", { required: "Full name is required" })} placeholder="Enter full name" />
-        {errors.fullName && <p className="text-sm text-red-600">{errors.fullName.message}</p>}
+      
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">        
+        <Input 
+          label="FULL NAME" 
+          {...register("fullName", { required: "Full name is required" })} 
+          placeholder="Enter your full name"
+          error={errors.fullName?.message}
+        />
 
-        <Input label="USERNAME" {...register("username", { required: "Username is required" })} placeholder="Enter username" />
-        {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
+        <Input 
+          label="USERNAME" 
+          {...register("username", { required: "Username is required" })} 
+          placeholder="Choose a username"
+          error={errors.username?.message}
+        />
 
-        <Input label="EMAIL" type="email" {...register("email", { required: "Email is required" })} placeholder="Enter email address" />
-        {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+        <Input 
+          label="EMAIL" 
+          type="email" 
+          {...register("email", { required: "Email is required" })} 
+          placeholder="Enter your email address"
+          error={errors.email?.message}
+        />
 
-        <Input label="PHONE NUMBER" type="tel" {...register("phone", { required: "Phone number is required" })} placeholder="Enter phone number" />
-        {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
+        <Input 
+          label="PHONE NUMBER" 
+          type="tel" 
+          {...register("phone", { required: "Phone number is required" })} 
+          placeholder="Enter your phone number"
+          error={errors.phone?.message}
+        />
         
-         <Input label="REFERRAL (OPTIONAL)" {...register("referral")} placeholder="Enter referral code" />
+        <Input 
+          label="REFERRAL CODE (OPTIONAL)" 
+          {...register("referral")} 
+          placeholder="Enter referral code if you have one" 
+        />
 
-        <Input label="PASSWORD" type="password" {...register("password", { required: "Password is required", minLength: { value: 6, message: "Password must be at least 6 characters" } })} placeholder="Create a password" />
-        {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+        <Input 
+          label="PASSWORD" 
+          type="password" 
+          {...register("password", { 
+            required: "Password is required", 
+            minLength: { value: 6, message: "Password must be at least 6 characters" } 
+          })} 
+          placeholder="Create a secure password"
+          error={errors.password?.message}
+        />
 
-        {/* Display API errors here */}
-        {apiError && <p className="text-sm text-red-600 text-center">{apiError}</p>}
+        {apiError && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-sm text-red-600">{apiError}</p>
+          </div>
+        )}
 
-        <Button type="submit" isLoading={isLoading} className="mt-2">
+        <Button type="submit" isLoading={isLoading} className="w-full mt-6">
           Create Account
         </Button>
       </form>
 
-      <p className="text-sm text-center text-gray-500">
-        Already have an account?{' '}
-        <Link href="/auth/login" className="font-medium text-orange-600 hover:text-orange-500">
-          Login
-        </Link>
-      </p>
+      <div className="text-center pt-4 border-t border-gray-200">
+        <p className="text-sm text-gray-600">
+          Already have an account?{' '}
+          <Link href="/auth/login" className="font-medium text-orange-600 hover:text-orange-500">
+            Sign in
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

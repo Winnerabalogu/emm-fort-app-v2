@@ -25,7 +25,7 @@ export default function PaymentSuccessPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
-      <div className="text-center p-8 bg-white rounded-lg shadow-xl max-w-md w-full">
+      <div className="text-center p-8 max-w-md w-full">
         {isLoading ? (
           // Loading State
           <div className="fade-in flex flex-col items-center">

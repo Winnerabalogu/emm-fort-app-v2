@@ -6,7 +6,6 @@ import { useFormStatus } from 'react-dom';
 import { authenticate } from '@/actions/auth.actions';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button'; 
-import { ChevronLeft } from 'lucide-react';
 
 function LoginButton() {
   const { pending } = useFormStatus();
@@ -18,62 +17,59 @@ function LoginButton() {
   );
 }
 
-
-export default function LoginForm() {
-  // useFormState hook to manage form state and display errors from the server action.
+export default function LoginForm() {  
   const [errorMessage, dispatch] = useActionState(authenticate, undefined);
 
   return (
-    <div className="w-full bg-white rounded-lg shadow-md sm:max-w-md p-6 sm:p-8 space-y-6">
-       <Link href="/" className="flex items-center text-sm font-semibold text-orange-600 hover:text-orange-800">
-        <ChevronLeft className="w-4 h-4 mr-1" />
-        Back to Home
-      </Link>
+    <div className="w-full space-y-8">
+      <div className="text-center">
+        <h1 className="text-3xl lg:text-4xl font-bold text-gray-900">Welcome Back</h1>
+        <p className="text-gray-600 mt-2">Sign in to your account to continue</p>
+      </div>      
       
-      <div className="text-left">
-        <h1 className="text-2xl sm:text-3xl font-bold">Login</h1>
-        <p className="text-gray-500 mt-1">Add your details below to log in the app</p>
-      </div>
-
-      {/* The form now calls the server action directly */}
       <form action={dispatch} className="space-y-6">
         <Input 
           label="EMAIL" 
           type="email" 
-          name="email" // 'name' attribute is required for FormData
-          placeholder="Enter email address" 
+          name="email"
+          placeholder="Enter your email address" 
           required 
         />
         <Input 
           label="PASSWORD" 
           type="password" 
-          name="password" // 'name' attribute is required for FormData
-          placeholder="Enter password" 
+          name="password" 
+          placeholder="Enter your password" 
           required 
         />
 
         <div className="text-right">
-            <Link href="/auth/forgot-password" passHref>
-                <span className="text-sm font-medium text-orange-600 hover:text-orange-500 cursor-pointer">Forgot password?</span>
-            </Link>
-        </div>
+          <Link href="/auth/forgot-password" passHref>
+            <span className="text-sm font-medium text-orange-600 hover:text-orange-500 cursor-pointer">
+              Forgot password?
+            </span>
+          </Link>
+        </div>                
         
-        {/* The LoginButton component handles its own loading state */}
         <LoginButton />
         
         {errorMessage && (
-          <div className="text-sm text-red-600 text-center mt-2">
-            <p>{errorMessage}</p>
+          <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+            <p className="text-sm text-red-600">{errorMessage}</p>
           </div>
         )}
       </form>
       
-      <p className="text-sm text-center text-gray-500">
-        Don&apos;t have an account?{' '}
-        <Link href="/auth/register" passHref>
-            <span className="font-medium text-orange-600 hover:text-orange-500 cursor-pointer">Create account</span>
-        </Link>
-      </p>
+      <div className="text-center pt-4 border-t border-gray-200">
+        <p className="text-sm text-gray-600">
+          Don&apos;t have an account?{' '}
+          <Link href="/auth/register" passHref>
+            <span className="font-medium text-orange-600 hover:text-orange-500 cursor-pointer">
+              Create account
+            </span>
+          </Link>
+        </p>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,12 @@
 generator client {
-  provider      = "prisma-client-js"
-  output        = "../generated/wordpress-client"
+  provider = "prisma-client-js"
+  output   = "../generated/wordpress-client"
   binaryTargets = ["native", "debian-openssl-1.0.x"]
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("WORDPRESS_DB_URL")
+  provider = "mysql"  
+  url      = env("WORDPRESS_DB_URL")  
 }
 
 model wp_bm_guests {
@@ -28,7 +28,7 @@ model wp_bm_user_index {
   nickname      String?  @db.VarChar(255)
   first_name    String?  @db.VarChar(255)
   last_name     String?  @db.VarChar(255)
-  last_activity DateTime @default(dbgenerated("('1970-01-01 00:00:00')")) @db.DateTime(0)
+  last_activity DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @db.DateTime(0)
   last_changed  BigInt?
 
   @@index([last_activity], map: "last_activity_index")
@@ -60,8 +60,8 @@ model wp_comments {
   comment_author_email String   @default("") @db.VarChar(100)
   comment_author_url   String   @default("") @db.VarChar(200)
   comment_author_IP    String   @default("") @db.VarChar(100)
-  comment_date         DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  comment_date_gmt     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  comment_date         DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  comment_date_gmt     DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   comment_content      String   @db.Text
   comment_karma        Int      @default(0)
   comment_approved     String   @default("1") @db.VarChar(20)
@@ -119,8 +119,8 @@ model wp_postmeta {
 model wp_posts {
   ID                    BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
   post_author           BigInt   @default(0) @db.UnsignedBigInt
-  post_date             DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  post_date_gmt         DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  post_date             DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  post_date_gmt         DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   post_content          String   @db.LongText
   post_title            String   @db.Text
   post_excerpt          String   @db.Text
@@ -131,8 +131,8 @@ model wp_posts {
   post_name             String   @default("") @db.VarChar(200)
   to_ping               String   @db.Text
   pinged                String   @db.Text
-  post_modified         DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  post_modified_gmt     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  post_modified         DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  post_modified_gmt     DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   post_content_filtered String   @db.LongText
   post_parent           BigInt   @default(0) @db.UnsignedBigInt
   guid                  String   @default("") @db.VarChar(255)
@@ -350,11 +350,11 @@ model wp_users {
   user_nicename       String   @default("") @db.VarChar(50)
   user_email          String   @default("") @db.VarChar(100)
   user_url            String   @default("") @db.VarChar(100)
-  user_registered     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  user_registered     DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   user_activation_key String   @default("") @db.VarChar(255)
   user_status         Int      @default(0)
   display_name        String   @default("") @db.VarChar(250)
-
+  
   @@index([user_email], map: "user_email")
   @@index([user_login], map: "user_login_key")
   @@index([user_nicename], map: "user_nicename")
@@ -384,7 +384,7 @@ model wp_wc_admin_notes {
   content_data  String?   @db.LongText
   status        String    @db.VarChar(200)
   source        String    @db.VarChar(200)
-  date_created  DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created  DateTime  @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   date_reminder DateTime? @db.DateTime(0)
   is_snoozable  Boolean   @default(false)
   layout        String    @default("") @db.VarChar(20)
@@ -454,7 +454,7 @@ model wp_wc_order_addresses {
 model wp_wc_order_coupon_lookup {
   order_id        BigInt   @db.UnsignedBigInt
   coupon_id       BigInt
-  date_created    DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created    DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   discount_amount Float    @default(0)
 
   @@id([order_id, coupon_id])
@@ -491,7 +491,7 @@ model wp_wc_order_product_lookup {
   product_id            BigInt   @db.UnsignedBigInt
   variation_id          BigInt   @db.UnsignedBigInt
   customer_id           BigInt?  @db.UnsignedBigInt
-  date_created          DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created          DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   product_qty           Int
   product_net_revenue   Float    @default(0)
   product_gross_revenue Float    @default(0)
@@ -510,10 +510,10 @@ model wp_wc_order_product_lookup {
 model wp_wc_order_stats {
   order_id           BigInt    @id @db.UnsignedBigInt
   parent_id          BigInt    @default(0) @db.UnsignedBigInt
-  date_created       DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_created_gmt   DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_paid          DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_completed     DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created       DateTime  @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_created_gmt   DateTime  @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_paid          DateTime? @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_completed     DateTime? @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   num_items_sold     Int       @default(0)
   total_sales        Float     @default(0)
   tax_total          Float     @default(0)
@@ -531,7 +531,7 @@ model wp_wc_order_stats {
 model wp_wc_order_tax_lookup {
   order_id     BigInt   @db.UnsignedBigInt
   tax_rate_id  BigInt   @db.UnsignedBigInt
-  date_created DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   shipping_tax Float    @default(0)
   order_tax    Float    @default(0)
   total_tax    Float    @default(0)
@@ -636,8 +636,8 @@ model wp_wc_reserved_stock {
   order_id       BigInt
   product_id     BigInt
   stock_quantity Float    @default(0)
-  timestamp      DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  expires        DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  timestamp      DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  expires        DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
 
   @@id([order_id, product_id])
 }
@@ -656,10 +656,10 @@ model wp_wc_webhooks {
   delivery_url      String   @db.Text
   secret            String   @db.Text
   topic             String   @db.VarChar(200)
-  date_created      DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_created_gmt  DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_modified     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  date_modified_gmt DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  date_created      DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_created_gmt  DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_modified     DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
+  date_modified_gmt DateTime @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   api_version       Int      @db.SmallInt
   failure_count     Int      @default(0) @db.SmallInt
   pending_delivery  Boolean  @default(false)
@@ -813,7 +813,7 @@ model wp_yith_wcaf_payments {
   gateway         String    @default("") @db.VarChar(255)
   status          String    @db.VarChar(255)
   amount          Float     @default(0.0000)
-  created_at      DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
+  created_at      DateTime  @default(dbgenerated("'0000-00-00 00:00:00'")) @db.DateTime(0)
   completed_at    DateTime? @db.DateTime(0)
   transaction_key String?   @db.VarChar(255)
   gateway_details String?   @db.Text
@@ -866,487 +866,4 @@ model wp_zedvance_loans {
   other_info           String?   @db.Text
   attestation          String?   @db.Text
   submitted_at         DateTime? @default(now()) @db.DateTime(0)
-}
-
-model wp_actionscheduler_actions {
-  action_id            BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  hook                 String
-  status               String    @db.VarChar(20)
-  scheduled_date_gmt   DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  scheduled_date_local DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  priority             Int       @default(10) @db.UnsignedTinyInt
-  args                 String?
-  schedule             String?   @db.LongText
-  group_id             BigInt    @default(0) @db.UnsignedBigInt
-  attempts             Int       @default(0)
-  last_attempt_gmt     DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  last_attempt_local   DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  claim_id             BigInt    @default(0) @db.UnsignedBigInt
-  extended_args        String?   @db.VarChar(8000)
-
-  @@index([args], map: "args")
-  @@index([claim_id, status, scheduled_date_gmt], map: "claim_id_status_scheduled_date_gmt")
-  @@index([group_id], map: "group_id")
-  @@index([hook(length: 163), status, scheduled_date_gmt], map: "hook_status_scheduled_date_gmt")
-  @@index([last_attempt_gmt], map: "last_attempt_gmt")
-  @@index([scheduled_date_gmt], map: "scheduled_date_gmt")
-  @@index([status, scheduled_date_gmt], map: "status_scheduled_date_gmt")
-}
-
-model wp_actionscheduler_claims {
-  claim_id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  date_created_gmt DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-
-  @@index([date_created_gmt], map: "date_created_gmt")
-}
-
-model wp_actionscheduler_groups {
-  group_id BigInt @id @default(autoincrement()) @db.UnsignedBigInt
-  slug     String @db.VarChar(255)
-
-  @@index([slug(length: 191)], map: "slug")
-}
-
-model wp_actionscheduler_logs {
-  log_id         BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  action_id      BigInt    @db.UnsignedBigInt
-  message        String    @db.Text
-  log_date_gmt   DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  log_date_local DateTime? @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-
-  @@index([action_id], map: "action_id")
-  @@index([log_date_gmt], map: "log_date_gmt")
-}
-
-model wp_bm_mentions {
-  id         BigInt              @id @default(autoincrement())
-  thread_id  BigInt
-  message_id BigInt
-  user_id    BigInt
-  type       wp_bm_mentions_type
-}
-
-model wp_bm_message_messages {
-  id         BigInt   @id @default(autoincrement())
-  thread_id  BigInt
-  sender_id  BigInt
-  message    String   @db.LongText
-  date_sent  DateTime @db.DateTime(0)
-  created_at BigInt   @default(0)
-  updated_at BigInt   @default(0)
-  temp_id    String?  @db.VarChar(50)
-
-  @@index([created_at], map: "created_at")
-  @@index([sender_id], map: "sender_id")
-  @@index([temp_id], map: "temp_id")
-  @@index([thread_id], map: "thread_id")
-  @@index([updated_at], map: "updated_at")
-}
-
-model wp_bm_message_meta {
-  meta_id       BigInt  @id @default(autoincrement())
-  bm_message_id BigInt
-  meta_key      String? @db.VarChar(255)
-  meta_value    String? @db.LongText
-
-  @@index([bm_message_id], map: "bm_message_id")
-  @@index([meta_key(length: 191)], map: "meta_key")
-}
-
-model wp_bm_message_recipients {
-  id             BigInt   @id @default(autoincrement())
-  user_id        BigInt
-  thread_id      BigInt
-  unread_count   Int      @default(0)
-  last_read      DateTime @default(dbgenerated("('1970-01-01 00:00:00')")) @db.DateTime(0)
-  last_delivered DateTime @default(dbgenerated("('1970-01-01 00:00:00')")) @db.DateTime(0)
-  last_email     DateTime @default(dbgenerated("('1970-01-01 00:00:00')")) @db.DateTime(0)
-  is_muted       Boolean  @default(false)
-  is_pinned      Boolean  @default(false)
-  is_deleted     Boolean  @default(false)
-  last_update    BigInt   @default(0)
-
-  @@unique([user_id, thread_id], map: "user_thread")
-  @@index([is_deleted], map: "is_deleted")
-  @@index([is_pinned], map: "is_pinned")
-  @@index([thread_id], map: "thread_id")
-  @@index([unread_count], map: "unread_count")
-  @@index([user_id, is_deleted, unread_count], map: "unread_count_index")
-  @@index([user_id], map: "user_id")
-}
-
-model wp_bm_moderation {
-  id         BigInt                @id @default(autoincrement())
-  user_id    BigInt
-  thread_id  BigInt
-  type       wp_bm_moderation_type
-  expiration DateTime?             @db.DateTime(0)
-  admin_id   BigInt
-  created_at DateTime              @default(now()) @db.DateTime(0)
-  updated_at DateTime              @default(now()) @db.DateTime(0)
-
-  @@unique([user_id, thread_id, type], map: "user_thread_type")
-}
-
-model wp_bm_thread_meta {
-  meta_id      BigInt  @id @default(autoincrement())
-  bm_thread_id BigInt
-  meta_key     String? @db.VarChar(255)
-  meta_value   String? @db.LongText
-
-  @@index([meta_key(length: 191)], map: "meta_key")
-  @@index([bm_thread_id], map: "thread_id")
-}
-
-model wp_bm_threads {
-  id      BigInt             @id @default(autoincrement())
-  subject String             @db.VarChar(255)
-  type    wp_bm_threads_type @default(thread)
-}
-
-model wp_e_events {
-  id         BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
-  event_data String?  @db.Text
-  created_at DateTime @db.DateTime(0)
-
-  @@index([created_at], map: "created_at_index")
-}
-
-model wp_gla_budget_recommendations {
-  id           BigInt @id @default(autoincrement())
-  currency     String @db.VarChar(3)
-  country      String @db.VarChar(2)
-  daily_budget Int
-
-  @@unique([country, currency], map: "country_currency")
-}
-
-model wp_gla_merchant_issues {
-  id                   BigInt   @id @default(autoincrement())
-  product_id           BigInt
-  issue                String   @db.VarChar(200)
-  code                 String   @db.VarChar(100)
-  severity             String   @default("warning") @db.VarChar(20)
-  product              String   @db.VarChar(100)
-  action               String   @db.Text
-  action_url           String   @db.VarChar(1024)
-  applicable_countries String   @db.Text
-  source               String   @default("mc") @db.VarChar(10)
-  type                 String   @default("product") @db.VarChar(10)
-  created_at           DateTime @db.DateTime(0)
-}
-
-model wp_links {
-  link_id          BigInt   @id @default(autoincrement()) @db.UnsignedBigInt
-  link_url         String   @default("") @db.VarChar(255)
-  link_name        String   @default("") @db.VarChar(255)
-  link_image       String   @default("") @db.VarChar(255)
-  link_target      String   @default("") @db.VarChar(25)
-  link_description String   @default("") @db.VarChar(255)
-  link_visible     String   @default("Y") @db.VarChar(20)
-  link_owner       BigInt   @default(1) @db.UnsignedBigInt
-  link_rating      Int      @default(0)
-  link_updated     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  link_rel         String   @default("") @db.VarChar(255)
-  link_notes       String   @db.MediumText
-  link_rss         String   @default("") @db.VarChar(255)
-
-  @@index([link_visible], map: "link_visible")
-}
-
-model wp_litespeed_url {
-  id         BigInt @id @default(autoincrement())
-  url        String @unique(map: "url", length: 191) @db.VarChar(500)
-  cache_tags String @default("") @db.VarChar(1000)
-
-  @@index([cache_tags(length: 191)], map: "cache_tags")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model wp_litespeed_url_file {
-  id       BigInt @id @default(autoincrement())
-  url_id   BigInt
-  vary     String @default("") @db.VarChar(32)
-  filename String @default("") @db.VarChar(32)
-  type     Int    @db.TinyInt
-  mobile   Int    @db.TinyInt
-  webp     Int    @db.TinyInt
-  expired  Int    @default(0)
-
-  @@index([filename], map: "filename")
-  @@index([filename, expired], map: "filename_2")
-  @@index([type], map: "type")
-  @@index([url_id, expired], map: "url_id")
-  @@index([url_id, vary, type], map: "url_id_2")
-}
-
-model wp_options {
-  option_id    BigInt @id @default(autoincrement()) @db.UnsignedBigInt
-  option_name  String @unique(map: "option_name") @default("")
-  option_value String @db.LongText
-  autoload     String @default("yes") @db.VarChar(20)
-
-  @@index([autoload], map: "autoload")
-}
-
-model wp_slicewp_creatives {
-  id            BigInt   @id @default(autoincrement())
-  name          String   @db.Text
-  description   String   @db.LongText
-  date_created  DateTime @db.DateTime(0)
-  date_modified DateTime @db.DateTime(0)
-  type          String   @db.TinyText
-  image_url     String   @db.Text
-  alt_text      String   @db.Text
-  text          String   @db.Text
-  landing_url   String   @db.Text
-  status        String   @db.TinyText
-}
-
-model wp_slicewp_notes {
-  id             BigInt   @id @default(autoincrement())
-  object_context String   @db.MediumText
-  object_id      BigInt?
-  user_id        BigInt
-  date_created   DateTime @db.DateTime(0)
-  note_content   String   @db.LongText
-}
-
-model wp_snippets {
-  id          BigInt   @id @default(autoincrement())
-  name        String   @db.TinyText
-  description String   @db.Text
-  code        String   @db.LongText
-  tags        String   @db.LongText
-  scope       String   @default("global") @db.VarChar(15)
-  priority    Int      @default(10) @db.SmallInt
-  active      Boolean  @default(false)
-  modified    DateTime @default(now()) @db.DateTime(0)
-  revision    BigInt   @default(1)
-  cloud_id    String?  @db.VarChar(255)
-
-  @@index([active], map: "active")
-  @@index([scope], map: "scope")
-}
-
-model wp_term_relationships {
-  object_id        BigInt @default(0) @db.UnsignedBigInt
-  term_taxonomy_id BigInt @default(0) @db.UnsignedBigInt
-  term_order       Int    @default(0)
-
-  @@id([object_id, term_taxonomy_id])
-  @@index([term_taxonomy_id], map: "term_taxonomy_id")
-}
-
-model wp_woocommerce_attribute_taxonomies {
-  attribute_id      BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
-  attribute_name    String  @db.VarChar(200)
-  attribute_label   String? @db.VarChar(200)
-  attribute_type    String  @db.VarChar(20)
-  attribute_orderby String  @db.VarChar(20)
-  attribute_public  Int     @default(1)
-
-  @@index([attribute_name(length: 20)], map: "attribute_name")
-}
-
-model wp_woocommerce_downloadable_product_permissions {
-  permission_id       BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
-  download_id         String    @db.VarChar(36)
-  product_id          BigInt    @db.UnsignedBigInt
-  order_id            BigInt    @default(0) @db.UnsignedBigInt
-  order_key           String    @db.VarChar(200)
-  user_email          String    @db.VarChar(200)
-  user_id             BigInt?   @db.UnsignedBigInt
-  downloads_remaining String?   @db.VarChar(9)
-  access_granted      DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  access_expires      DateTime? @db.DateTime(0)
-  download_count      BigInt    @default(0) @db.UnsignedBigInt
-
-  @@index([product_id, order_id, order_key(length: 16), download_id], map: "download_order_key_product")
-  @@index([download_id, order_id, product_id], map: "download_order_product")
-  @@index([order_id], map: "order_id")
-  @@index([user_id, order_id, downloads_remaining, access_expires], map: "user_order_remaining_expires")
-}
-
-model wp_woocommerce_shipping_zone_locations {
-  location_id   BigInt @id @default(autoincrement()) @db.UnsignedBigInt
-  zone_id       BigInt @db.UnsignedBigInt
-  location_code String @db.VarChar(200)
-  location_type String @db.VarChar(40)
-
-  @@index([location_type(length: 10), location_code(length: 20)], map: "location_type_code")
-  @@index([zone_id], map: "zone_id")
-}
-
-model wp_woocommerce_shipping_zone_methods {
-  zone_id      BigInt  @db.UnsignedBigInt
-  instance_id  BigInt  @id @default(autoincrement()) @db.UnsignedBigInt
-  method_id    String  @db.VarChar(200)
-  method_order BigInt  @db.UnsignedBigInt
-  is_enabled   Boolean @default(true)
-}
-
-model wp_woocommerce_tax_rate_locations {
-  location_id   BigInt @id @default(autoincrement()) @db.UnsignedBigInt
-  location_code String @db.VarChar(200)
-  tax_rate_id   BigInt @db.UnsignedBigInt
-  location_type String @db.VarChar(40)
-
-  @@index([location_type(length: 10), location_code(length: 20)], map: "location_type_code")
-  @@index([tax_rate_id], map: "tax_rate_id")
-}
-
-model wp_wp_phpmyadmin_extension__errors_log {
-  id            Int       @id @unique(map: "id") @default(autoincrement())
-  gmdate        DateTime? @db.DateTime(0)
-  function_name String    @db.LongText
-  function_args String    @db.LongText
-  message       String    @db.LongText
-}
-
-model wp_wpforms_logs {
-  id        BigInt   @id @default(autoincrement())
-  title     String   @db.VarChar(255)
-  message   String   @db.LongText
-  types     String   @db.VarChar(255)
-  create_at DateTime @db.DateTime(0)
-  form_id   BigInt?
-  entry_id  BigInt?
-  user_id   BigInt?
-}
-
-model wp_wpforms_payments {
-  id                  BigInt   @id @default(autoincrement())
-  form_id             BigInt
-  status              String   @default("") @db.VarChar(10)
-  subtotal_amount     Decimal  @default(0.00000000) @db.Decimal(26, 8)
-  discount_amount     Decimal  @default(0.00000000) @db.Decimal(26, 8)
-  total_amount        Decimal  @default(0.00000000) @db.Decimal(26, 8)
-  currency            String   @default("") @db.VarChar(3)
-  entry_id            BigInt   @default(0)
-  gateway             String   @default("") @db.VarChar(20)
-  type                String   @default("") @db.VarChar(12)
-  mode                String   @default("") @db.VarChar(4)
-  transaction_id      String   @default("") @db.VarChar(40)
-  customer_id         String   @default("") @db.VarChar(40)
-  subscription_id     String   @default("") @db.VarChar(40)
-  subscription_status String   @default("") @db.VarChar(10)
-  title               String   @default("") @db.VarChar(255)
-  date_created_gmt    DateTime @db.DateTime(0)
-  date_updated_gmt    DateTime @db.DateTime(0)
-  is_published        Boolean  @default(true)
-
-  @@index([customer_id(length: 32)], map: "customer_id")
-  @@index([form_id], map: "form_id")
-  @@index([status(length: 8)], map: "status")
-  @@index([subscription_id(length: 32)], map: "subscription_id")
-  @@index([subscription_status(length: 8)], map: "subscription_status")
-  @@index([title(length: 64)], map: "title")
-  @@index([total_amount], map: "total_amount")
-  @@index([transaction_id(length: 32)], map: "transaction_id")
-  @@index([type(length: 8)], map: "type")
-}
-
-model wp_wpmailsmtp_debug_events {
-  id         Int      @id @default(autoincrement()) @db.UnsignedInt
-  content    String?  @db.Text
-  initiator  String?  @db.Text
-  event_type Int      @default(0) @db.UnsignedTinyInt
-  created_at DateTime @default(now()) @db.Timestamp(0)
-}
-
-model wp_yith_wcaf_clicks {
-  ID           BigInt    @id @default(autoincrement())
-  affiliate_id BigInt
-  link         String    @db.VarChar(255)
-  origin       String?   @db.VarChar(255)
-  origin_base  String?   @db.VarChar(255)
-  IP           String    @db.VarChar(15)
-  click_date   DateTime  @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  order_id     BigInt?
-  conv_date    DateTime? @db.DateTime(0)
-  conv_time    BigInt?
-
-  @@index([affiliate_id], map: "external_affiliate")
-  @@index([order_id], map: "external_order")
-}
-
-model wp_yith_wcaf_commission_notes {
-  ID            BigInt   @id @default(autoincrement())
-  commission_id BigInt
-  note_content  String   @db.Text
-  note_date     DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-
-  @@index([commission_id], map: "external_commission")
-}
-
-model wp_yith_wcaf_commissions {
-  ID           BigInt   @id @default(autoincrement())
-  order_id     BigInt
-  line_item_id BigInt
-  product_id   BigInt
-  product_name String   @db.Text
-  affiliate_id BigInt
-  rate         Decimal  @db.Decimal(4, 2)
-  line_total   Float    @default(0.000)
-  amount       Float    @default(0.000)
-  refunds      Float    @default(0.000)
-  status       String   @db.VarChar(255)
-  created_at   DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-  last_edit    DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-
-  @@index([affiliate_id], map: "external_affiliate")
-  @@index([line_item_id], map: "external_line_item")
-  @@index([order_id], map: "external_order")
-  @@index([product_id], map: "external_product")
-}
-
-model wp_yith_wcaf_payment_commission {
-  ID            BigInt @id @default(autoincrement())
-  payment_id    BigInt
-  commission_id BigInt
-
-  @@index([commission_id], map: "external_commission")
-  @@index([payment_id], map: "external_payment")
-}
-
-model wp_yith_wcaf_payment_notes {
-  ID           BigInt   @id @default(autoincrement())
-  payment_id   BigInt
-  note_content String   @db.Text
-  note_date    DateTime @default(dbgenerated("('0000-00-00 00:00:00')")) @db.DateTime(0)
-
-  @@index([payment_id], map: "external_payment")
-}
-
-model wp_yith_wcwl {
-  ID                BigInt   @id @default(autoincrement())
-  prod_id           BigInt
-  quantity          Int
-  user_id           BigInt?
-  wishlist_id       BigInt?
-  position          Int?     @default(0)
-  original_price    Decimal? @db.Decimal(9, 3)
-  original_currency String?  @db.Char(3)
-  dateadded         DateTime @default(now()) @db.Timestamp(0)
-  on_sale           Int      @default(0) @db.TinyInt
-
-  @@index([prod_id], map: "prod_id")
-}
-
-enum wp_bm_threads_type {
-  thread
-  group
-  chat_room @map("chat-room")
-}
-
-enum wp_bm_moderation_type {
-  ban
-  mute
-}
-
-enum wp_bm_mentions_type {
-  mention
-  reply
-  reaction
 }

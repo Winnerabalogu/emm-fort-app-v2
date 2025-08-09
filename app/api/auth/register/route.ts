@@ -14,17 +14,32 @@ const wpPasswordHasher = new PasswordHash(8, false);
 export async function POST(request: NextRequest) {
   try {
     const { email, username, password, fullName, phone, referral } = RegisterSchema.parse(await request.json());
+    
     const existingAppUser = await prisma.user.findFirst({
       where: { OR: [{ email: { equals: email, mode: 'insensitive' } }, { username }] },
     });
+    
     const existingWpUser = await prismaWp.wp_users.findFirst({
       where: { OR: [{ user_email: email }, { user_login: username }] },
-    });
-
-    if (existingAppUser || existingWpUser) {
-      return NextResponse.json({ error: 'User with this email or username already exists' }, { status: 409 });
+    });    
+    if (existingAppUser && existingWpUser) {
+      return NextResponse.json({ 
+        error: 'User with this email or username already exists in both systems' 
+      }, { status: 409 });
     }
-
+    
+    if (existingAppUser && !existingWpUser) {      
+      return NextResponse.json({ 
+        error: 'Account exists in our system but not in WordPress. Please contact support.' 
+      }, { status: 409 });
+    }
+    
+    if (!existingAppUser && existingWpUser) {      
+      return NextResponse.json({ 
+        error: 'User already exists in our affiliate system. Please try logging in or contact support.' 
+      }, { status: 409 });
+    }    
+    
     // --- Prepare Data ---
     const appHashedPassword = await bcrypt.hash(password, 10);
     const wpHashedPassword = wpPasswordHasher.hashPassword(password);
@@ -63,11 +78,8 @@ export async function POST(request: NextRequest) {
         password: appHashedPassword,
         verificationToken, verificationTokenExpiry,
       },
-    });
-
-    // Use a try/catch block for the WordPress operations to allow for a rollback
-    try {
-      // 2. Create the user in the WordPress DB
+    });    
+    try {      
       const wpUser = await prismaWp.wp_users.create({
         data: {
           user_login: username,
@@ -77,9 +89,7 @@ export async function POST(request: NextRequest) {
           display_name: fullName,
           user_registered: new Date(),
         }
-      });
-
-      // 3. Create the necessary metadata for the WP user
+      });      
       await prismaWp.wp_usermeta.createMany({
         data: [
           { user_id: wpUser.ID, meta_key: 'nickname', meta_value: username },
@@ -91,7 +101,7 @@ export async function POST(request: NextRequest) {
       });
 
       // 4. Create the affiliate record in SliceWP
-       await prismaWp.wp_slicewp_affiliates.create({
+      await prismaWp.wp_slicewp_affiliates.create({
         data: {
           user_id: wpUser.ID,
           status: 'pending',
