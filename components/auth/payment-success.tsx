@@ -13,8 +13,10 @@ const SuccessLoader = () => (
       ></div>
     </div>
 );
+
 export default function PaymentSuccessPage() {
   const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
@@ -30,17 +32,22 @@ export default function PaymentSuccessPage() {
           // Loading State
           <div className="fade-in flex flex-col items-center">
             <SuccessLoader />
-            <h1 className="mt-6 text-2xl font-bold text-gray-800">Confirming Your Payment</h1>
+            <h1 className="mt-6 text-2xl font-bold text-gray-800">Confirming Your Subscription</h1>
             <p className="mt-2 text-gray-600">Please wait while we finalize your subscription. This won&apos;t take long.</p>
           </div>
         ) : (
           // Success State
           <div className="fade-in flex flex-col items-center">
             <CheckCircle className="mx-auto h-20 w-20 text-green-500" />
-            <h1 className="mt-4 text-3xl font-bold text-gray-900">Payment Successful!</h1>
+            <h1 className="mt-4 text-3xl font-bold text-gray-900">Subscription Successful!</h1>
             <p className="mt-2 text-lg text-gray-600">
-              Your account has been upgraded. Please log in to access your new dashboard.
+              Your account has been upgraded successfully. Check your email for confirmation details.
             </p>
+            <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+              <p className="text-sm text-blue-800">
+                📧 A confirmation email has been sent with your subscription details and next steps.
+              </p>
+            </div>
             <div className="mt-8">
               <Link 
                 href="/auth/login" 

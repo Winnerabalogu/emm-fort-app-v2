@@ -51,19 +51,29 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   },
   callbacks: {    
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+  const isLoggedIn = !!auth?.user;
+  const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
 
-      if (isOnDashboard) {
-        if (isLoggedIn) return true; 
-        return false; 
-      } else if (isLoggedIn) {    
-        if (nextUrl.pathname.startsWith('/auth')) {        
-          return Response.redirect(new URL('/dashboard', nextUrl));
-        }
-      }      
+  if (isOnDashboard) {
+    if (isLoggedIn) return true; 
+    return false; 
+  } else if (isLoggedIn) {        
+    const allowedAuthPagesWhenLoggedIn = [
+      '/auth/tier-selection',
+      // Add future onboarding pages here as needed
+      // '/auth/setup-profile',
+      // '/auth/welcome',
+    ];        
+    if (allowedAuthPagesWhenLoggedIn.includes(nextUrl.pathname)) {
       return true;
-    },
+    }
+    // Redirect away from other auth pages (login, register, etc.)
+    if (nextUrl.pathname.startsWith('/auth')) {        
+      return Response.redirect(new URL('/dashboard', nextUrl));
+    }
+  }      
+  return true;
+},
 
     async jwt({ token, user, trigger }) {            
       if (user) {
