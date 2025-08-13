@@ -60,4 +60,55 @@ export type CachedUserData = {
   emailVerified: Date | null;
   subscriptionStartDate: Date | null;
   image?: string | null;
-};;
+  role: string; // <-- ADDED: Include role in cached user data
+};
+
+export interface User {
+  id: string;
+  username: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+  tier: string;
+  isVerified: boolean;
+  subscriptionStartDate: string | null;
+  subscriptionExpiryDate: string | null;
+  createdAt: string;
+  totalCommissions: number;
+  directReferrals: number;
+}
+export interface SaveRequest {
+  id: string;
+  amount: number;
+  purpose: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    fullName: string;
+    username: string;
+    email: string;
+    tier: string;
+  };
+}
+export interface WithdrawalRequest {
+  id: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: string;
+    fullName: string;
+    username: string;
+    email: string;
+    tier: string;
+    withdrawalDetails: {
+      bankName: string;
+      firstName: string;
+      lastName: string;
+      accountNumber: string;
+    } | null;
+  };
+}

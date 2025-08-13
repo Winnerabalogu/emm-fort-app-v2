@@ -2,6 +2,9 @@
 
 import { Tier } from '@/lib/types';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { SaveRequest } from '@/lib/types';
+import {User} from '@/lib/types';
+import { WithdrawalRequest } from '@/lib/types';
 
 type ModalPayload = {
   tierName?: string;
@@ -10,16 +13,43 @@ type ModalPayload = {
   paidDownlines?: number; 
   downlineId?: string;
   balance?: number; 
+  component?: ReactNode;
+  transaction?: Transaction;
+  user?: User;
+   onEdit?: (user: User) => void;
+   withdrawal?: WithdrawalRequest;
+  onSuccess?: () => void;   
+   saveRequest?: SaveRequest;
 };
-
-type ModalType = 'TIER_OVERVIEW' | 'UPGRADE_TIER' | 'PAYMENT' | 'ADD_DOWNLINE'| 'DOWNLINE_OVERVIEW'| 'ADD_DOWNLINE'| 'WITHDRAWAL'| 'SAVE';
+interface Transaction {
+  id: string;
+  type: string;
+  amount: number;
+  status: string;
+  createdAt: string;
+  user: {
+    id: string;
+    fullName: string;
+    username: string;
+    email: string;
+    tier: string;
+  };
+  sourceUser?: {
+    id: string;
+    fullName: string;
+    username: string;
+    tier: string;
+  };
+}
+type ModalType = 'TIER_OVERVIEW' | 'UPGRADE_TIER' | 'PAYMENT' | 'ADD_DOWNLINE'| 'DOWNLINE_OVERVIEW'| 'ADD_DOWNLINE'| 'WITHDRAWAL'| 'SAVE'|'CREATE_TRANSACTION' | 'VIEW_TRANSACTION' | 'EDIT_TRANSACTION' | 'CREATE_USER' | 'VIEW_USER' | 'EDIT_USER' | 'VIEW_WITHDRAWAL'| 'CREATE_COMMISSION' | 'VIEW_SAVE_REQUEST';
 
 interface ModalContextType {
   isOpen: boolean;
   modalType: ModalType | null;
   payload: ModalPayload | null;
   openModal: (type: ModalType, payload?: ModalPayload) => void;
-  closeModal: () => void;
+  closeModal: () => void;    
+  onSuccess?: () => void;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);

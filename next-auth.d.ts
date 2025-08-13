@@ -8,6 +8,7 @@ declare module 'next-auth' {
       fullName: string;
       username: string;
       tier: Tier;
+      
       emailVerified: Date | null;
       subscriptionStartDate: Date | null;
     } & DefaultSession['user']; 
@@ -21,6 +22,7 @@ declare module 'next-auth' {
     tier: Tier;
     emailVerified: Date | null;
     subscriptionStartDate: Date | null;
+    role: string; // <-- ADDED: Include role in user type
   }
 }
 

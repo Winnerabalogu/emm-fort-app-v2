@@ -1,6 +1,5 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.0.x"]
+  provider      = "prisma-client-js"  
 }
 
 datasource db {
@@ -21,7 +20,8 @@ model User {
   subscriptionId          String?
   subscriptionStartDate   DateTime?
   subscriptionExpiryDate  DateTime?
-  emailVerified           DateTime?
+  emailVerified           DateTime?           
+  role                    Role                @default(USER)               
   verificationToken       String?             @unique
   verificationTokenExpiry DateTime?
   resetToken              String?   
@@ -68,6 +68,7 @@ model SaveRequest {
   id        String   @id @default(cuid())
   amount    Float
   purpose   String
+  adminNote String?
   status    String   @default("PENDING")
   userId    String
   createdAt DateTime @default(now())
@@ -84,6 +85,7 @@ model Transaction {
   status       String
   createdAt    DateTime @default(now())
   userId       String
+  description String?
   sourceUserId String?
   sourceUser   User?    @relation("CommissionSource", fields: [sourceUserId], references: [id])
   user         User     @relation(fields: [userId], references: [id])
@@ -99,4 +101,8 @@ enum Tier {
   SILVER
   BRONZE
   BASIC
+}
+enum Role {
+  USER
+  ADMIN
 }

@@ -19,6 +19,7 @@
       }
     ],
  "paths": {
+      "@/components/*": ["./components/*"],
       "@/*": ["./*"],
      ".prisma/wordpress-client": ["../generated/wordpress-client"]
     }
