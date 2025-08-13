@@ -24,7 +24,8 @@ build/
 generated
 prisma/generated/
 app/generated/prisma/
-
+components/admin/notes.txt
+emmy.zip
 # ─── Environment Variables ───────────────────────────────────────────
 .env*
 *.pem
