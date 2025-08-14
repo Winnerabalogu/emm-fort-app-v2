@@ -607,7 +607,7 @@ export const sendNewSaveRequestEmail = async (userEmail: string, amount: number,
   console.log(`Save request notification sent to admin for ${userEmail}`);
 };
 
-export const sendPasswordResetEmail = async (email: string, resetToken: string, p0: boolean) => {
+export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
   const resetUrl = `${siteUrl}/auth/reset-password?token=${resetToken}`;
   
   const emailHtml = `

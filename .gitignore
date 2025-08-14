@@ -21,6 +21,7 @@ out/
 build/
 
 # ─── Prisma Generated ────────────────────────────────────────────────
+generated/
 generated
 prisma/generated/
 app/generated/prisma/
