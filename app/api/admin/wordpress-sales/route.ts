@@ -1,11 +1,12 @@
 // app/api/admin/wordpress-sales/route.ts
 export const runtime = 'nodejs';
-
 import { NextRequest, NextResponse } from 'next/server';
 import { withAdmin } from '@/lib/auth-admin';
 import { prismaWp } from '@/lib/prisma-wp';
 import { processCommissions } from '@/lib/commissionService';
 import { z } from 'zod';
+import type { Prisma } from '@/generated/wordpress-client';
+
 
 // Schema for WordPress sale data
 const WordPressSaleSchema = z.object({
@@ -29,9 +30,7 @@ const ProcessSalesSchema = z.object({
   }))
 });
 
-
-// Infer the where input type from the Prisma client
-type Wp_wc_ordersWhereInput = Parameters<typeof prismaWp.wp_wc_orders.findMany>[0]['where'];
+type Wp_wc_ordersWhereInput = Prisma.wp_wc_ordersWhereInput;
 
 // GET: Fetch WordPress sales with filters
 export const GET = withAdmin(async (req: NextRequest) => {
@@ -69,7 +68,7 @@ export const GET = withAdmin(async (req: NextRequest) => {
       // Add email search (billing_email supports string operations)
       if (search.includes('@') || !searchAsNumber) {
         searchConditions.push({
-          billing_email: { contains: search, mode: 'insensitive' }
+          billing_email: { contains: search }
         });
       }
       

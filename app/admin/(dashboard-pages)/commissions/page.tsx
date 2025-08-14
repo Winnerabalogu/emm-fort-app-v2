@@ -165,7 +165,7 @@ export default function AdminCommissionsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -185,11 +185,11 @@ export default function AdminCommissionsPage() {
       {/* Stats Cards */}
       <CommissionStatsCards stats={stats} loading={loading} />
 
-      {/* Two Column Layout */}
-      <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
+      {/* Two Column Layout - Better proportions */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         
         {/* Main Content - Commission Table */}
-        <div className="xl:col-span-3 space-y-4">
+        <div className="lg:col-span-8 space-y-6">
           {/* Filters */}
           <CommissionFilters
             searchInput={searchInput}
@@ -218,41 +218,41 @@ export default function AdminCommissionsPage() {
                   <table className="w-full">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Recipient</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Source</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                        <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {commissions.map((commission) => (
                         <tr key={commission.id} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <User className="h-8 w-8 text-gray-400 mr-3" />
+                              <User className="h-10 w-10 text-gray-400 mr-4" />
                               <div>
                                 <div className="text-sm font-medium text-gray-900">{commission.user.fullName}</div>
-                                <div className="text-sm text-gray-500">@{commission.user.username}</div>
-                                <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getTierColor(commission.user.tier)}`}>
+                                <div className="text-sm text-gray-500 mb-1">@{commission.user.username}</div>
+                                <span className={`inline-flex px-2.5 py-1 text-xs font-medium rounded-full ${getTierColor(commission.user.tier)}`}>
                                   {commission.user.tier}
                                 </span>
                               </div>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${getTypeColor(commission.type)}`}>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className={`inline-flex px-3 py-1.5 text-xs font-medium rounded-full ${getTypeColor(commission.type)}`}>
                               {commission.type}
                             </span>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-5 whitespace-nowrap">
                             <div className="flex items-center">
-                              <ArrowUpRight className="h-4 w-4 text-green-600 mr-1" />
-                              <span className="text-sm font-medium text-gray-900">{formatCurrency(commission.amount)}</span>
+                              <ArrowUpRight className="h-4 w-4 text-green-600 mr-2" />
+                              <span className="text-sm font-semibold text-gray-900">{formatCurrency(commission.amount)}</span>
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
+                          <td className="px-6 py-5 whitespace-nowrap">
                             {commission.sourceUser ? (
                               <div className="text-sm">
                                 <p className="font-medium text-gray-900">{commission.sourceUser.fullName}</p>
@@ -262,16 +262,16 @@ export default function AdminCommissionsPage() {
                               <span className="text-gray-400 text-sm">System Generated</span>
                             )}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500">
                             <div className="flex items-center">
-                              <Calendar className="h-4 w-4 mr-1" />
+                              <Calendar className="h-4 w-4 mr-2" />
                               {formatDate(commission.createdAt)}
                             </div>
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-medium">
                             <button
                               onClick={() => handleViewTransaction(commission)}
-                              className="text-blue-600 hover:text-blue-900 transition-colors"
+                              className="text-blue-600 hover:text-blue-900 transition-colors p-2 hover:bg-blue-50 rounded-md"
                             >
                               <Eye className="h-4 w-4" />
                             </button>
@@ -283,7 +283,7 @@ export default function AdminCommissionsPage() {
                 </div>
 
                 {/* Pagination */}
-                <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div className="bg-white px-6 py-4 flex items-center justify-between border-t border-gray-200">
                   <div className="flex-1 flex justify-between sm:hidden">
                     <button
                       onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
@@ -313,14 +313,14 @@ export default function AdminCommissionsPage() {
                         <button
                           onClick={() => setPagination(prev => ({ ...prev, page: Math.max(1, prev.page - 1) }))}
                           disabled={pagination.page === 1}
-                          className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                          className="relative inline-flex items-center px-3 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                         >
                           Previous
                         </button>
                         <button
                           onClick={() => setPagination(prev => ({ ...prev, page: Math.min(prev.pages, prev.page + 1) }))}
                           disabled={pagination.page === pagination.pages}
-                          className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+                          className="relative inline-flex items-center px-3 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                         >
                           Next
                         </button>
@@ -330,8 +330,8 @@ export default function AdminCommissionsPage() {
                 </div>
               </>
             ) : (
-              <div className="text-center py-12">
-                <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <div className="text-center py-16">
+                <CreditCard className="h-16 w-16 text-gray-400 mx-auto mb-6" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No commissions found</h3>
                 <p className="text-gray-500">No commission transactions match your current filters.</p>
               </div>
@@ -340,7 +340,7 @@ export default function AdminCommissionsPage() {
         </div>
 
         {/* Sidebar - Top Earners */}
-        <div className="xl:col-span-1">
+        <div className="lg:col-span-4">
           <TopEarnersCard 
             topEarners={stats?.topEarners || []} 
             loading={loading} 

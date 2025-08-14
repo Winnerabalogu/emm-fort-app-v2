@@ -13,6 +13,7 @@ import {
   Award
 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import RevenueByTierChart from '@/components/admin/reports/RevenueByTierChart';
 
 interface TierDistribution {
   [key: string]: number;
@@ -347,33 +348,23 @@ export default function AdminTierManagementPage() {
       </div>
 
       {/* Revenue by Tier Chart */}
-      {stats && (
-        <div className="bg-white p-6 rounded-lg border">
-          <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-            <DollarSign className="h-5 w-5 text-green-600 mr-2" />
-            Revenue by Tier (Last 3 Months)
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-            {Object.entries(stats.tierRevenue).map(([tier, revenue]) => (
-              <div key={tier} className={`p-4 rounded-lg border ${getTierColor(tier)}`}>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    {getTierIcon(tier)}
-                    <span className="ml-2 font-medium">{tier}</span>
-                  </div>
-                </div>
-                <div className="mt-2">
-                  <p className="text-lg font-bold">{formatCurrency(revenue)}</p>
-                  <p className="text-xs opacity-75">
-                    {stats.tierDistribution[tier] || 0} users
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+     {stats && (
+  <div className="bg-white p-6 rounded-lg border">
+    <RevenueByTierChart 
+      data={Object.entries(stats.tierRevenue).map(([tier, revenue]) => ({
+        tier,
+        revenue,
+        userCount: stats.tierDistribution[tier] || 0,
+        averagePerUser: stats.tierDistribution[tier] > 0 ? revenue / stats.tierDistribution[tier] : 0,
+        percentage: Object.values(stats.tierRevenue).reduce((sum, val) => sum + val, 0) > 0 
+          ? (revenue / Object.values(stats.tierRevenue).reduce((sum, val) => sum + val, 0)) * 100 
+          : 0
+      }))}
+      loading={loading}
+      period="Last 3 Months"
+    />
+  </div>
+)}
     </div>
   );
 }

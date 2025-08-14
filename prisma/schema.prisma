@@ -36,10 +36,25 @@ model User {
   referredUsers           User[]              @relation("Referrals")
   withdrawalDetails       WithdrawalDetails?
   withdrawalRequests      WithdrawalRequest[]
+  platformSettingsUpdates PlatformSettings[]  @relation("SettingsUpdatedBy")
 
   @@index([email, emailVerified], map: "User_email_verified_idx")
   @@index([id, tier, subscriptionStartDate], map: "User_id_tier_subscription_idx")
   @@index([tier])
+}
+
+model PlatformSettings {
+  id        String   @id @default(cuid())
+  section   String   @unique
+  data      Json
+  updatedBy String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  updatedByUser User @relation("SettingsUpdatedBy", fields: [updatedBy], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  
+  @@index([updatedBy])
+  @@index([updatedAt(sort: Desc)])
 }
 
 model WithdrawalDetails {
@@ -102,6 +117,7 @@ enum Tier {
   BRONZE
   BASIC
 }
+
 enum Role {
   USER
   ADMIN

@@ -55,32 +55,44 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
   },
   callbacks: {    
     authorized({ auth, request: { nextUrl } }) {
-      const isLoggedIn = !!auth?.user;
-      const userRole = auth?.user?.role;
-      const isOnAdminRoute = nextUrl.pathname.startsWith('/admin');
-      const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');      
-      if (isOnAdminRoute) {
-        if (isLoggedIn && userRole === 'ADMIN') {
-          return true;
-        }
-        return false; 
-      }      
-      if (isOnDashboard) {
-        if (isLoggedIn) return true; 
-        return false; 
-      }            
-      if (isLoggedIn) {
-        const allowedAuthPagesWhenLoggedIn = ['/auth/tier-selection'];
-        if (allowedAuthPagesWhenLoggedIn.includes(nextUrl.pathname)) {
-          return true;
-        }
-        if (nextUrl.pathname.startsWith('/auth')) {
-          return Response.redirect(new URL('/dashboard', nextUrl));
-        }
-      }      
+  const isLoggedIn = !!auth?.user;
+  const userRole = auth?.user?.role;
+  const isOnAdminRoute = nextUrl.pathname.startsWith('/admin');
+  const isOnAdminLogin = nextUrl.pathname === '/admin/auth/login';
+  const isOnDashboard = nextUrl.pathname.startsWith('/dashboard');
+  
+  // Admin route protection
+  if (isOnAdminRoute && !isOnAdminLogin) {
+    if (!isLoggedIn || userRole !== 'ADMIN') {
+      return false; // Will redirect to /admin/login via pages config
+    }
+    return true;
+  }
+  
+  // If admin trying to access admin login when already logged in
+  if (isOnAdminLogin && isLoggedIn && userRole === 'ADMIN') {
+    return Response.redirect(new URL('/admin/overview', nextUrl));
+  }
+  
+  // Your existing logic for regular routes...
+  if (isOnDashboard) {
+    if (isLoggedIn) return true; 
+    return false; 
+  }
+  
+  // Rest of your existing authorized logic...
+  if (isLoggedIn) {
+    const allowedAuthPagesWhenLoggedIn = ['/auth/tier-selection'];
+    if (allowedAuthPagesWhenLoggedIn.includes(nextUrl.pathname)) {
       return true;
-    },
-
+    }
+    if (nextUrl.pathname.startsWith('/auth')) {
+      return Response.redirect(new URL('/dashboard', nextUrl));
+    }
+  }
+  
+  return true;
+},
     async jwt({ token, user, trigger }) {      
       if (user) {
         token.id = user.id;

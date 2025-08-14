@@ -607,7 +607,7 @@ export const sendNewSaveRequestEmail = async (userEmail: string, amount: number,
   console.log(`Save request notification sent to admin for ${userEmail}`);
 };
 
-export const sendPasswordResetEmail = async (email: string, resetToken: string) => {
+export const sendPasswordResetEmail = async (email: string, resetToken: string, p0: boolean) => {
   const resetUrl = `${siteUrl}/auth/reset-password?token=${resetToken}`;
   
   const emailHtml = `
@@ -683,5 +683,110 @@ export const sendPasswordResetEmail = async (email: string, resetToken: string) 
   } catch (error) {
     console.error('Failed to send password reset email:', error);
     throw new Error('Failed to send password reset email');
+  }
+};
+
+export const sendAdminPasswordResetEmail = async (email: string, resetToken: string) => {
+  const resetUrl = `${siteUrl}/admin/auth/reset-password?token=${resetToken}`;
+  
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Password Reset - EMM-Fort Group</title>
+        ${getBaseEmailStyles()}
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">EMM-Fort Group</div>
+                <h1 class="title">🔐 Admin Password Reset</h1>
+                <p class="subtitle">Secure admin access password reset request</p>
+            </div>
+            
+            <div class="content">
+                <p>Hello Administrator,</p>
+                <p>A password reset has been requested for your admin account. For security, this reset link is only valid for <strong>1 hour</strong> and can only be used once.</p>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${resetUrl}" class="button">Reset Admin Password</a>
+                </div>
+                
+                <div class="warning-box">
+                    <strong>🔒 Security Notice:</strong>
+                    <ul style="margin: 10px 0;">
+                        <li>This link expires in <strong>60 minutes</strong></li>
+                        <li>Only use this link from a secure, trusted device</li>
+                        <li>Admin passwords must be at least 12 characters</li>
+                        <li>Never share this reset link with anyone</li>
+                    </ul>
+                </div>
+                
+                <p>If the button doesn't work, copy and paste this secure link:</p>
+                <p style="color: #f97316; word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 4px; font-family: monospace;">${resetUrl}</p>
+                
+                <div class="info-box">
+                    <strong>🛡️ Security Tips:</strong>
+                    <ul style="margin: 10px 0;">
+                        <li>Use a strong, unique password for your admin account</li>
+                        <li>Consider using a password manager</li>
+                        <li>Enable two-factor authentication when available</li>
+                        <li>Log out of admin sessions when finished</li>
+                    </ul>
+                </div>
+                
+                <p><strong>Didn't request this reset?</strong> If you didn't initiate this password reset, please contact IT security immediately. Someone may be attempting unauthorized access to your admin account.</p>
+                
+                <p><strong>Emergency Contact:</strong> If you suspect unauthorized access, contact the system administrator immediately.</p>
+            </div>
+            
+            <div class="footer">
+                <p>This secure email was sent to ${email}</p>
+                <p><strong>CONFIDENTIAL:</strong> This email contains sensitive admin access information</p>
+                <p>&copy; ${new Date().getFullYear()} EMM-Fort Group. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+
+  const emailText = `
+    EMM-Fort Group - Admin Password Reset
+    
+    A password reset has been requested for your administrator account.
+    
+    Reset your admin password: ${resetUrl}
+    
+    SECURITY NOTICE:
+    - This link expires in 60 minutes
+    - Admin passwords must be at least 12 characters  
+    - Only use this link from a secure device
+    - Never share this reset link
+    
+    If you didn't request this reset, contact IT security immediately.
+    
+    EMM-Fort Group Security Team
+  `;
+
+  try {
+    await transporter.sendMail({
+      from: fromEmail,
+      to: email,
+      subject: '🔒 Admin Password Reset - EMM-Fort Group [SECURE]',
+      text: emailText,
+      html: emailHtml,
+      priority: 'high', // High priority for admin emails
+      headers: {
+        'X-Priority': '1',
+        'X-MSMail-Priority': 'High'
+      }
+    });
+    
+    console.log(`Admin password reset email sent successfully to ${email}`);
+  } catch (error) {
+    console.error('Failed to send admin password reset email:', error);
+    throw new Error('Failed to send admin password reset email');
   }
 };

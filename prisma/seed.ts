@@ -37,7 +37,93 @@ async function main() {
     },
   });
   console.log("Admin user created:", adminUser.username);
+await prisma.platformSettings.upsert({
+  where: { section: 'general' },
+  update: {},
+  create: {
+    id: 'general-default',
+    section: 'general',
+    data: {
+      siteName: "EmmFort Platform",
+      siteUrl: "https://emmfort.com",
+      supportEmail: "support@emmfort.com",
+      maintenanceMode: false,
+      registrationEnabled: true,
+      maxUplineDepth: 5,
+      defaultTier: "BRONZE"
+    },
+    updatedBy: adminUser.id,
+  },
+});
 
+await prisma.platformSettings.upsert({
+  where: { section: 'commission' },
+  update: {},
+  create: {
+    id: 'commission-default',
+    section: 'commission',
+    data: {
+      commissionRates: { BRONZE: 5.0, SILVER: 10.0, GOLD: 15.0, PLATINUM: 20.0 },
+      minWithdrawalAmount: 5000.0,
+      withdrawalFee: 100.0,
+      withdrawalProcessingDays: 3
+    },
+    updatedBy: adminUser.id,
+  },
+});
+
+await prisma.platformSettings.upsert({
+  where: { section: 'notifications' },
+  update: {},
+  create: {
+    id: 'notifications-default',
+    section: 'notifications',
+    data: {
+      emailNotifications: true,
+      smsNotifications: false,
+      withdrawalNotifications: true,
+      commissionNotifications: true,
+      systemNotifications: true
+    },
+    updatedBy: adminUser.id,
+  },
+});
+
+await prisma.platformSettings.upsert({
+  where: { section: 'payment' },
+  update: {},
+  create: {
+    id: 'payment-default',
+    section: 'payment',
+    data: {
+      supportedMethods: ["paystack"],
+      paymentGateways: {
+        paystack: { enabled: false, publicKey: "", secretKey: "" },
+        flutterwave: { enabled: false, publicKey: "", secretKey: "" }
+      }
+    },
+    updatedBy: adminUser.id,
+  },
+});
+
+await prisma.platformSettings.upsert({
+  where: { section: 'security' },
+  update: {},
+  create: {
+    id: 'security-default',
+    section: 'security',
+    data: {
+      passwordMinLength: 8,
+      requireEmailVerification: true,
+      maxLoginAttempts: 5,
+      sessionTimeout: 1440,
+      twoFactorAuth: false
+    },
+    updatedBy: adminUser.id,
+  },
+});
+
+console.log("PlatformSettings default values created/updated.");
 
   // --- 1. Create a Master Upliner User (GOLD Tier) ---
   const uplinerPassword = await bcrypt.hash('password123', 10);
