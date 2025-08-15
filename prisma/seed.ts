@@ -26,7 +26,7 @@ async function main() {
     data: {
       fullName: 'Platform Admin',
       username: 'admin',
-      email: 'admin@emmfort.com',
+      email: 'admin@emmfortgroup.com',
       phone: '0000000000',
       password: adminPassword,
       emailVerified: new Date(),
