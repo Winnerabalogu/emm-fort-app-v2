@@ -1,7 +1,6 @@
 // components/admin/settings/NotificationSettings.tsx
 import React from 'react';
 import { SettingsSectionProps } from '@/types/settings';
-import { ToggleSwitch } from './ToggleSwitch';
 import { SaveButton } from './SaveButton';
 import { Mail, MessageSquare, CreditCard, Users, Settings } from 'lucide-react';
 

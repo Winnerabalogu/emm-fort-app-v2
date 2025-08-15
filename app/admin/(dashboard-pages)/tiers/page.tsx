@@ -8,7 +8,6 @@ import {
   TrendingUp, 
   RefreshCw,
   Shield,
-  DollarSign,
   Calendar,
   Award
 } from 'lucide-react';

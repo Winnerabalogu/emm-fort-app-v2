@@ -260,9 +260,10 @@ export default function WordPressSalesDashboard() {
     }
   };
 
-  useEffect(() => {
-    fetchSales();
-  }, []);
+useEffect(() => {
+  fetchSales();
+}, [fetchSales]);
+
 
   const unprocessedSales = sales.filter(sale => !sale.processedAt);
 

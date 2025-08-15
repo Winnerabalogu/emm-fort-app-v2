@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // components/admin/settings/PaymentSettings.tsx
 import React from 'react';
 import { SettingsSectionProps } from '@/types/settings';

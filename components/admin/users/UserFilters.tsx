@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { Filter, UserPlus, Calendar } from 'lucide-react';
+import { Filter, UserPlus } from 'lucide-react';
 import SearchFilter from '../common/SearchFilter';
 
 interface UserFiltersProps {
@@ -42,8 +42,6 @@ export default function UserFilters({
   filters,
   onFiltersChange,
   onApply,
-  onClear,
-  onExport,
   onCreateUser,
   loading = false
 }: UserFiltersProps) {

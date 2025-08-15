@@ -2,7 +2,7 @@
 "use client";
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { TrendingUp, TrendingDown, Users, DollarSign, Activity } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -31,7 +31,6 @@ interface MonthlyGrowthChartProps {
 const MonthlyGrowthChart: React.FC<MonthlyGrowthChartProps> = ({ 
   growthMetrics, 
   loading,
-  dateRange 
 }) => {
   const formatCurrency = (value: number) => {
     if (value >= 1000000) {

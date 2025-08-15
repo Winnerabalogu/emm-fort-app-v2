@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/settings/route.ts
 export const runtime = 'nodejs';
 
@@ -334,7 +335,7 @@ export const HEAD = withAdmin(async () => {
     // Quick health check - just verify we can read settings
     await getSettingsFromDB();
     return new NextResponse(null, { status: 200 });
-  } catch (error) {
-    return new NextResponse(null, { status: 500 });
-  }
+  } catch (_) {
+  return new NextResponse(null, { status: 500 });
+}
 });

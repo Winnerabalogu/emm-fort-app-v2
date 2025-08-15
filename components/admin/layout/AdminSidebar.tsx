@@ -29,7 +29,6 @@ const AdminSidebar = memo(function AdminSidebar({
   isOpen, 
   isCollapsed, 
   onClose, 
-  onToggleCollapse 
 }: AdminSidebarProps) {
   const pathname = usePathname();
   

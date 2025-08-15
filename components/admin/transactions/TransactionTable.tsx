@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // components/admin/transactions/TransactionTable.tsx
 "use client";
@@ -48,10 +49,10 @@ export default function TransactionTable({
     {
       key: 'id' as keyof Transaction,
       label: 'Transaction',
-      render: (value: string, row: Transaction) => (
+      render: (value: any, row: Transaction) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
-            #{value.slice(-8)}
+            #{(value as string).slice(-8)}
           </div>
           {row.referenceId && (
             <div className="text-xs text-gray-500">
@@ -64,34 +65,37 @@ export default function TransactionTable({
     {
       key: 'user' as keyof Transaction,
       label: 'User',
-      render: (user: Transaction['user']) => (
-        <div className="flex items-center space-x-3">
-          <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
-            <User className="h-4 w-4 text-orange-600" />
-          </div>
-          <div>
-            <div className="text-sm font-medium text-gray-900">
-              {user.fullName}
+      render: (value: any, row: Transaction) => {
+        const user = value as Transaction['user'];
+        return (
+          <div className="flex items-center space-x-3">
+            <div className="h-8 w-8 bg-orange-100 rounded-full flex items-center justify-center">
+              <User className="h-4 w-4 text-orange-600" />
             </div>
-            <div className="text-sm text-gray-500">
-              @{user.username} • {user.tier}
+            <div>
+              <div className="text-sm font-medium text-gray-900">
+                {user.fullName}
+              </div>
+              <div className="text-sm text-gray-500">
+                @{user.username} • {user.tier}
+              </div>
             </div>
           </div>
-        </div>
-      )
+        );
+      }
     },
     {
       key: 'type' as keyof Transaction,
       label: 'Type',
-      render: (type: string) => <TransactionTypeBadge type={type} />
+      render: (value: any) => <TransactionTypeBadge type={value as string} />
     },
     {
       key: 'amount' as keyof Transaction,
       label: 'Amount',
-      render: (amount: number, row: Transaction) => (
+      render: (value: any, row: Transaction) => (
         <div>
           <div className="text-sm font-medium text-gray-900">
-            ₦{amount.toLocaleString()}
+            ₦{(value as number).toLocaleString()}
           </div>
           {row.sourceUser && (
             <div className="text-xs text-gray-500 flex items-center">
@@ -105,18 +109,18 @@ export default function TransactionTable({
     {
       key: 'status' as keyof Transaction,
       label: 'Status',
-      render: (status: string) => <TransactionStatusBadge status={status} />
+      render: (value: any) => <TransactionStatusBadge status={value as string} />
     },
     {
       key: 'createdAt' as keyof Transaction,
       label: 'Date',
-      render: (createdAt: string) => (
+      render: (value: any) => (
         <div>
           <div className="text-sm text-gray-900">
-            {new Date(createdAt).toLocaleDateString()}
+            {new Date(value as string).toLocaleDateString()}
           </div>
           <div className="text-xs text-gray-500">
-            {new Date(createdAt).toLocaleTimeString()}
+            {new Date(value as string).toLocaleTimeString()}
           </div>
         </div>
       )

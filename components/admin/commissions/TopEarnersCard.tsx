@@ -1,7 +1,6 @@
 "use client";
 
 import { Crown, TrendingUp, User } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
 
 interface TopEarner {
   user: {

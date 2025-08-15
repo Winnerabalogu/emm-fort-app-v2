@@ -3,7 +3,6 @@ export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
 import { withAdmin } from '@/lib/auth-admin';
 import { prismaWp } from '@/lib/prisma-wp';
-import { processCommissions } from '@/lib/commissionService';
 import { z } from 'zod';
 import type { Prisma } from '@/generated/wordpress-client';
 

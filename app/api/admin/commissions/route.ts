@@ -1,7 +1,7 @@
 // app/api/admin/commissions/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -16,7 +16,7 @@ const ManualCommissionSchema = z.object({
   description: z.string().optional()
 });
 
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -178,7 +178,7 @@ export const GET = withAdmin(async (req) => {
   }
 });
 
-export const POST = withAdmin(async (req) => {
+export const POST = withAdmin(async (req: NextRequest) => {
   try {
     const body = await req.json();
     const validation = ManualCommissionSchema.safeParse(body);
@@ -271,7 +271,7 @@ export const POST = withAdmin(async (req) => {
 });
 
 // Bulk commission processing endpoint
-export const PUT = withAdmin(async (req) => {
+export const PUT = withAdmin(async (req: NextRequest) => {
   try {
     const body = await req.json();
     const { sourceUserId, amount } = body;

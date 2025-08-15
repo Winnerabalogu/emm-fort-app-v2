@@ -39,7 +39,8 @@ export default function CreateUserModal() {
     handleSubmit, 
     formState: { errors },
     watch,
-    setError 
+    setError,
+    setValue 
   } = useForm<CreateFormInputs>({
     defaultValues: {
       fullName: '',
@@ -120,12 +121,12 @@ export default function CreateUserModal() {
 
   const handleGeneratePassword = () => {
     const newPassword = generateRandomPassword();
-    // You'll need to use setValue from react-hook-form
-    const event = { target: { value: newPassword } };
-    // Since we can't directly set form values in this simplified version,
-    // we'll show the generated password and user can copy it
+    // Set the generated password in both password fields
+    setValue('password', newPassword);
+    setValue('confirmPassword', newPassword);
+    // Also copy to clipboard for convenience
     navigator.clipboard.writeText(newPassword);
-    toast.success('Password generated and copied to clipboard!');
+    toast.success('Password generated, set in form, and copied to clipboard!');
   };
 
   return (

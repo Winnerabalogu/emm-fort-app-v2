@@ -1,6 +1,7 @@
 // app/api/admin/savings/route.ts
 export const runtime = 'nodejs';
-import { NextResponse } from 'next/server';
+
+import { NextRequest, NextResponse } from 'next/server';
 import { withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
@@ -12,7 +13,7 @@ const UpdateSaveRequestSchema = z.object({
   adminNote: z.string().optional()
 });
 
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest) => {
   try {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -112,7 +113,7 @@ export const GET = withAdmin(async (req) => {
   }
 });
 
-export const PATCH = withAdmin(async (req) => {
+export const PATCH = withAdmin(async (req: NextRequest) => {
   try {
     const body = await req.json();
     const validation = UpdateSaveRequestSchema.safeParse(body);

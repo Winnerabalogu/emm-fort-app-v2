@@ -23,7 +23,7 @@ const reportQuerySchema = z.object({
 
 // Rate limiting for expensive queries
 const CACHE_TTL = 5 * 60 * 1000; 
-const reportCache = new Map<string, { data: any; timestamp: number }>();
+const reportCache = new Map<string, { data: unknown; timestamp: number }>();
 
 
 export const GET = withAdmin(async (req) => {

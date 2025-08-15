@@ -8,7 +8,6 @@ import {
   User,
   Calendar,
   ArrowUpRight,
-  ArrowDownLeft,
   CreditCard
 } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';

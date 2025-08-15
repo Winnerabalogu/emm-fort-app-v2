@@ -55,7 +55,7 @@ const UserTierChart: React.FC<UserTierChartProps> = ({ data, loading }) => {
   });
 
   // SVG pie chart using path elements
-  const createPieSlice = (startAngle: number, endAngle: number, color: string) => {
+  const createPieSlice = (startAngle: number, endAngle: number) => {
     const centerX = 100;
     const centerY = 100;
     const radius = 80;

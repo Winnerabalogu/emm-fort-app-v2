@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { X, User, Mail, Phone, Calendar, Award, Users, DollarSign, CheckCircle, XCircle, Clock, Shield } from 'lucide-react';
+import { X, User, Mail, Phone, Calendar, Award, Users, DollarSign, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { useModal } from '@/contexts/ModalContext';
 import { toast } from 'sonner';
 
