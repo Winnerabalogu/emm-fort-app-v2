@@ -1,4 +1,3 @@
-// hooks/useSettings.ts
 "use client"
 import { useState, useEffect, useCallback } from 'react';
 import { toast } from 'sonner';
@@ -13,7 +12,6 @@ import {
   SecuritySettingsTypes
 } from '@/types/settings';
 
-// Type for section data mapping
 type SectionDataMap = {
   general: GeneralSettingsTypes;
   commission: CommissionSettingsTypes;
