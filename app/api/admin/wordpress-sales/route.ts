@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/wordpress-sales/route.ts
 export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prismaWp } from '@/lib/prisma-wp';
 import { z } from 'zod';
 import type { Prisma } from '@/generated/wordpress-client';
+import { User } from 'next-auth';
+import { processCommissions } from '@/lib/commissionService';
 
 
 // Schema for WordPress sale data
@@ -32,7 +35,7 @@ const ProcessSalesSchema = z.object({
 type Wp_wc_ordersWhereInput = Prisma.wp_wc_ordersWhereInput;
 
 // GET: Fetch WordPress sales with filters
-export const GET = withAdmin(async (req: NextRequest) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const { searchParams } = new URL(req.url);
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
@@ -229,7 +232,7 @@ export const GET = withAdmin(async (req: NextRequest) => {
 });
 
 // POST: Process multiple sales (create commissions)
-export const POST = withAdmin(async (req: NextRequest) => {
+export const POST = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const validation = ProcessSalesSchema.safeParse(body);
@@ -321,9 +324,9 @@ export const POST = withAdmin(async (req: NextRequest) => {
           });
 
           // If you have the main app's commission system, process upstream commissions
-          // await processCommissions(affiliate.ID.toString(), commissionAmount);
+          await processCommissions(affiliate.ID.toString(), commissionAmount);
         }
-
+ 
         results.processed++;
 
       } catch (saleError) {
@@ -352,7 +355,7 @@ export const POST = withAdmin(async (req: NextRequest) => {
 });
 
 // PUT: Add manual sale (create order manually)
-export const PUT = withAdmin(async (req: NextRequest) => {
+export const PUT = withAdmin(async(req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const validation = WordPressSaleSchema.safeParse(body);

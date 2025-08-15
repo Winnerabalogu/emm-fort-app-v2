@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/savings/route.ts
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { User } from 'next-auth';
 
 const UpdateSaveRequestSchema = z.object({
   id: z.string(),
@@ -13,7 +15,7 @@ const UpdateSaveRequestSchema = z.object({
   adminNote: z.string().optional()
 });
 
-export const GET = withAdmin(async (req: NextRequest) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -113,7 +115,7 @@ export const GET = withAdmin(async (req: NextRequest) => {
   }
 });
 
-export const PATCH = withAdmin(async (req: NextRequest) => {
+export const PATCH = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const validation = UpdateSaveRequestSchema.safeParse(body);

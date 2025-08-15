@@ -20,6 +20,7 @@ type ModalPayload = {
    withdrawal?: WithdrawalRequest;
   onSuccess?: () => void;   
    saveRequest?: SaveRequest;
+   onRefresh?:()=>void;
 };
 interface Transaction {
   id: string;

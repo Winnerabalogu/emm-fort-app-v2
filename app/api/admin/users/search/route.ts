@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
+import { User } from 'next-auth'; // Add this import
 
-export const GET = withAdmin(async (request: NextRequest) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
-    const url = new URL(request.url);
+    const url = new URL(req.url);
     const query = url.searchParams.get('q');
     const limit = parseInt(url.searchParams.get('limit') || '10');
 

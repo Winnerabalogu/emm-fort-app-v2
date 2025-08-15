@@ -1,10 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/reports/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { User } from 'next-auth';
+
 interface TopEarnerQueryResult {
   id: string;
   fullName: string | null;
@@ -12,7 +15,6 @@ interface TopEarnerQueryResult {
   tier: string;
   total_earnings: string | number; 
 }
-
 
 // Input validation schema
 const reportQuerySchema = z.object({
@@ -25,8 +27,7 @@ const reportQuerySchema = z.object({
 const CACHE_TTL = 5 * 60 * 1000; 
 const reportCache = new Map<string, { data: unknown; timestamp: number }>();
 
-
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const url = new URL(req.url);
     const queryParams = {
@@ -218,13 +219,14 @@ export const GET = withAdmin(async (req) => {
     }));
 
     // Process top earners data with proper typing
-  const processedTopEarners = (topEarners as TopEarnerQueryResult[]).map(earner => ({
-  id: earner.id,
-  fullName: earner.fullName,
-  username: earner.username,
-  tier: earner.tier,
-  totalEarnings: Number(earner.total_earnings) || 0
-}));
+    const processedTopEarners = (topEarners as TopEarnerQueryResult[]).map(earner => ({
+      id: earner.id,
+      fullName: earner.fullName,
+      username: earner.username,
+      tier: earner.tier,
+      totalEarnings: Number(earner.total_earnings) || 0
+    }));
+    
     // Calculate growth metrics safely
     const calculateGrowthMetrics = async () => {
       try {

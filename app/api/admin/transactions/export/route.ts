@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/transactions/export/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
+import { User } from 'next-auth';
 
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const url = new URL(req.url);
     const status = url.searchParams.get('status');

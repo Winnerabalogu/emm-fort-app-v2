@@ -74,7 +74,15 @@ export default function EditTransactionModal() {
 
       if (result.success) {
         toast.success('Transaction updated successfully!');
-        payload?.onSuccess?.();
+        
+        // Call both onSuccess and onRefresh if available
+        if (payload?.onSuccess) {
+          payload.onSuccess();
+        }
+        if (payload?.onRefresh) {
+          payload.onRefresh();
+        }
+        
         closeModal();
       } else {
         throw new Error(result.error || 'Transaction update failed');
@@ -188,7 +196,7 @@ export default function EditTransactionModal() {
             <div className="text-sm text-yellow-800">
               <p className="font-medium">Important:</p>
               <ul className="mt-1 list-disc list-inside space-y-1">
-                <li>Changing status to "Failed&quot; or "Cancelled" may affect user balances</li>
+                <li>Changing status to "Failed" or "Cancelled" may affect user balances</li>
                 <li>Status changes are irreversible and will be logged</li>
                 <li>Consider the impact on commission calculations before changing</li>
               </ul>

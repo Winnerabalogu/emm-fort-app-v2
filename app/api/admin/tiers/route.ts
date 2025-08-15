@@ -1,11 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/tiers/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { Prisma } from '@prisma/client';
+import { User } from 'next-auth';
 
 const UpdateUserTierSchema = z.object({
   userId: z.string(),
@@ -14,7 +16,7 @@ const UpdateUserTierSchema = z.object({
   reason: z.string().optional()
 });
 
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const { searchParams } = new URL(req.url);
     const includeSummary = searchParams.get('summary') === 'true';
@@ -128,7 +130,7 @@ export const GET = withAdmin(async (req) => {
   }
 });
 
-export const PATCH = withAdmin(async (req) => {
+export const PATCH = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const validation = UpdateUserTierSchema.safeParse(body);
@@ -239,7 +241,7 @@ export const PATCH = withAdmin(async (req) => {
 });
 
 // Bulk tier operations
-export const PUT = withAdmin(async (req) => {
+export const PUT = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const { operation, userIds, targetTier, extendSubscription } = body;

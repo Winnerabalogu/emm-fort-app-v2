@@ -1,5 +1,5 @@
 import { type DefaultSession } from "next-auth";
-import { Tier } from '@prisma/client';
+import { Tier, Role } from '@prisma/client';
 
 declare module 'next-auth' {
   interface Session {
@@ -8,7 +8,7 @@ declare module 'next-auth' {
       fullName: string;
       username: string;
       tier: Tier;
-      
+      role: Role;
       emailVerified: Date | null;
       subscriptionStartDate: Date | null;
     } & DefaultSession['user']; 
@@ -22,7 +22,7 @@ declare module 'next-auth' {
     tier: Tier;
     emailVerified: Date | null;
     subscriptionStartDate: Date | null;
-    role: string; // <-- ADDED: Include role in user type
+    role: Role; 
   }
 }
 
@@ -32,6 +32,7 @@ declare module 'next-auth/jwt' {
     name: string;
     username: string;
     tier: Tier;
+    role: Role; // Add role to JWT
     emailVerified: Date | null;
     subscriptionStartDate: Date | null;
     lastUpdated?: number; 

@@ -1,5 +1,5 @@
 // lib/types.ts
-import { Tier as PrismaTier } from '@prisma/client';
+import { Tier as PrismaTier, Role } from '@prisma/client';
 
 export type Tier = PrismaTier;
 
@@ -60,9 +60,8 @@ export type CachedUserData = {
   emailVerified: Date | null;
   subscriptionStartDate: Date | null;
   image?: string | null;
-  role: string; // <-- ADDED: Include role in cached user data
-};
-
+  role: Role; 
+}
 export interface User {
   id: string;
   username: string;

@@ -2,8 +2,8 @@
 // app/api/admin/settings/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { User } from 'next-auth';
@@ -160,7 +160,7 @@ async function getSettingsFromDB(): Promise<typeof defaultSettings> {
   }
 }
 
-export const GET = withAdmin(async () => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const settings = await getSettingsFromDB();
     
@@ -199,7 +199,7 @@ export const GET = withAdmin(async () => {
   }
 });
 
-export const PATCH = withAdmin(async (req, admin: User) => {
+export const PATCH = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const { section, data } = updateRequestSchema.parse(body);
@@ -330,12 +330,12 @@ export const PATCH = withAdmin(async (req, admin: User) => {
 });
 
 // Health check endpoint for settings
-export const HEAD = withAdmin(async () => {
+export const HEAD = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     // Quick health check - just verify we can read settings
     await getSettingsFromDB();
     return new NextResponse(null, { status: 200 });
   } catch (_) {
-  return new NextResponse(null, { status: 500 });
-}
+    return new NextResponse(null, { status: 500 });
+  }
 });

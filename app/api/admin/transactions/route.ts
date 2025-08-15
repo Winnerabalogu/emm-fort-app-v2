@@ -1,26 +1,30 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/transactions/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { processCommissions } from '@/lib/commissionService';
 import { z } from 'zod';
 import type { Prisma } from '@prisma/client';
+import { User } from 'next-auth';
+
+// More flexible schema that accepts both UUIDs and other string formats
 const ManualTransactionSchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.string().min(1, "User ID is required"),
   type: z.enum(['COMMISSION', 'BONUS', 'SALE_COMMISSION', 'MANUAL_ADJUSTMENT']),
-  amount: z.number().positive(),
-  sourceUserId: z.string().uuid().optional(),
+  amount: z.number().positive("Amount must be positive"),
+  sourceUserId: z.string().min(1).optional(),
   triggerCommissions: z.boolean().default(false),
 });
 
 const UpdateTransactionSchema = z.object({
-  transactionId: z.string().uuid(),
+  transactionId: z.string().min(1, "Transaction ID is required"),
   status: z.enum(['PENDING', 'COMPLETED', 'FAILED', 'CANCELLED']).optional(),
 });
 
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const url = new URL(req.url);
     const page = Math.max(1, parseInt(url.searchParams.get('page') || '1'));
@@ -85,30 +89,31 @@ export const GET = withAdmin(async (req) => {
       }),
       prisma.transaction.count({ where })
     ]);
+
     const summary = await prisma.transaction.aggregate({
-  where,
-  _sum: { amount: true },
-  _count: true
-});
+      where,
+      _sum: { amount: true },
+      _count: true
+    });
 
-const statusSummary = await prisma.transaction.groupBy({
-  by: ['status'],
-  where,
-  _sum: { amount: true },
-  _count: true
-});
+    const statusSummary = await prisma.transaction.groupBy({
+      by: ['status'],
+      where,
+      _sum: { amount: true },
+      _count: true
+    });
 
-const transactionStats = {
-  totalCount,
-  totalAmount: summary._sum.amount || 0,
-  byStatus: statusSummary.reduce((acc, item) => {
-    acc[item.status] = {
-      count: item._count,
-      amount: item._sum.amount || 0
+    const transactionStats = {
+      totalCount,
+      totalAmount: summary._sum.amount || 0,
+      byStatus: statusSummary.reduce((acc, item) => {
+        acc[item.status] = {
+          count: item._count,
+          amount: item._sum.amount || 0
+        };
+        return acc;
+      }, {} as Record<string, { count: number; amount: number }>)
     };
-    return acc;
-  }, {} as Record<string, { count: number; amount: number }>)
-};
 
     return NextResponse.json({
       success: true,
@@ -128,15 +133,20 @@ const transactionStats = {
 
   } catch (error) {
     console.error('GET_TRANSACTIONS_ERROR:', error);
-    throw new Error('Failed to fetch transactions');
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to fetch transactions'
+    }, { status: 500 });
   }
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const POST = withAdmin(async (req, admin) => {
+export const POST = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
+    console.log('Transaction creation request:', JSON.stringify(body, null, 2));
+    
     const validatedData = ManualTransactionSchema.parse(body);
+    console.log('Validated data:', JSON.stringify(validatedData, null, 2));
 
     // Verify target user exists
     const targetUser = await prisma.user.findUnique({
@@ -150,7 +160,10 @@ export const POST = withAdmin(async (req, admin) => {
     });
 
     if (!targetUser) {
-      throw new Error('Target user not found');
+      return NextResponse.json({
+        success: false,
+        error: 'Target user not found'
+      }, { status: 404 });
     }
 
     // Verify source user if provided
@@ -167,7 +180,10 @@ export const POST = withAdmin(async (req, admin) => {
       });
       
       if (!sourceUser) {
-        throw new Error('Source user not found');
+        return NextResponse.json({
+          success: false,
+          error: 'Source user not found'
+        }, { status: 404 });
       }
     }
 
@@ -200,10 +216,14 @@ export const POST = withAdmin(async (req, admin) => {
       }
     });
 
+    console.log('Transaction created:', transaction.id);
+
+    // Process commissions if requested
     if (validatedData.triggerCommissions && 
         validatedData.sourceUserId && 
         ['SALE_COMMISSION', 'COMMISSION'].includes(validatedData.type)) {
       
+      console.log('Triggering commission processing...');
       processCommissions(validatedData.sourceUserId, validatedData.amount)
         .then(() => {
           console.log(`Commissions processed for manual transaction: ${transaction.id}`);
@@ -225,17 +245,33 @@ export const POST = withAdmin(async (req, admin) => {
   } catch (error) {
     console.error('CREATE_TRANSACTION_ERROR:', error);
     
-    if (error instanceof Error && error.message.includes('not found')) {
-      throw error; // Will be handled by withAdmin wrapper
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid transaction data provided',
+        details: error.flatten().fieldErrors
+      }, { status: 400 });
     }
     
-    throw new Error('Failed to create manual transaction');
+    if (error instanceof Error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to create manual transaction'
+    }, { status: 500 });
   }
 });
 
-export const PATCH = withAdmin(async (req) => {
+export const PATCH = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
+    console.log('Transaction update request:', JSON.stringify(body, null, 2));
+    
     const validatedData = UpdateTransactionSchema.parse(body);
 
     // Check if transaction exists
@@ -245,7 +281,10 @@ export const PATCH = withAdmin(async (req) => {
     });
 
     if (!existingTransaction) {
-      throw new Error('Transaction not found');
+      return NextResponse.json({
+        success: false,
+        error: 'Transaction not found'
+      }, { status: 404 });
     }
 
     const updateData: Partial<Prisma.TransactionUpdateInput> = {};
@@ -282,6 +321,8 @@ export const PATCH = withAdmin(async (req) => {
       }
     });
 
+    console.log('Transaction updated:', updatedTransaction.id);
+
     return NextResponse.json({
       success: true,
       message: 'Transaction updated successfully',
@@ -291,10 +332,24 @@ export const PATCH = withAdmin(async (req) => {
   } catch (error) {
     console.error('UPDATE_TRANSACTION_ERROR:', error);
     
-    if (error instanceof Error && error.message.includes('not found')) {
-      throw error; // Will be handled by withAdmin wrapper
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({
+        success: false,
+        error: 'Invalid update data provided',
+        details: error.flatten().fieldErrors
+      }, { status: 400 });
     }
     
-    throw new Error('Failed to update transaction');
+    if (error instanceof Error) {
+      return NextResponse.json({
+        success: false,
+        error: error.message
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      success: false,
+      error: 'Failed to update transaction'
+    }, { status: 500 });
   }
 });

@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/commissions/route.ts
 export const runtime = 'nodejs';
-
 import { NextRequest, NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { withAdmin, type RouteContext } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { processCommissions } from '@/lib/commissionService';
 import { Prisma } from '@prisma/client';
+import { User } from 'next-auth';
 
 const ManualCommissionSchema = z.object({
   userId: z.string(),
@@ -16,25 +17,24 @@ const ManualCommissionSchema = z.object({
   description: z.string().optional()
 });
 
-export const GET = withAdmin(async (req: NextRequest) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const { searchParams } = new URL(req.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
+    const page = parseInt(searchParams.get('page') || '1', 10);
+    const limit = parseInt(searchParams.get('limit') || '20', 10);
     const userId = searchParams.get('userId');
     const type = searchParams.get('type');
     const dateFrom = searchParams.get('dateFrom');
     const dateTo = searchParams.get('dateTo');
     const search = searchParams.get('search') || '';
-    
+
     const skip = (page - 1) * limit;
-    
-    // Build where clause for commissions
-      const where: Prisma.TransactionWhereInput = {};
+
+    const where: Prisma.TransactionWhereInput = {};
 
     if (userId) where.userId = userId;
     if (type && type !== 'all') where.type = type.toUpperCase();
-    
+
     if (dateFrom || dateTo) {
       where.createdAt = {};
       if (dateFrom) where.createdAt.gte = new Date(dateFrom);
@@ -44,7 +44,7 @@ export const GET = withAdmin(async (req: NextRequest) => {
         where.createdAt.lte = toDate;
       }
     }
-    
+
     if (search) {
       where.OR = [
         { user: { fullName: { contains: search, mode: 'insensitive' } } },
@@ -55,7 +55,6 @@ export const GET = withAdmin(async (req: NextRequest) => {
     }
 
     const [commissions, totalCount, summaryStats, topEarners] = await Promise.all([
-      // Get commissions with user details
       prisma.transaction.findMany({
         where,
         include: {
@@ -81,18 +80,15 @@ export const GET = withAdmin(async (req: NextRequest) => {
         skip,
         take: limit
       }),
-      
-      // Total count
+
       prisma.transaction.count({ where }),
-      
-      // Summary statistics
+
       prisma.transaction.aggregate({
         where,
         _sum: { amount: true },
         _count: true
       }),
-      
-      // Top commission earners this month
+
       prisma.transaction.groupBy({
         by: ['userId'],
         where: {
@@ -109,7 +105,6 @@ export const GET = withAdmin(async (req: NextRequest) => {
       })
     ]);
 
-    // Get user details for top earners
     const topEarnersWithDetails = await Promise.all(
       topEarners.map(async (earner) => {
         const user = await prisma.user.findUnique({
@@ -130,7 +125,6 @@ export const GET = withAdmin(async (req: NextRequest) => {
       })
     );
 
-    // Get commission type breakdown
     const typeBreakdown = await prisma.transaction.groupBy({
       by: ['type'],
       where: {
@@ -168,27 +162,29 @@ export const GET = withAdmin(async (req: NextRequest) => {
         }
       }
     });
-
   } catch (error) {
     console.error('ADMIN_COMMISSIONS_FETCH_ERROR:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to fetch commission data'
-    }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch commission data' },
+      { status: 500 }
+    );
   }
 });
 
-export const POST = withAdmin(async (req: NextRequest) => {
+export const POST = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const validation = ManualCommissionSchema.safeParse(body);
-    
+
     if (!validation.success) {
-      return NextResponse.json({
-        success: false,
-        error: 'Invalid input data',
-        details: validation.error.flatten().fieldErrors
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid input data',
+          details: validation.error.flatten().fieldErrors
+        },
+        { status: 400 }
+      );
     }
 
     const { userId, amount, type, sourceUserId, description } = validation.data;
@@ -200,10 +196,10 @@ export const POST = withAdmin(async (req: NextRequest) => {
     });
 
     if (!targetUser) {
-      return NextResponse.json({
-        success: false,
-        error: 'Target user not found'
-      }, { status: 404 });
+      return NextResponse.json(
+        { success: false, error: 'Target user not found' },
+        { status: 404 }
+      );
     }
 
     // Verify source user if provided
@@ -212,12 +208,12 @@ export const POST = withAdmin(async (req: NextRequest) => {
         where: { id: sourceUserId },
         select: { id: true }
       });
-      
+
       if (!sourceUser) {
-        return NextResponse.json({
-          success: false,
-          error: 'Source user not found'
-        }, { status: 404 });
+        return NextResponse.json(
+          { success: false, error: 'Source user not found' },
+          { status: 404 }
+        );
       }
     }
 
@@ -229,7 +225,7 @@ export const POST = withAdmin(async (req: NextRequest) => {
         status: 'COMPLETED',
         userId,
         sourceUserId: sourceUserId || null,
-        description: description || null,
+        description: description || null
       },
       include: {
         user: {
@@ -260,18 +256,17 @@ export const POST = withAdmin(async (req: NextRequest) => {
         createdAt: commission.createdAt.toISOString()
       }
     });
-
   } catch (error) {
     console.error('ADMIN_CREATE_COMMISSION_ERROR:', error);
-    return NextResponse.json({
-      success: false,
-      error: 'Failed to create manual commission'
-    }, { status: 500 });
+    return NextResponse.json(
+      { success: false, error: 'Failed to create manual commission' },
+      { status: 500 }
+    );
   }
 });
 
 // Bulk commission processing endpoint
-export const PUT = withAdmin(async (req: NextRequest) => {
+export const PUT = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const body = await req.json();
     const { sourceUserId, amount } = body;

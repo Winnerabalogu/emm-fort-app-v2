@@ -45,8 +45,8 @@ await prisma.platformSettings.upsert({
     section: 'general',
     data: {
       siteName: "EmmFort Platform",
-      siteUrl: "https://emmfort.com",
-      supportEmail: "support@emmfort.com",
+      siteUrl: "https://affiliate.emmfortgroup.com",
+      supportEmail: "support@emmfortgroup.com",
       maintenanceMode: false,
       registrationEnabled: true,
       maxUplineDepth: 5,

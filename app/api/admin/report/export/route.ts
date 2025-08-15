@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 // app/api/admin/reports/export/route.ts
 export const runtime = 'nodejs';
 
-import { NextResponse } from 'next/server';
-import { withAdmin } from '@/lib/auth-admin';
+import { NextRequest, NextResponse } from 'next/server';
+import { RouteContext, withAdmin } from '@/lib/auth-admin';
 import { prisma } from '@/lib/prisma';
+import { User } from 'next-auth';
 
 // Define proper types for CSV data
 interface CSVRow {
@@ -43,8 +45,7 @@ function generateCSV(data: CSVRow[], headers: string[]): string {
 function formatCurrency(amount: number): string {
   return `₦${amount.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
 }
-
-export const GET = withAdmin(async (req) => {
+export const GET = withAdmin(async (req: NextRequest, admin: User, context: RouteContext) => {
   try {
     const url = new URL(req.url);
     const from = url.searchParams.get('from');
