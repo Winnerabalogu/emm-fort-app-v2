@@ -1,9 +1,10 @@
-// middleware.ts
-import { auth } from "@/auth";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+// middleware.ts - FIXED: Use the same auth instance as login
+import { auth } from '@/auth'; // Import from auth.ts, not auth.config.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default auth(async function middleware(request: NextRequest) {
+export default auth(function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
@@ -70,7 +71,7 @@ export default auth(async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all routes except static files
-    "/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
+    // Match all routes except static files and NextAuth API routes
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };

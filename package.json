@@ -9,7 +9,8 @@
     "lint": "next lint",
     "prisma:generate": "npm run prisma:generate:app && npm run prisma:generate:wp",
     "prisma:generate:app": "prisma generate --schema=./prisma/schema.prisma",
-    "prisma:generate:wp": "prisma generate --schema=./prisma/wordpress.prisma"
+    "prisma:generate:wp": "prisma generate --schema=./prisma/wordpress.prisma",
+     "db:seed-earnings": "ts-node --project tsconfig.seed.json prisma/seed-earnings.ts"  
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",

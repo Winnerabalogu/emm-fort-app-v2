@@ -1,3 +1,4 @@
+// types/next-auth.d.ts - Updated to include creator fields
 import { type DefaultSession } from "next-auth";
 import { Tier, Role } from '@prisma/client';
 
@@ -11,6 +12,13 @@ declare module 'next-auth' {
       role: Role;
       emailVerified: Date | null;
       subscriptionStartDate: Date | null;
+      // NEW: Creator-specific fields
+      isCreator: boolean;
+      instagramHandle?: string;
+      tiktokHandle?: string;
+      whatsappNumber?: string;
+      contentStyle?: string;
+      followersCount?: string;
     } & DefaultSession['user']; 
   }
 
@@ -22,7 +30,14 @@ declare module 'next-auth' {
     tier: Tier;
     emailVerified: Date | null;
     subscriptionStartDate: Date | null;
-    role: Role; 
+    role: Role;
+    // NEW: Creator-specific fields
+    isCreator: boolean;
+    instagramHandle?: string;
+    tiktokHandle?: string;
+    whatsappNumber?: string;
+    contentStyle?: string;
+    followersCount?: string;
   }
 }
 
@@ -32,9 +47,16 @@ declare module 'next-auth/jwt' {
     name: string;
     username: string;
     tier: Tier;
-    role: Role; // Add role to JWT
+    role: Role;
     emailVerified: Date | null;
     subscriptionStartDate: Date | null;
-    lastUpdated?: number; 
+    lastUpdated?: number;
+    // NEW: Creator-specific fields
+    isCreator: boolean;
+    instagramHandle?: string;
+    tiktokHandle?: string;
+    whatsappNumber?: string;
+    contentStyle?: string;
+    followersCount?: string;
   }
 }
