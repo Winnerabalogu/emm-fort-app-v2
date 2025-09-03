@@ -12,7 +12,7 @@ const imageData = [
     description: "Join thousands of creators earning through authentic grocery hauls and lifestyle content sharing.",
   },
   {
-    src: "/creator-bg-webp/creator-podcast.jpwebpg",
+    src: "/creator-bg-webp/creator-podcast.webp",
     title: "Content Creation Tips",
     description:
       "Learn from successful creators who share grocery hauls, cooking tips, and lifestyle content that converts.",

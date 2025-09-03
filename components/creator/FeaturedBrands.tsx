@@ -3,14 +3,14 @@ import Image from "next/image"
 
 
 const brands = [
-  { name: "Zoo TV", logo: "/creator-logos-webp/zoo-tv.png" },
-  { name: "Velocity 9", logo: "/creator-logos-webp/velocity-9.png" },
-  { name: "Treva", logo: "/creator-logos-webp/treva.png" },
-  { name: "Muzica", logo: "/creator-logos-webp/muzica.png" },
-  { name: "Fox Hub", logo: "/creator-logos-webp/fox-hub.png" },
-  { name: "Asgardia", logo: "/creator-logos-webp/asgardia.png" },
-  { name: "Earth 2.0", logo: "/creator-logos-webp/earth-2.0.png" },
-  { name: "Code Lab", logo: "/creator-logos-webp/code-lab.png" },
+  { name: "Zoo TV", logo: "/creator-logos-webp/zoo-tv.webp" },
+  { name: "Velocity 9", logo: "/creator-logos-webp/velocity-9.webp" },
+  { name: "Treva", logo: "/creator-logos-webp/treva.webp" },
+  { name: "Muzica", logo: "/creator-logos-webp/muzica.webp" },
+  { name: "Fox Hub", logo: "/creator-logos-webp/fox-hub.webp" },
+  { name: "Asgardia", logo: "/creator-logos-webp/asgardia.webp" },
+  { name: "Earth 2.0", logo: "/creator-logos-webp/earth-2.0.webp" },
+  { name: "Code Lab", logo: "/creator-logos-webp/code-lab.webp" },
 ]
 
 export default function FeaturedBrands() {
