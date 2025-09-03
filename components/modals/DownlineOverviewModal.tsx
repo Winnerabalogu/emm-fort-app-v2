@@ -115,7 +115,7 @@ export default function DownlineOverviewModal() {
           {/* Header Section */}
           <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 border border-gray-200 rounded-xl">
             <Image 
-              src="/images/user-avatar.png" 
+              src="/images-webp/user-avatar.webp" 
               alt="Avatar" 
               width={48} 
               height={48} 

@@ -20,15 +20,25 @@ model User {
   subscriptionId          String?
   subscriptionStartDate   DateTime?
   subscriptionExpiryDate  DateTime?
-  emailVerified           DateTime?           
-  role                    Role                @default(USER)               
+  emailVerified           DateTime?
+  role                    Role                @default(USER)
   verificationToken       String?             @unique
   verificationTokenExpiry DateTime?
-  resetToken              String?   
+  resetToken              String?
   resetTokenExpiry        DateTime?
   createdAt               DateTime            @default(now())
   updatedAt               DateTime            @updatedAt
   uplinerId               String?
+  
+  // Creator fields
+  isCreator           Boolean               @default(false)
+  instagramHandle     String?
+  tiktokHandle        String?
+  whatsappNumber      String?
+  contentStyle        String?               // 'Grocery Hauls & Unboxing', 'Lifestyle & Food Content', etc.
+  followersCount      String?               // '0-1K followers', '1K-10K followers', etc.
+
+  // Relations
   saveRequests            SaveRequest[]
   generatedCommissions    Transaction[]       @relation("CommissionSource")
   transactions            Transaction[]
@@ -37,10 +47,68 @@ model User {
   withdrawalDetails       WithdrawalDetails?
   withdrawalRequests      WithdrawalRequest[]
   platformSettingsUpdates PlatformSettings[]  @relation("SettingsUpdatedBy")
+  contentPosts            ContentPost[]
+  templateRequests        TemplateRequest[]
+  preferences             UserPreference[]
 
   @@index([email, emailVerified], map: "User_email_verified_idx")
   @@index([id, tier, subscriptionStartDate], map: "User_id_tier_subscription_idx")
   @@index([tier])
+}
+
+model UserPreference {
+  id        String   @id @default(cuid())
+  userId    String
+  key       String   // e.g., "templateOrder", "captionOrder", "dashboardLayout"
+  value     String   // JSON string containing the preference data
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, key], name: "UserPreference_userId_key_unique")
+  @@index([userId], name: "UserPreference_userId_idx")
+  @@index([key], name: "UserPreference_key_idx")
+}
+
+model EmailSubscription {
+  id              String   @id @default(cuid())
+  email           String   @unique
+  source          String   // Which company page/form they signed up from
+  status          String   @default("ACTIVE") // ACTIVE, UNSUBSCRIBED
+  metadata        Json?    // Store additional data like preferences, UTM params, etc.
+  subscribedAt    DateTime @default(now())
+  unsubscribedAt  DateTime?
+  lastEmailSent   DateTime?
+  emailsSent      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([email, status])
+  @@index([source, status])
+  @@index([subscribedAt])
+}
+
+model ContactRequest {
+  id          String   @id @default(cuid())
+  fullName    String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  source      String   @default("contact_form") // Where the contact came from
+  status      String   @default("NEW") // NEW, IN_PROGRESS, RESOLVED, CLOSED
+  priority    String   @default("NORMAL") // LOW, NORMAL, HIGH, URGENT
+  assignedTo  String?
+  adminNotes  String?
+  respondedAt DateTime?
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([email, status])
+  @@index([status, priority])
+  @@index([createdAt])
 }
 
 model PlatformSettings {
@@ -94,20 +162,126 @@ model SaveRequest {
 }
 
 model Transaction {
-  id           String   @id @default(cuid())
-  type         String
-  amount       Float
-  status       String
-  createdAt    DateTime @default(now())
-  userId       String
-  description String?
-  sourceUserId String?
-  sourceUser   User?    @relation("CommissionSource", fields: [sourceUserId], references: [id])
-  user         User     @relation(fields: [userId], references: [id])
-
+  id              String   @id @default(cuid())
+  type            String
+  amount          Float
+  status          String
+  createdAt       DateTime @default(now())
+  userId          String
+  description     String?
+  sourceUserId    String?
+  contentPostId   String?   // Link earnings to specific content posts
+  referralOrderId String?   // Link to specific order that generated commission
+  
+  sourceUser      User?        @relation("CommissionSource", fields: [sourceUserId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+  contentPost     ContentPost? @relation(fields: [contentPostId], references: [id])
+  
+  @@index([contentPostId])
+  @@index([referralOrderId])
   @@index([createdAt])
   @@index([userId, status, createdAt])
   @@index([userId, status, type])
+}
+
+model ContentPost {
+  id            String    @id @default(cuid())
+  title         String
+  platform      String    // 'instagram', 'tiktok', 'youtube', 'facebook'
+  type          String    // 'reel', 'post', 'video', 'story', 'carousel'
+  content       String?   @db.Text // The actual caption/content
+  description   String?   @db.Text
+  hashtags      String[]  // Array of hashtags used
+  views         Int       @default(0)
+  likes         Int       @default(0)
+  comments      Int       @default(0)
+  shares        Int       @default(0)
+  earnings      Float     @default(0.0)   // Earnings attributed to this post
+  templateId    String?   // Reference to template used
+  status        String    @default("DRAFT") // DRAFT, PUBLISHED, ARCHIVED
+  publishedAt   DateTime?
+  userId        String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions  Transaction[]
+  analytics     ContentAnalytics[]
+  
+  @@index([userId, createdAt])
+  @@index([platform, type])
+  @@index([templateId])
+  @@index([status, publishedAt])
+}
+
+// NEW MODEL: ContentTemplate for pre-made templates
+model ContentTemplate {
+  id            String   @id @default(cuid())
+  title         String
+  category      String   // 'unboxing', 'lifestyle', 'cooking', 'photography', etc.
+  type          String   // 'video', 'image', 'carousel'
+  platform      String[] // ['instagram', 'tiktok', 'youtube'] - array of supported platforms
+  description   String   @db.Text
+  thumbnailUrl  String?
+  duration      String?  // '15-30s', '30-60s', etc.
+  difficulty    String   // 'Easy', 'Medium', 'Hard'
+  engagement    String   // 'Low', 'Medium', 'High', 'Very High'
+  tags          String[] // Array of tags
+  instructions  String[] // Step-by-step instructions
+  captionTemplate String @db.Text // Template with placeholders like {{REFERRAL_CODE}}
+  hashtags      String[] // Recommended hashtags
+  tips          String[] // Additional tips for creators
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@index([category, platform])
+  @@index([difficulty, engagement])
+  @@index([isActive])
+}
+
+model TemplateRequest {
+  id                String    @id @default(cuid())
+  title             String
+  description       String    @db.Text
+  type              String    // 'template' or 'caption'
+  category          String    @default("general")
+  platform          String    @default("instagram")
+  contentStyle      String?
+  specificRequests  String?   @db.Text
+  status            String    @default("pending") // 'pending', 'in_progress', 'completed', 'rejected'
+  adminNotes        String?   @db.Text
+  userId            String
+  assignedTo        String?   // Admin user who's working on this
+  completedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, status])
+  @@index([status, createdAt])
+  @@index([assignedTo])
+}
+
+model ContentAnalytics {
+  id              String    @id @default(cuid())
+  contentPostId   String
+  date            DateTime  @default(now())
+  views           Int       @default(0)
+  likes           Int       @default(0)
+  comments        Int       @default(0)
+  shares          Int       @default(0)
+  earnings        Float     @default(0.0)
+  impressions     Int?      // Platform-specific metrics
+  reach           Int?
+  engagement      Float?    // Calculated engagement rate
+  
+  contentPost     ContentPost @relation(fields: [contentPostId], references: [id], onDelete: Cascade)
+  
+  @@unique([contentPostId, date])
+  @@index([contentPostId])
+  @@index([date])
 }
 
 enum Tier {

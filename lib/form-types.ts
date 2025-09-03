@@ -7,7 +7,7 @@ export type RegisterStep1Form = {
   phone: string;
   referral?: string;
   password: string;
-  
+  termsAccepted: boolean;
 };
 
 export type RegisterStep3Form = {

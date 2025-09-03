@@ -82,7 +82,7 @@ const UserTierChart: React.FC<UserTierChartProps> = ({ data, loading }) => {
             {processedData.map((item) => (
               <path
                 key={item.tier}
-                d={createPieSlice(item.startAngle, item.endAngle, item.color)}
+                d={createPieSlice(item.startAngle, item.endAngle)}
                 fill={item.color}
                 stroke="white"
                 strokeWidth="2"

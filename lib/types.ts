@@ -61,6 +61,12 @@ export type CachedUserData = {
   subscriptionStartDate: Date | null;
   image?: string | null;
   role: Role; 
+    isCreator: boolean;
+  instagramHandle?: string;
+  tiktokHandle?: string;
+  whatsappNumber?: string;
+  contentStyle?: string;
+  followersCount?: string;
 }
 export interface User {
   id: string;

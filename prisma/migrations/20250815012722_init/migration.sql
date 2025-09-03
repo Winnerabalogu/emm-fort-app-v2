@@ -159,3 +159,57 @@ ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_sourceUserId_fkey" FOREIGN
 
 -- AddForeignKey
 ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
+-- Migration to add EmailSubscription and ContactRequest tables
+-- Run: npx prisma db push
+-- Or create a migration: npx prisma migrate dev --name add-email-and-contact-models
+
+-- EmailSubscription table
+CREATE TABLE "EmailSubscription" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "source" TEXT NOT NULL,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "metadata" JSONB,
+    "subscribedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "unsubscribedAt" TIMESTAMP(3),
+    "lastEmailSent" TIMESTAMP(3),
+    "emailsSent" INTEGER NOT NULL DEFAULT 0,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "EmailSubscription_pkey" PRIMARY KEY ("id")
+);
+
+-- ContactRequest table
+CREATE TABLE "ContactRequest" (
+    "id" TEXT NOT NULL,
+    "fullName" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT,
+    "subject" TEXT NOT NULL,
+    "message" TEXT NOT NULL,
+    "source" TEXT NOT NULL DEFAULT 'contact_form',
+    "status" TEXT NOT NULL DEFAULT 'NEW',
+    "priority" TEXT NOT NULL DEFAULT 'NORMAL',
+    "assignedTo" TEXT,
+    "adminNotes" TEXT,
+    "respondedAt" TIMESTAMP(3),
+    "resolvedAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ContactRequest_pkey" PRIMARY KEY ("id")
+);
+
+-- Indexes for EmailSubscription
+CREATE UNIQUE INDEX "EmailSubscription_email_key" ON "EmailSubscription"("email");
+CREATE INDEX "EmailSubscription_email_status_idx" ON "EmailSubscription"("email", "status");
+CREATE INDEX "EmailSubscription_source_status_idx" ON "EmailSubscription"("source", "status");
+CREATE INDEX "EmailSubscription_subscribedAt_idx" ON "EmailSubscription"("subscribedAt");
+
+-- Indexes for ContactRequest
+CREATE INDEX "ContactRequest_email_status_idx" ON "ContactRequest"("email", "status");
+CREATE INDEX "ContactRequest_status_priority_idx" ON "ContactRequest"("status", "priority");
+CREATE INDEX "ContactRequest_createdAt_idx" ON "ContactRequest"("createdAt");

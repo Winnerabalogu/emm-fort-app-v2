@@ -790,3 +790,284 @@ export const sendAdminPasswordResetEmail = async (email: string, resetToken: str
     throw new Error('Failed to send admin password reset email');
   }
 };
+export const sendEmailSubscriptionConfirmation = async (email: string, source: string) => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const unsubscribeToken = Buffer.from(email).toString('base64');
+  const unsubscribeUrl = `${siteUrl}/api/email-subscription?email=${encodeURIComponent(email)}&token=${unsubscribeToken}`;
+  
+  const sourceDisplay = source.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Subscription Confirmed - EMM-Fort Group</title>
+        ${getBaseEmailStyles()}
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">EMM-Fort Group</div>
+                <h1 class="title">🎉 You're In!</h1>
+                <p class="subtitle">Welcome to the EMM-Fort family</p>
+            </div>
+            
+            <div class="content">
+                <p>Hi there,</p>
+                <p>Thank you for subscribing to updates from <strong>${sourceDisplay}</strong>! We're thrilled to have you on board.</p>
+                
+                <div class="success-box">
+                    <h3 style="margin-top: 0;">✅ Subscription Confirmed</h3>
+                    <ul style="margin: 10px 0;">
+                        <li>You'll be the first to know about launches and updates</li>
+                        <li>Exclusive early access to new features</li>
+                        <li>Special offers and promotions</li>
+                        <li>Industry insights and company news</li>
+                    </ul>
+                </div>
+                
+                <p>We promise to keep our emails valuable and not spam your inbox. You can expect to hear from us when we have something truly worth sharing.</p>
+                
+                <div class="info-box">
+                    <h3 style="margin-top: 0;">🚀 What's Next?</h3>
+                    <p>Keep an eye on your inbox for exciting updates about our upcoming launches. In the meantime, feel free to explore our other companies and services.</p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="${siteUrl}" class="button">Explore EMM-Fort Group</a>
+                    </div>
+                </div>
+                
+                <p>Thank you for joining our community. We're excited to share this journey with you!</p>
+            </div>
+            
+            <div class="footer">
+                <p>This email was sent to ${email}</p>
+                <p>Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color: #f97316;">Unsubscribe here</a></p>
+                <p>&copy; ${new Date().getFullYear()} EMM-Fort Group. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+
+  const emailText = `
+    Subscription Confirmed - EMM-Fort Group
+    
+    Thank you for subscribing to updates from ${sourceDisplay}!
+    
+    You'll receive:
+    - First access to launches and updates
+    - Exclusive early access to new features
+    - Special offers and promotions
+    - Industry insights and company news
+    
+    Visit us: ${siteUrl}
+    Unsubscribe: ${unsubscribeUrl}
+    
+    Thanks,
+    EMM-Fort Group Team
+  `;
+
+  const mailOptions = {
+    from: fromEmail,
+    to: email,
+    subject: '🎉 Welcome to EMM-Fort Group - Subscription Confirmed',
+    text: emailText,
+    html: emailHtml,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Subscription confirmation email sent to ${email}`);
+};
+
+export const sendNewContactRequestEmail = async (contactRequest: any) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER;  
+
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>New Contact Request - EMM-Fort Group</title>
+        ${getBaseEmailStyles()}
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">EMM-Fort Group</div>
+                <h1 class="title">📧 New Contact Request</h1>
+                <p class="subtitle">Someone wants to get in touch</p>
+            </div>
+            
+            <div class="content">
+                <p>A new contact request has been submitted through the website.</p>
+                
+                <div class="info-box">
+                    <table class="details-table">
+                        <tr>
+                            <th>Name</th>
+                            <td><strong>${contactRequest.fullName}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Email</th>
+                            <td>${contactRequest.email}</td>
+                        </tr>
+                        ${contactRequest.phone ? `
+                        <tr>
+                            <th>Phone</th>
+                            <td>${contactRequest.phone}</td>
+                        </tr>
+                        ` : ''}
+                        <tr>
+                            <th>Subject</th>
+                            <td><strong>${contactRequest.subject}</strong></td>
+                        </tr>
+                        <tr>
+                            <th>Source</th>
+                            <td>${contactRequest.source}</td>
+                        </tr>
+                        <tr>
+                            <th>Submitted</th>
+                            <td>${new Date(contactRequest.createdAt).toLocaleString('en-US', { timeZone: 'Africa/Lagos' })} (WAT)</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="warning-box">
+                    <h3 style="margin-top: 0;">💬 Message</h3>
+                    <p style="background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #f97316; margin: 10px 0; white-space: pre-wrap;">${contactRequest.message}</p>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="mailto:${contactRequest.email}?subject=Re: ${encodeURIComponent(contactRequest.subject)}" class="button">Reply to ${contactRequest.fullName}</a>
+                </div>
+                
+                <p><strong>Action Required:</strong> Please respond to this contact request within 24 hours to maintain excellent customer service.</p>
+            </div>
+            
+            <div class="footer">
+                <p>This notification was sent to ${adminEmail}</p>
+                <p>Contact ID: ${contactRequest.id}</p>
+                <p>&copy; ${new Date().getFullYear()} EMM-Fort Group. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+
+  const emailText = `
+    New Contact Request - EMM-Fort Group
+    
+    Name: ${contactRequest.fullName}
+    Email: ${contactRequest.email}
+    ${contactRequest.phone ? `Phone: ${contactRequest.phone}` : ''}
+    Subject: ${contactRequest.subject}
+    
+    Message:
+    ${contactRequest.message}
+    
+    Please respond within 24 hours.
+    Contact ID: ${contactRequest.id}
+    
+    EMM-Fort Group Admin System
+  `;
+
+  const mailOptions = {
+    from: fromEmail,
+    to: adminEmail,
+    subject: `📧 New Contact: ${contactRequest.fullName} - ${contactRequest.subject}`,
+    text: emailText,
+    html: emailHtml,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Contact request notification sent to admin for ${contactRequest.email}`);
+};
+
+export const sendContactConfirmationEmail = async (email: string, fullName: string, subject: string) => {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  const emailHtml = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Message Received - EMM-Fort Group</title>
+        ${getBaseEmailStyles()}
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <div class="logo">EMM-Fort Group</div>
+                <h1 class="title">✅ Message Received</h1>
+                <p class="subtitle">We'll get back to you soon</p>
+            </div>
+            
+            <div class="content">
+                <p>Hi ${fullName},</p>
+                <p>Thank you for reaching out to EMM-Fort Group! We've successfully received your message about "<strong>${subject}</strong>" and wanted to confirm it's in our queue.</p>
+                
+                <div class="success-box">
+                    <h3 style="margin-top: 0;">📋 What Happens Next?</h3>
+                    <ul style="margin: 10px 0;">
+                        <li><strong>Review:</strong> Our team will review your message within 4 business hours</li>
+                        <li><strong>Response:</strong> You'll hear back from us within 24 hours</li>
+                        <li><strong>Follow-up:</strong> We may reach out for additional details if needed</li>
+                    </ul>
+                </div>
+                
+                <div class="info-box">
+                    <h3 style="margin-top: 0;">🚀 In the Meantime</h3>
+                    <p>While you wait for our response, feel free to explore our companies and services:</p>
+                    
+                    <div style="text-align: center; margin: 20px 0;">
+                        <a href="${siteUrl}" class="button">Explore Our Companies</a>
+                    </div>
+                </div>
+                
+                <p><strong>Need immediate assistance?</strong> For urgent matters, please call us directly or mention "URGENT" in any follow-up emails.</p>
+                
+                <p>Thank you for considering EMM-Fort Group. We look forward to connecting with you soon!</p>
+            </div>
+            
+            <div class="footer">
+                <p>This email was sent to ${email}</p>
+                <p>Reference: Contact form submission</p>
+                <p>&copy; ${new Date().getFullYear()} EMM-Fort Group. All rights reserved.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+  `;
+
+  const emailText = `
+    Message Received - EMM-Fort Group
+    
+    Hi ${fullName},
+    
+    Thank you for reaching out about "${subject}".
+    We've received your message and will respond within 24 hours.
+    
+    Our team will review your message within 4 business hours.
+    
+    For urgent matters, please mention "URGENT" in follow-up emails.
+    
+    Thanks,
+    EMM-Fort Group Team
+  `;
+
+  const mailOptions = {
+    from: fromEmail,
+    to: email,
+    subject: '✅ Message Received - EMM-Fort Group',
+    text: emailText,
+    html: emailHtml,
+  };
+
+  await transporter.sendMail(mailOptions);
+  console.log(`Contact confirmation email sent to ${email}`);
+};

@@ -75,7 +75,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="flex items-center gap-2 p-1 pr-2 rounded-full border border-ui-border bg-ui-surface hover:bg-gray-100 transition-colors"
             >
-                <Image src="/images/user-avatar.png" alt="User Avatar" width={32} height={32} className="rounded-full" />              
+                <Image src="/images-webp/user-avatar.webp" alt="User Avatar" width={32} height={32} className="rounded-full" />              
                 <span className="text-sm font-semibold text-text-primary hidden md:block">{session?.user?.name || 'User'}</span>
                 <ChevronDown className={`h-4 w-4 text-text-secondary hidden md:block transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} />
             </button>

@@ -42,8 +42,8 @@ const SubsidiaryCard = ({ logoUrl, title, description, imageUrl, linkUrl ,imageP
           `}
           style={{ transitionDelay: inView ? '200ms' : '0ms' }} 
         >
-          <div className="bg-black p-3 rounded-2xl shadow-lg">
-            <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden">
+          <div className="border-2 border-brand-orange p-1 rounded-2xl shadow-lg">
+            <div className="relative aspect-[4/3] rounded-2xl  w-full overflow-hidden">
                 <Image
                     src={imageUrl}
                     alt={title}

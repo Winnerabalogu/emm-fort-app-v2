@@ -29,9 +29,10 @@ const toastVariants = cva(
   {
     variants: {
       variant: {
-        default: "border bg-background text-foreground",
-        destructive:
-          "destructive group border-destructive bg-destructive text-destructive-foreground",
+        default: "border-gray-200 bg-white text-gray-900",
+        destructive: "border-red-200 bg-red-50 text-red-900",
+        success: "border-green-200 bg-green-50 text-green-900",
+        warning: "border-amber-200 bg-amber-50 text-amber-900",
       },
     },
     defaultVariants: {
@@ -62,7 +63,7 @@ const ToastAction = React.forwardRef<
   <ToastPrimitives.Action
     ref={ref}
     className={cn(
-      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border border-gray-200 bg-white px-3 text-sm font-medium text-gray-900 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.variant-destructive]:border-red-200 group-[.variant-destructive]:hover:border-red-300 group-[.variant-destructive]:hover:bg-red-100 group-[.variant-destructive]:text-red-900 group-[.variant-success]:border-green-200 group-[.variant-success]:hover:bg-green-100 group-[.variant-success]:text-green-900 group-[.variant-warning]:border-amber-200 group-[.variant-warning]:hover:bg-amber-100 group-[.variant-warning]:text-amber-900",
       className
     )}
     {...props}
@@ -77,7 +78,7 @@ const ToastClose = React.forwardRef<
   <ToastPrimitives.Close
     ref={ref}
     className={cn(
-      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      "absolute right-2 top-2 rounded-md p-1 text-gray-400 opacity-0 transition-opacity hover:text-gray-600 focus:opacity-100 focus:outline-none focus:ring-2 focus:ring-orange-500 group-hover:opacity-100 group-[.variant-destructive]:text-red-400 group-[.variant-destructive]:hover:text-red-600 group-[.variant-success]:text-green-400 group-[.variant-success]:hover:text-green-600 group-[.variant-warning]:text-amber-500 group-[.variant-warning]:hover:text-amber-700",
       className
     )}
     toast-close=""
