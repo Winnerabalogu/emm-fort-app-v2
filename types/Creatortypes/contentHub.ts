@@ -16,6 +16,7 @@ export interface ContentTemplate {
 
 // User content interface
 export interface UserContent {
+  status: string;
   id: string;
   title: string;
   platform: 'Instagram' | 'TikTok';
@@ -88,7 +89,11 @@ export interface CaptionTemplatesProps {
 }
 
 export interface ContentCalendarProps {
+  scheduledContent?: UserContent[];
   onSchedulePost: () => void;
+  onEditScheduled: (id: string) => void;
+  onDeleteScheduled: (id: string) => void;
+  isLoading?: boolean;
 }
 
 export interface ContentHubHeaderProps {

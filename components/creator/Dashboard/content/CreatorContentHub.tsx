@@ -465,8 +465,11 @@ useEffect(() => {
       case 'schedule':
         return (
           <div className="p-6">
-            <ContentCalendar 
-              onSchedulePost={handlers.onSchedulePost}
+            <ContentCalendar               
+            onSchedulePost={handlers.onSchedulePost}
+            scheduledContent={[]} // Add empty array for now
+            onEditScheduled={(post) => handlers.onEditPost(post)}
+            onDeleteScheduled={handlers.onDeletePost}
             />
           </div>
         );
