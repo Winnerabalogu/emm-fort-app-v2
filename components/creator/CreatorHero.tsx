@@ -11,65 +11,69 @@ export default function CreatorHero() {
 
   return (
     <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100 py-20 overflow-hidden">
-      <div className="container mx-auto pt-32 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-12 items-center">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
           {/* Left Content - Order 1 on all screens */}
-          <div className="space-y-6 order-1 mb-3">
-            <div className="space-y-3">
+          <div className="space-y-6 order-1">
+            <div className="space-y-2 mb-6">
               <p className="text-red-500 text-3xl lg:text-4xl font-bold uppercase tracking-wide">
                 EMM-FORT CREATOR PROGRAM
               </p>
               <h1 className="text-sm font-bold text-gray-900 leading-tight text-balance">
                 Earn 5% Commission Creating Content You Already Love
               </h1>
-              <p className="text-gray-600 text-lg mb-2 ">
+              <p className="text-gray-600 text-lg">
                 Get paid when people shop groceries through your content. Create fun, authentic grocery hauls,
                 unboxings, and lifestyle posts.
               </p>
             </div>
             
-            {/* Dynamic button based on auth state */}
-            {!isLoading && (
-              <>
-                {isCreator ? (
-                  <Link href="/creator/dashboard">
-                    <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                      Go to Dashboard
-                    </button>
-                  </Link>
-                ) : (
-                  <Link href="/creator/auth/login">
-                    <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                      Start Earning Today
-                    </button>
-                  </Link>
-                )}
-              </>
-            )}
-            
-            {isLoading && (
-              <button disabled className="bg-gray-400 text-white font-semibold py-3 px-6 rounded-full">
-                Loading...
-              </button>
-            )}
+            {/* Fixed height container to prevent layout shift */}
+            <div className="h-12 flex items-center">
+              {!isLoading && (
+                <>
+                  {isCreator ? (
+                    <Link href="/creator/dashboard">
+                      <button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                        Go to Dashboard
+                      </button>
+                    </Link>
+                  ) : (
+                    <Link href="/creator/auth/login">
+                      <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
+                        Start Earning Today
+                      </button>
+                    </Link>
+                  )}
+                </>
+              )}
+              
+              {isLoading && (
+                <button disabled className="bg-gray-400 text-white font-semibold py-3 px-6 rounded-full">
+                  Loading...
+                </button>
+              )}
+            </div>
           </div>
 
-          {/* Center Content - Hero Image with Animated Background - Order 2 on mobile, 2 on desktop */}
+          {/* Center Content - Hero Image with Background - Order 2 on mobile, 2 on desktop */}
           <div className="relative order-2 flex justify-center">
-            <div className="relative w-80 h-80 lg:w-96 lg:h-96">
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse"></div>
-              <div
-                className="absolute inset-0 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
-                style={{
-                  animation: "float 6s ease-in-out infinite",
-                  transform: "scale(1.05)",
-                }}
-              ></div>
+            {/* Background gradients - positioned lower with more width */}
+            <div className="absolute top-32 left-4 right-4 bottom-32 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60"></div>
+            <div
+              className="absolute top-28 left-2 right-2 bottom-28 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
+              style={{
+                animation: "float 6s ease-in-out infinite",
+              }}
+            ></div>
+            
+            {/* Image container - much larger to avoid cropping */}
+            <div className="relative w-[500px] h-[500px] lg:w-[600px] lg:h-[600px] z-10">
               <Image
                 src="/creator/img_4.png"
                 fill
                 alt="Content creator with finger to lips"
-                className="absolute inset-4 w-72 h-72 lg:w-88 lg:h-88 object-cover rounded-full z-10 transition-transform duration-300 hover:scale-105"
+                className="object-contain transition-transform duration-300 hover:scale-105"
               />
             </div>
           </div>
@@ -123,6 +127,18 @@ export default function CreatorHero() {
           </div>
         </div>
       </div>
+
+      {/* Custom CSS for float animation */}
+      <style jsx>{`
+        @keyframes float {
+          0%, 100% {
+            transform: translateY(0) scale(1.05);
+          }
+          50% {
+            transform: translateY(-10px) scale(1.05);
+          }
+        }
+      `}</style>
     </section>
   );
 }
