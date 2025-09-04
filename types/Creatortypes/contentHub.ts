@@ -72,7 +72,7 @@ export interface ContentStatsGridProps {
 }
 
 export interface ContentTemplatesProps {
-  templates: ContentTemplate[];
+  templates?: ContentTemplate[];
   onUseTemplate: (template: ContentTemplate) => void;
   onPreviewTemplate: (template: ContentTemplate) => void;
 }

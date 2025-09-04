@@ -3,7 +3,7 @@ export const runtime = 'nodejs';
 import { NextResponse } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
-import { startOfWeek, subDays, eachDayOfInterval, format } from 'date-fns';
+import { format, startOfWeek, startOfMonth, eachDayOfInterval } from 'date-fns';
 
 export async function GET() {
   try {
@@ -13,10 +13,14 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    if (!session?.user?.isCreator) {
+      return NextResponse.json({ error: 'Creator access required' }, { status: 403 });
+    }
+
     const userId = session.user.id;
     const now = new Date();
     const weekStart = startOfWeek(now);
-    const monthStart = subDays(now, 30);
+    const monthStart = startOfMonth(now);
 
     // Check if user is a creator
     const user = await prisma.user.findUnique({
@@ -110,7 +114,6 @@ export async function GET() {
           uplinerId: userId,
           emailVerified: { not: null },
           createdAt: { gte: weekStart }
-          
         }
       }),
 
@@ -165,46 +168,78 @@ export async function GET() {
     const thisWeekEarnings = thisWeekEarningsData._sum.amount || 0;
     const thisMonthEarnings = thisMonthEarningsData._sum.amount || 0;
     const pendingEarnings = pendingEarningsData._sum.amount || 0;
-// Generate last 30 days earnings trend
-const dailyEarningsMap = new Map<string, number>();
 
-eachDayOfInterval({ start: monthStart, end: now }).forEach(date => {
-  const dayKey = format(date, 'MMM d'); // e.g. "Aug 25"
-  dailyEarningsMap.set(dayKey, 0);
-});
+    // Generate last 30 days earnings trend
+    const dailyEarningsMap = new Map<string, number>();
 
-const transactionsLast30Days = await prisma.transaction.findMany({
-  where: {
-    userId,
-    type: 'COMMISSION',
-    status: 'COMPLETED',
-    createdAt: { gte: monthStart }
-  },
-  select: {
-    amount: true,
-    createdAt: true
-  }
-});
+    eachDayOfInterval({ start: monthStart, end: now }).forEach(date => {
+      const dayKey = format(date, 'MMM d'); // e.g. "Aug 25"
+      dailyEarningsMap.set(dayKey, 0);
+    });
 
-transactionsLast30Days.forEach(tx => {
-  const dayKey = format(tx.createdAt, 'MMM d');
-  dailyEarningsMap.set(dayKey, (dailyEarningsMap.get(dayKey) || 0) + Number(tx.amount));
-});
+    const transactionsLast30Days = await prisma.transaction.findMany({
+      where: {
+        userId,
+        type: 'COMMISSION',
+        status: 'COMPLETED',
+        createdAt: { gte: monthStart }
+      },
+      select: {
+        amount: true,
+        createdAt: true
+      }
+    });
 
-// Convert to array for charting
-const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
-  date,
-  earnings: Number(earnings.toFixed(2))
-}));
+    transactionsLast30Days.forEach(tx => {
+      const dayKey = format(tx.createdAt, 'MMM d');
+      dailyEarningsMap.set(dayKey, (dailyEarningsMap.get(dayKey) || 0) + Number(tx.amount));
+    });
 
-    // Calculate growth percentages (mock calculation for demo)
+    // Convert to array for charting
+    const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
+      date,
+      earnings: Number(earnings.toFixed(2))
+    }));
+
+    // Calculate growth percentages
     const earningsGrowth = thisMonthEarnings > 0 ? 
       ((thisWeekEarnings * 4 - thisMonthEarnings) / thisMonthEarnings * 100) : 0;
 
     // Generate referral code (using username with current year)
     const referralCode = `${user.username?.toUpperCase()}${new Date().getFullYear()}`;
 
-    // Create dashboard response
+    // Transform content posts to activity format
+    const contentActivities = recentActivity.map(content => ({
+      id: content.id,
+      type: 'content' as const,
+      description: `Posted "${content.title}" on ${content.platform}`,
+      timestamp: content.createdAt.toISOString(),
+      amount: content.earnings || null,
+      metadata: {
+        platform: content.platform,
+        views: content.views,
+        likes: content.likes
+      }
+    }));
+
+    // Transform transactions to activity format
+    const transactionActivities = recentTransactions
+      .filter(tx => tx.amount > 50) // Only show significant transactions
+      .slice(0, 3)
+      .map(tx => ({
+        id: tx.id,
+        type: 'earning' as const,
+        description: tx.description || `${tx.type.toLowerCase()} received`,
+        timestamp: tx.createdAt.toISOString(),
+        amount: tx.amount
+      }));
+
+    // Combine and sort activities
+    const allActivities = [...contentActivities, ...transactionActivities]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 10);
+
+    // Construct response
     const dashboardData = {
       user: {
         id: user.id,
@@ -218,51 +253,47 @@ const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
         contentStyle: user.contentStyle,
         followersCount: user.followersCount,
         referralCode: referralCode,
-        memberSince: user.createdAt
+        isCreator: user.isCreator,
+        joinDate: user.createdAt.toISOString()
       },
       stats: {
-        totalEarnings: Number(totalEarnings.toFixed(2)),
-        thisWeekEarnings: Number(thisWeekEarnings.toFixed(2)),
-        thisMonthEarnings: Number(thisMonthEarnings.toFixed(2)),
-        pendingEarnings: Number(pendingEarnings.toFixed(2)),
-        earningsGrowth: Number(earningsGrowth.toFixed(1)),
+        totalEarnings: Number(totalEarnings),
+        thisWeekEarnings: Number(thisWeekEarnings),
+        thisMonthEarnings: Number(thisMonthEarnings),
+        pendingEarnings: Number(pendingEarnings),
         totalReferrals: totalReferralsCount,
         thisWeekReferrals: thisWeekReferralsCount,
         totalContentPosts: contentPostsCount,
-        thisWeekContentPosts: thisWeekContentCount
+        thisWeekContentPosts: thisWeekContentCount,
+        earningsGrowth: Number(earningsGrowth.toFixed(1)),
+        conversionRate: totalReferralsCount > 0 ? 
+          ((totalReferralsCount / (totalReferralsCount + 50)) * 100).toFixed(1) : '0.0' // Example calculation
       },
-       dailyEarnings,
+      dailyEarnings: dailyEarnings,
       recentTransactions: recentTransactions.map(tx => ({
         id: tx.id,
         type: tx.type,
-        amount: Number(tx.amount.toFixed(2)),
+        amount: Number(tx.amount),
+        date: tx.createdAt.toISOString(),
         status: tx.status,
-        description: tx.description,
-        createdAt: tx.createdAt.toISOString()
+        description: tx.description
       })),
-      recentActivity: [
-        // Add recent transactions as activity
-        ...recentTransactions.slice(0, 2).map(tx => ({
-          type: tx.type === 'COMMISSION' ? 'earning' : 'withdrawal',
-          message: tx.type === 'COMMISSION' ? 'Commission earned from grocery order' : 'Withdrawal processed',
-          amount: tx.type === 'COMMISSION' ? `₦${tx.amount.toFixed(2)}` : `₦${tx.amount.toFixed(2)}`,
-          time: getRelativeTime(tx.createdAt),
-          createdAt: tx.createdAt.toISOString()
-        })),
-        // Add recent content as activity
-        ...recentActivity.map(content => ({
-          type: 'content',
-          referralField: 'referrerId',
-          message: `Posted ${content.type} on ${content.platform}`,
-          amount: `${content.likes} likes`,
-          time: getRelativeTime(content.createdAt),
-          createdAt: content.createdAt.toISOString()
-        }))
-      ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).slice(0, 4)
+      recentActivity: allActivities,
+      contentPerformance: recentActivity.map(content => ({
+        id: content.id,
+        title: content.title,
+        platform: content.platform,
+        type: content.type,
+        views: content.views || 0,
+        likes: content.likes || 0,
+        earnings: Number(content.earnings || 0),
+        createdAt: content.createdAt.toISOString()
+      }))
     };
 
+    // Cache response for 2 minutes
     const response = NextResponse.json(dashboardData);
-    response.headers.set('Cache-Control', 'private, max-age=60, stale-while-revalidate=120');
+    response.headers.set('Cache-Control', 'private, max-age=120, stale-while-revalidate=240');
     
     return response;
 
@@ -270,8 +301,12 @@ const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
     console.error("CREATOR_DASHBOARD_API_ERROR: ", error);
 
     if (error instanceof Error) {
+      // Prisma-specific error handling
       if (error.message.includes('P2025')) {
-        return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
+      }
+      if (error.message.includes('P2002')) {
+        return NextResponse.json({ error: 'Database constraint error' }, { status: 400 });
       }
       if (error.message.includes('auth')) {
         return NextResponse.json({ error: 'Authentication error' }, { status: 401 });
@@ -293,24 +328,5 @@ const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
       },
       { status: 500 }
     );
-  }
-}
-
-// Helper function to get relative time
-function getRelativeTime(date: Date): string {
-  const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  
-  if (diffInSeconds < 60) {
-    return 'Just now';
-  } else if (diffInSeconds < 3600) {
-    const minutes = Math.floor(diffInSeconds / 60);
-    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
-  } else if (diffInSeconds < 86400) {
-    const hours = Math.floor(diffInSeconds / 3600);
-    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-  } else {
-    const days = Math.floor(diffInSeconds / 86400);
-    return `${days} day${days > 1 ? 's' : ''} ago`;
   }
 }

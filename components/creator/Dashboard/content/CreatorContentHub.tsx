@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect ,useCallback} from 'react';
 import { Camera, Users, Edit, Calendar, Plus } from 'lucide-react';
 import { PreviewModal } from '@/components/modals/previewmodal';
 import { sharedUtils } from '@/utils/helpers';
 
 // Import your existing components
-import ContentHubHeader from './ContentHubHeader';
 import ContentStatsGrid from './ContentStatsGrid';
 import TabButton from './TabButton';
 import MyContent from './MyContent';
@@ -62,26 +61,40 @@ class ContentHubAPI {
     }
   }
 
-  static async getContentTemplates(): Promise<ContentTemplate[]> {
-    try {
-      const response = await fetch(`${this.baseURL}/templates`);
-      if (!response.ok) throw new Error('Failed to fetch templates');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching templates:', error);
-      // Return mock data if API fails
-      return [
-        {
-          id: '1',
-          title: 'Grocery Haul Unboxing',
-          description: 'Show off your fresh groceries with this engaging unboxing format',
-          platform: 'Instagram',
-          type: 'video',
-          duration: '30s',
-          tags: ['groceries', 'unboxing', 'fresh', 'haul'],
-          engagement: 'High',
-          difficulty: 'Easy'
-        },
+ static async getContentTemplates(): Promise<ContentTemplate[]> {
+  try {
+    // Add type=templates parameter
+    const response = await fetch(`${this.baseURL}/templates?type=templates`);
+    if (!response.ok) throw new Error('Failed to fetch templates');
+    
+    const result = await response.json();
+    
+    // Handle the API response structure
+    if (result.success && result.data && result.data.templates) {
+      return result.data.templates;
+    }
+    
+    // Fallback if structure is different
+    if (Array.isArray(result)) {
+      return result;
+    }
+    
+    throw new Error('Invalid response structure');
+  } catch (error) {
+    console.error('Error fetching templates:', error);
+    // Return mock data if API fails
+    return [
+      {
+        id: '1',
+        title: 'Grocery Haul Unboxing',
+        description: 'Show off your fresh groceries with this engaging unboxing format',
+        platform: 'Instagram',
+        type: 'video',
+        duration: '30s',
+        tags: ['groceries', 'unboxing', 'fresh', 'haul'],
+        engagement: 'High',
+        difficulty: 'Easy'
+      },
         {
           id: '2',
           title: 'Recipe Prep Tutorial',
@@ -164,16 +177,25 @@ class ContentHubAPI {
     }
   }
 
-  static async getCaptionTemplates(): Promise<CaptionTemplate[]> {
-    try {
-      const response = await fetch(`${this.baseURL}/captions`);
-      if (!response.ok) throw new Error('Failed to fetch captions');
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching captions:', error);
-      throw error;
+ static async getCaptionTemplates(): Promise<CaptionTemplate[]> {
+  try {
+    // Use the captions endpoint which returns the correct structure
+    const response = await fetch(`${this.baseURL}/captions`);
+    if (!response.ok) throw new Error('Failed to fetch captions');
+    
+    const result = await response.json();
+    
+    // Handle the response structure from captions route
+    if (result.captions && Array.isArray(result.captions)) {
+      return result.captions;
     }
+    
+    throw new Error('Invalid response structure');
+  } catch (error) {
+    console.error('Error fetching captions:', error);
+    throw error;
   }
+}
 
   private static formatNumber(num: number): string {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -215,25 +237,54 @@ const CreatorContentHub: React.FC = () => {
     contentEarnings: '₦0'
   });
 
-  const [contentTemplates, setContentTemplates] = useState<ContentTemplate[]>([]);
+  
+const [contentTemplates, setContentTemplates] = useState<ContentTemplate[]>([]);
   const [captionTemplates, setCaptionTemplates] = useState<CaptionTemplate[]>([]);
   const [templatesLoaded, setTemplatesLoaded] = useState(false);
+  const [templatesLoading, setTemplatesLoading] = useState(false);
   const [captionsLoaded, setCaptionsLoaded] = useState(false);
 
-  // Load data when component mounts or tab changes
-  useEffect(() => {
-    if (activeTab === 'templates') {
-      loadContentStats();
-      if (!templatesLoaded) {
-        loadContentTemplates();
-      }
-    } else if (activeTab === 'captions') {
-      if (!captionsLoaded) {
-        loadCaptionTemplates();
-      }
-    }
-  }, [activeTab, templatesLoaded, captionsLoaded]);
+const loadContentTemplates = useCallback(async () => {
+  if (templatesLoading) return;
+  
+  try {
+    setTemplatesLoading(true);
+    const templates = await ContentHubAPI.getContentTemplates();
+    setContentTemplates(Array.isArray(templates) ? templates : []);
+    setTemplatesLoaded(true);
+  } catch (err) {
+    console.error('Failed to load templates:', err);
+    setContentTemplates([]);
+    setError('Failed to load templates');
+  } finally {
+    setTemplatesLoading(false);
+  }
+}, [templatesLoading]); // Only re-create if templatesLoading changes
 
+
+ const loadCaptionTemplates = useCallback(async () => {
+  try {
+    const captions = await ContentHubAPI.getCaptionTemplates();
+    setCaptionTemplates(captions);
+    setCaptionsLoaded(true);
+  } catch (err) {
+    console.error('Failed to load captions:', err);
+    setError('Failed to load captions');
+  }
+}, []);
+  // Load data when component mounts or tab changes
+useEffect(() => {
+  if (activeTab === 'templates') {
+    loadContentStats();
+    if (!templatesLoaded && !templatesLoading) {
+      loadContentTemplates();
+    }
+  } else if (activeTab === 'captions') {
+    if (!captionsLoaded) {
+      loadCaptionTemplates();
+    }
+  }
+}, [activeTab, templatesLoaded, captionsLoaded, templatesLoading, loadContentTemplates, loadCaptionTemplates]);
   const loadContentStats = async () => {
     try {
       setLoading(true);
@@ -247,27 +298,7 @@ const CreatorContentHub: React.FC = () => {
     }
   };
 
-  const loadContentTemplates = async () => {
-    try {
-      const templates = await ContentHubAPI.getContentTemplates();
-      setContentTemplates(templates);
-      setTemplatesLoaded(true);
-    } catch (err) {
-      console.error('Failed to load templates:', err);
-      setError('Failed to load templates');
-    }
-  };
 
-  const loadCaptionTemplates = async () => {
-    try {
-      const captions = await ContentHubAPI.getCaptionTemplates();
-      setCaptionTemplates(captions);
-      setCaptionsLoaded(true);
-    } catch (err) {
-      console.error('Failed to load captions:', err);
-      setError('Failed to load captions');
-    }
-  };
 
   // Enhanced reordering handlers with API persistence
   const handleReorderTemplates = async (newOrder: ContentTemplate[]) => {
@@ -389,31 +420,32 @@ const CreatorContentHub: React.FC = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'templates':
-        return (
-          <div className="p-6">
-            {loading && <LoadingSpinner />}
-            {error && <ErrorState message={error} onRetry={loadContentStats} />}
-            {!loading && !error && (
-              <>
-                <ContentStatsGrid stats={contentStats} />
-                <div className="mt-6">
-                  <EnhancedContentTemplates 
-                    templates={contentTemplates}
-                    onUseTemplate={handlers.onUseTemplate}
-                    onPreviewTemplate={handlers.onPreviewTemplate}
-                    onReorderTemplates={handleReorderTemplates}
-                  />
-                </div>
-              </>
-            )}
+       case 'templates':
+  return (
+    <div className="p-6">
+      {loading && <LoadingSpinner />}
+      {error && <ErrorState message={error} onRetry={loadContentStats} />}
+      {!loading && !error && (
+        <>
+          <ContentStatsGrid stats={contentStats} />
+          <div className="mt-6">
+            <EnhancedContentTemplates 
+              templates={contentTemplates || []} // Extra safety
+              onUseTemplate={handlers.onUseTemplate}
+              onPreviewTemplate={handlers.onPreviewTemplate}
+              onReorderTemplates={handleReorderTemplates}
+            />
           </div>
-        );
+        </>
+      )}
+    </div>
+  );
 
       case 'my-content':
         return (
           <div className="p-6">
             <MyContent 
-              content={[]} // Component will fetch its own data
+              content={[]}
               onAddNewPost={handlers.onAddNewPost}
             />
           </div>

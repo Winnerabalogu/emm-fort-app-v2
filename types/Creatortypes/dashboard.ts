@@ -25,9 +25,11 @@ export interface SidebarLink {
 export interface Activity {
  type: 'earning' | 'withdrawal' | 'content'| 'referral'|'withdrawal';
   message: string;
-  amount: string;
+  amount?: number | null;
   time: string;
   createdAt?: string;
+  description: string;
+  timestamp: string;
 }
 
 // Stat card interface
@@ -62,6 +64,7 @@ export interface StatsGridProps {
 
 export interface QuickActionsProps {
   user: User;
+  onRefresh?: () => void;
 }
 
 export interface ActivityItemProps {
@@ -72,6 +75,7 @@ export interface ActivityItemProps {
 export interface RecentActivityProps {
   activities?: Activity[];
   transactions?:RecentTransaction[]
+   isLoading?: boolean;
 }
 
 export interface DashboardStats {
@@ -109,9 +113,21 @@ export interface RecentActivities {
 }
 
 export interface DashboardData {
-  user: unknown; 
+  user: {
+    id: string;
+    fullName: string;
+    username: string;
+    email: string;
+    phone?: string;
+    instagramHandle?: string;
+    tiktokHandle?: string;
+    whatsappNumber?: string;
+    referralCode: string;
+    isCreator: boolean;
+    joinDate: string;
+  };
   stats: DashboardStats;
   dailyEarnings: DailyEarning[];
   recentTransactions: RecentTransaction[];
-  recentActivity: RecentActivities[];
+  recentActivity: Activity[];
 }

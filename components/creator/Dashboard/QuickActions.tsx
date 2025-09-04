@@ -1,23 +1,30 @@
+// components/creator/Dashboard/QuickActions.tsx
 import React from 'react';
-import { Camera, Share2, Copy } from 'lucide-react';
+import { Camera, Share2, Copy, RefreshCw } from 'lucide-react';
 import { QuickActionsProps } from '@/types/Creatortypes/dashboard';
 import { generateShareableUrl, sharedUtils } from '@/utils/helpers';
-const QuickActions: React.FC<QuickActionsProps> = ({ user }) => {
 
-   const handlers = {  
-          onCreateContent: () => {
-            sharedUtils.navigateToCreateContent();
-          },
-          onCopyRef: ()=> {
-            sharedUtils.copyToClipboard(user.referralCode);
-          },
-          onShare: () =>{
-            generateShareableUrl(user.referralCode)
-          }
+const QuickActions: React.FC<QuickActionsProps> = ({ user, onRefresh }) => {
+
+  const handlers = {  
+    onCreateContent: () => {
+      sharedUtils.navigateToCreateContent();
+    },
+    onCopyRef: () => {
+      sharedUtils.copyToClipboard(user.referralCode);
+    },
+    onShare: () => {
+      generateShareableUrl(user.referralCode);
+    },
+    onRefreshData: () => {
+      if (onRefresh) {
+        onRefresh();
+      }
     }
+  };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
       {/* Create Content Card */}
       <div className="bg-gradient-to-br from-orange-500 to-amber-500 rounded-xl p-6 text-white">
         <div className="flex items-center justify-between mb-4">
@@ -28,7 +35,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ user }) => {
           Use our content templates to create engaging posts and earn more commissions
         </p>
         <button 
-           onClick={handlers.onCreateContent}
+          onClick={handlers.onCreateContent}
           className="bg-white text-orange-600 font-semibold px-4 py-2 rounded-lg hover:bg-orange-50 transition-colors"
         >
           Get Started
@@ -59,6 +66,24 @@ const QuickActions: React.FC<QuickActionsProps> = ({ user }) => {
             Share Now
           </button>
         </div>
+      </div>
+
+      {/* Refresh Data Card */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Dashboard</h3>
+          <RefreshCw className="h-6 w-6 text-gray-600" />
+        </div>
+        <p className="text-gray-600 mb-4">
+          Keep your dashboard data up to date with the latest earnings and activity
+        </p>
+        <button 
+          onClick={handlers.onRefreshData}
+          className="w-full bg-blue-600 text-white font-semibold py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+        >
+          <RefreshCw className="h-4 w-4" />
+          Refresh Data
+        </button>
       </div>
     </div>
   );

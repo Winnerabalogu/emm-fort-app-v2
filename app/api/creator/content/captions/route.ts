@@ -122,12 +122,12 @@ export async function GET(request: NextRequest) {
       // Apply custom order if exists
       if (captionOrderPreference) {
         try {
-          const customOrder = JSON.parse(captionOrderPreference.value);
-          const orderedCaptions = [];
+          const customOrder: { id: string; order: number }[] = JSON.parse(captionOrderPreference.value);
+          const orderedCaptions: typeof captions = [];
           const captionMap = new Map(captions.map(c => [c.id, c]));
 
           // Add captions in custom order
-          customOrder.forEach((orderItem: { id: string; order: number }) => {
+          customOrder.forEach((orderItem) => {
             const caption = captionMap.get(orderItem.id);
             if (caption) {
               orderedCaptions.push(caption);
@@ -241,5 +241,72 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ 
       error: 'Failed to process caption request' 
     }, { status: 500 });
+  }
+}
+
+// PUT - Update caption order preference
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const userId = session.user.id;
+    const body = await request.json();
+
+    // Validate user is a creator
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { id: true, isCreator: true }
+    });
+
+    if (!user?.isCreator) {
+      return NextResponse.json({ 
+        error: 'Access denied. Creator account required.' 
+      }, { status: 403 });
+    }
+
+    // Check if this is an order update request
+    if (body.captionOrder && Array.isArray(body.captionOrder)) {
+      // Update caption order preference
+      await prisma.userPreference.upsert({
+        where: {
+         UserPreference_userId_key_unique: {
+            userId,
+            key: 'captionOrder' 
+          }
+        },
+        create: {
+          userId,
+          key: 'captionOrder',
+          value: JSON.stringify(body.captionOrder)
+        },
+        update: {
+          value: JSON.stringify(body.captionOrder),
+          updatedAt: new Date()
+        }
+      });
+
+      return NextResponse.json({ 
+        message: 'Caption order updated successfully' 
+      });
+    }
+
+    return NextResponse.json(
+      { error: 'Invalid request format' },
+      { status: 400 }
+    );
+
+  } catch (error: unknown) {
+    console.error('CAPTIONS_PUT_ERROR:', error);
+    return NextResponse.json(
+      { 
+        error: 'Failed to update caption order',
+        details: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined
+      },
+      { status: 500 }
+    );
   }
 }

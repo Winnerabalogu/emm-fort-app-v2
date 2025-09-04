@@ -5,10 +5,10 @@ import { Copy, Eye, GripVertical, Instagram, Music, Play, Video , Image} from 'l
 import { ContentTemplate, CaptionTemplate } from '@/types/Creatortypes/contentHub';
 import { EngagementBadge, DifficultyBadge } from '../creator/Dashboard/content';
 
-// Generic drag and drop interfaces
+// Generic drag and drop interfaces - simplified to just require id
 interface DragDropItem {
   id: string;
-  [key: string]: string | number | boolean | undefined;
+  // Removed index signature to allow more complex types
 }
 
 interface DragDropContainerProps<T extends DragDropItem> {
