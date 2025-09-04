@@ -38,7 +38,7 @@ function Header() {
 
           {/* CTA Button */}
           <Link
-            href="/creator/membership"
+            href="/creator/auth/login"
             className="hidden md:inline-flex bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-semibold px-6 py-3 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
           >
             Join Creator Program
@@ -75,7 +75,7 @@ function Header() {
                 Contact us
               </Link>             
               <Link
-                href="/creator/membership"
+                href="/creator/auth/login"
                 className="bg-gradient-to-r from-red-500 to-orange-500 text-white font-semibold px-6 py-3 rounded-full text-center"
               >
                 Join Creator Program
