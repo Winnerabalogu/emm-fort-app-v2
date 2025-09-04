@@ -12,7 +12,7 @@ export default function CreatorHero() {
   return (
     <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100 py-20 overflow-hidden">
       <div className="container mx-auto pt-32 pb-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 lg:gap-12 items-center">
           {/* Left Content - Order 1 on all screens */}
           <div className="space-y-6 order-1 mb-3">
             <div className="space-y-3">
@@ -22,7 +22,7 @@ export default function CreatorHero() {
               <h1 className="text-sm font-bold text-gray-900 leading-tight text-balance">
                 Earn 5% Commission Creating Content You Already Love
               </h1>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 text-lg mb-2 ">
                 Get paid when people shop groceries through your content. Create fun, authentic grocery hauls,
                 unboxings, and lifestyle posts.
               </p>

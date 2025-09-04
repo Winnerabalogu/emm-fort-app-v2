@@ -28,6 +28,9 @@ function Header() {
             <Link href="/creator/platform" className="text-gray-700 hover:text-red-500 transition-colors">
               Platform
             </Link>
+            <Link href="/creator/membership" className="text-gray-700 hover:text-red-500 transition-colors">
+              Memebership
+            </Link>
             <Link href="/creator/contact" className="text-gray-700 hover:text-red-500 transition-colors">
               Contact us
             </Link>                        
@@ -64,6 +67,9 @@ function Header() {
               </Link>
               <Link href="/creator/platform" className="text-gray-700 hover:text-red-500 transition-colors">
                 Platform
+              </Link>
+              <Link href="/creator/membership" className="text-gray-700 hover:text-red-500 transition-colors">
+                Memebership
               </Link>
               <Link href="/creator/contact" className="text-gray-700 hover:text-red-500 transition-colors">
                 Contact us
