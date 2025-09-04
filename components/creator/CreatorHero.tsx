@@ -66,7 +66,7 @@ export default function CreatorHero() {
                 }}
               ></div>
               <Image
-                src="/creator-webp/img_-1.webp"
+                src="/creator/img_4.png"
                 fill
                 alt="Content creator with finger to lips"
                 className="absolute inset-4 w-72 h-72 lg:w-88 lg:h-88 object-cover rounded-full z-10 transition-transform duration-300 hover:scale-105"
