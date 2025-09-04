@@ -10,11 +10,11 @@ export default function CreatorHero() {
   const isLoading = status === "loading";
 
   return (
-    <section className="bg-gradient-to-br from-gray-50 to-gray-100 py-20 overflow-hidden">
+    <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100 py-20 overflow-hidden">
       <div className="container mx-auto pt-32 pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 items-center">
           {/* Left Content - Order 1 on all screens */}
-          <div className="space-y-6 order-1">
+          <div className="space-y-6 order-1 mb-3">
             <div className="space-y-3">
               <p className="text-red-500 text-3xl lg:text-4xl font-bold uppercase tracking-wide">
                 EMM-FORT CREATOR PROGRAM
@@ -66,7 +66,7 @@ export default function CreatorHero() {
                 }}
               ></div>
               <Image
-                src="/creator-webp/img_4.webp"
+                src="/creator-webp/img_-1.webp"
                 fill
                 alt="Content creator with finger to lips"
                 className="absolute inset-4 w-72 h-72 lg:w-88 lg:h-88 object-cover rounded-full z-10 transition-transform duration-300 hover:scale-105"
