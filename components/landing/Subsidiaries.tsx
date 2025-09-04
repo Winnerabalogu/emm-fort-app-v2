@@ -7,7 +7,7 @@ interface SubsidiariesProps {
 const subsidiariesData = [
   {
     logoUrl: '/logos-webp/supermarket-logo.webp',
-    title: 'EMM-FORT SUPERMARKET',
+    title: 'EMM-FORT NIGERIA',
     description: 'Pioneering e-commerce in Nigeria with a curated selection of quality grocery products, delivered swiftly to your doorstep.',
     imageUrl: '/images-webp/supermarket.webp',
      linkUrl: 'https://emm-fort.com.ng/'

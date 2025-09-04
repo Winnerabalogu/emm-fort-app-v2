@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
 import { signIn } from 'next-auth/react';
+import Link from 'next/link';
 
 export default function CreatorLoginForm() {
   const router = useRouter();
@@ -235,19 +236,23 @@ export default function CreatorLoginForm() {
 
           {/* Sign Up Link */}
           <div className="mt-8 text-center pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600">
+            <Link href={'/creator/auth/register'}>
+            <p className="text-sm text-gray-600">            
               New to the creator program?{' '}
               <button className="font-semibold text-orange-600 hover:text-orange-700 transition-colors">
                 Join today and start earning
               </button>
             </p>
+            </Link>
           </div>
 
           {/* Back to main site */}
           <div className="mt-6 text-center">
+            <Link href={'/'}>
             <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
               ← Back to EMM-FORT
             </button>
+            </Link>
           </div>
         </div>
       </div>
