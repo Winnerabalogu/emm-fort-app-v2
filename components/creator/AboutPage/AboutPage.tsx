@@ -1,7 +1,7 @@
 "use client"
 import Image from "next/image"
 import { useInView } from "react-intersection-observer"
-import { CameraIcon, MicIcon, BookOpenIcon, Music2Icon } from "lucide-react"
+import { ShoppingCartIcon, PackageIcon, ChefHatIcon, StarIcon } from "lucide-react"
 
 const AboutPageComponent = () => {
   const { ref: heroRef, inView: heroInView } = useInView({
@@ -24,33 +24,33 @@ const AboutPageComponent = () => {
     threshold: 0.1,
   })
 
-  const categories = [
+  const contentCategories = [
     {
-      icon:CameraIcon,
-      title: "Daily Vlog",
+      icon: ShoppingCartIcon,
+      title: "Grocery Hauls",
       description:
-        "Share your daily adventures and connect with audiences through authentic storytelling and behind-the-scenes content.",
+        "Weekly grocery shopping videos showcasing fresh products and budget-friendly finds with natural product placement.",
       color: "from-purple-500 to-pink-500",
     },
     {
-      icon: MicIcon,
-      title: "Podcast",
+      icon: PackageIcon,
+      title: "Unboxing Videos",
       description:
-        "Create engaging audio content that educates, entertains, and builds meaningful conversations with your community.",
+        "Exciting unboxing content featuring grocery deliveries and product reveals that build trust and drive engagement.",
       color: "from-blue-500 to-cyan-500",
     },
     {
-      icon: BookOpenIcon,
-      title: "Story Teller",
+      icon: ChefHatIcon,
+      title: "Cooking Content",
       description:
-        "Craft compelling narratives that captivate audiences and bring brands to life through powerful storytelling.",
+        "Recipe videos and meal prep content using groceries from our partner stores, showing products in action.",
       color: "from-green-500 to-emerald-500",
     },
     {
-      icon: Music2Icon,
-      title: "Music",
+      icon: StarIcon,
+      title: "Lifestyle Posts",
       description:
-        "Share your musical talents and create soundtracks that resonate with audiences and enhance brand experiences.",
+        "Authentic lifestyle content featuring grocery shopping and healthy living integrated naturally into daily routines.",
       color: "from-orange-500 to-red-500",
     },
   ]
@@ -64,13 +64,13 @@ const AboutPageComponent = () => {
             <h1
               className={`text-4xl md:text-5xl font-bold text-gray-900 mb-4 transition-all duration-1000 ease-out ${heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
-              About us
+              About EMM-FORT Creator Program
             </h1>
             <p
               className={`text-xl text-gray-600 max-w-2xl mx-auto transition-all duration-1000 ease-out ${heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
               style={{ transitionDelay: heroInView ? "200ms" : "0ms" }}
             >
-              Creative and innovative at the same time.
+              Earn 5% commission creating grocery content you already love.
             </p>
           </div>
         </section>
@@ -87,16 +87,13 @@ const AboutPageComponent = () => {
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
                   Hello, I&apos;m Sarah Chen.
                   <br />
-                  Your favorite content creator.
+                  Your grocery content mentor.
                 </h2>
                 <p className="text-gray-600 text-lg mb-8">
-                  Welcome to EMM-FORT Creator Program, where creativity meets opportunity. I&apos;ve been creating
-                  content for over 5 years, helping brands connect with their audiences through authentic storytelling
-                  and innovative campaigns. Our mission is to empower creators like you to build sustainable careers
-                  while making a meaningful impact.
+                  Welcome to the EMM-FORT Creator Program, where grocery shopping meets earning opportunity. I&apos;ve helped over 10,000 creators turn their weekly grocery hauls into profitable content, earning 5% commission on every order. Our mission is to help everyday shoppers build income streams through authentic grocery and lifestyle content.
                 </p>
                 <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105">
-                  Learn more
+                  Start Earning Today
                 </button>
               </div>
 
@@ -110,7 +107,7 @@ const AboutPageComponent = () => {
                     <div className="w-full h-96 rounded-2xl overflow-hidden">
                       <Image
                         src="/creator-webp/1img_5.webp"
-                        alt="Sarah Chen - Content Creator"
+                        alt="Sarah Chen - Grocery Content Creator"
                         className="w-full h-full object-cover"
                         width={384}
                         height={384}
@@ -129,15 +126,14 @@ const AboutPageComponent = () => {
             <div
               className={`text-center mb-16 transition-all duration-1000 ease-out ${categoriesInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}
             >
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Featured Content Categories</h2>
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Popular Content Categories</h2>
               <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-                Discover the diverse range of content categories we support, each designed to help you showcase your
-                unique talents.
+                Discover the types of grocery content that perform best and drive the highest commission earnings for our creators.
               </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category, index) => {
+              {contentCategories.map((category, index) => {
                   const IconComponent = category.icon
                   return(
                 <div
@@ -172,13 +168,12 @@ const AboutPageComponent = () => {
               <div
                 className={`transition-all duration-1000 ease-out ${visionInView ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-8"}`}
               >
-                <h6 className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">VALUES</h6>
+                <h6 className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">OUR MISSION</h6>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-8">
-                  Making your everyday watching worthwhile.
+                  Making grocery shopping profitable for creators everywhere.
                 </h2>
                 <p className="text-gray-600 text-lg mb-12">
-                  We believe that great content has the power to inspire, educate, and transform lives. Our platform is
-                  built on the foundation of authenticity, creativity, and community.
+                  We believe that everyday activities like grocery shopping can become income opportunities. Our platform connects authentic creators with grocery shoppers, creating a win-win ecosystem where creators earn while helping people discover great products.
                 </p>
 
                 {/* Vision & Mission */}
@@ -203,8 +198,7 @@ const AboutPageComponent = () => {
                     <div>
                       <h4 className="text-xl font-bold text-gray-900 mb-2">Our vision</h4>
                       <p className="text-gray-600">
-                        To create a global ecosystem where every creator has the opportunity to thrive, connecting
-                        authentic voices with engaged communities worldwide.
+                        To create a world where every grocery shopping trip can become a source of income through authentic content creation and community building.
                       </p>
                     </div>
                   </div>
@@ -223,8 +217,7 @@ const AboutPageComponent = () => {
                     <div>
                       <h4 className="text-xl font-bold text-gray-900 mb-2">Our mission</h4>
                       <p className="text-gray-600">
-                        To empower content creators with the tools, resources, and partnerships they need to build
-                        sustainable careers while creating meaningful impact.
+                        To empower creators with tools and opportunities to monetize their grocery content while helping shoppers discover products through trusted, authentic recommendations.
                       </p>
                     </div>
                   </div>
@@ -238,7 +231,7 @@ const AboutPageComponent = () => {
                 <div className="relative">
                   <Image
                     src="/creator-bg-webp/about-value.webp"
-                    alt="Creator Vision"
+                    alt="Grocery Creator Community"
                     className="w-full h-96 object-cover rounded-2xl shadow-xl"
                     width={484}
                     height={216}
@@ -257,7 +250,7 @@ const AboutPageComponent = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
                 <Image
                   src="/creator-bg-webp/content-creator-1.webp"
-                  alt="Creator Community"
+                  alt="Grocery Haul Creator"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   width={384}
                   height={216}
@@ -266,7 +259,7 @@ const AboutPageComponent = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
                 <Image
                   src="/creator-bg-webp/content-creator-2.webp"
-                  alt="Creator Workshop"
+                  alt="Unboxing Content Creator"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   width={384}
                   height={216}
@@ -275,7 +268,7 @@ const AboutPageComponent = () => {
               <div className="aspect-video rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300 group">
                 <Image
                   src="/creator-bg-webp/content-creator-3.webp"
-                  alt="Creator Event"
+                  alt="Cooking Content Creator"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   width={384}
                   height={216}
@@ -289,7 +282,7 @@ const AboutPageComponent = () => {
          <section className="py-20 bg-gray-100">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
-          Ready to start earning commission on every grocery order?
+          Ready to start earning 5% commission on every grocery order?
         </h2>
         <p className="text-gray-600 text-lg mb-8 max-w-2xl mx-auto">
           Join thousands of creators who are already earning through authentic grocery content. Free signup, fast

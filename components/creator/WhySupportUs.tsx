@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import React, { useState } from 'react';
@@ -7,7 +6,6 @@ import { TrendingUp, Award, Users, ExternalLink, CheckCircle } from 'lucide-reac
 import InfoModal from '../modals/InfoModal';
 import Link from 'next/link';
 import { useSession } from 'next-auth/react';
-
 
 export default function WhySupportUs() {
     const { data: session, status } = useSession();
@@ -20,20 +18,20 @@ export default function WhySupportUs() {
   const features = [
     {
       icon: TrendingUp,
-      title: 'Business Growth & Scale Up',
-      description: 'Strategic guidance to scale your creator business and maximize revenue potential through proven growth strategies.',
+      title: '5% Commission on Every Order',
+      description: 'Earn competitive commission rates on all grocery orders made through your unique referral code with fast bi-weekly payouts.',
       delay: '0ms'
     },
     {
       icon: Award,
-      title: 'Premium Brand Partnerships',
-      description: 'Access to exclusive brand collaborations that align with your values and provide exceptional earning opportunities.',
+      title: 'Get Featured on Our Socials',
+      description: 'Top creators get featured on EMM-Fort\'s official TikTok and Instagram, reaching millions of potential customers.',
       delay: '100ms'
     },
     {
       icon: Users,
-      title: 'Community Success Network',
-      description: 'Join a thriving community of successful creators sharing insights, strategies, and collaborative opportunities.',
+      title: 'Join 10,000+ Active Creators',
+      description: 'Connect with a thriving community of grocery content creators sharing tips, collaborating, and growing together.',
       delay: '200ms'
     }
   ]
@@ -50,21 +48,19 @@ export default function WhySupportUs() {
               `}
             >
               <h6 className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
-                Why supporting us
+                Why join EMM-FORT
               </h6>
               <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
-                The ultimate social media experience.
+                Earn 5% Commission Creating Content You Already Love
               </h2>
               <p className="text-gray-600 text-lg mb-8">
-                Transform your digital presence with our comprehensive creator ecosystem. We provide the tools, 
-                support, and opportunities you need to build a sustainable and profitable creator business that 
-                stands out in today's competitive landscape.
+                Turn your grocery shopping into income with our creator affiliate program. Create fun, authentic grocery hauls, unboxing videos, and meal prep content while earning commission on every order made with your code. Free to join, no upfront costs.
               </p>
               <button 
                 onClick={() => setShowModal(true)}
                 className="inline-flex items-center border-2 border-orange-500 text-orange-500 font-semibold py-3 px-8 rounded-full hover:bg-orange-500 hover:text-white transition-all duration-300 group"
               >
-                Learn more 
+                Learn How It Works
                 <ExternalLink className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
@@ -105,33 +101,35 @@ export default function WhySupportUs() {
       <InfoModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Ultimate Social Media Experience"
+        title="How EMM-FORT Creator Program Works"
         icon={TrendingUp}
       >
         <div className="space-y-6">
-          <p className="text-lg">Experience the difference of working with a platform that truly understands creators. Our comprehensive ecosystem provides everything you need to build, grow, and monetize your social media presence effectively.</p>
+          <p className="text-lg">Join thousands of creators earning through authentic grocery content. Our three-step process makes it easy to start earning 5% commission on grocery orders while creating content you already love.</p>
           
           <div>
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-500" />
-              Platform Advantages
+              How It Works (3 Simple Steps)
             </h4>
-            <ul className="space-y-2">
-              <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Advanced analytics and performance tracking
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-sm">
+                <div className="w-6 h-6 bg-orange-500 rounded-full text-white flex items-center justify-center text-xs font-bold mt-0.5">1</div>
+                <div>
+                  <strong>Sign Up Free</strong> - Get your personal referral code and creator badge with instant approval
+                </div>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Direct brand partnership opportunities
+              <li className="flex items-start gap-3 text-sm">
+                <div className="w-6 h-6 bg-orange-500 rounded-full text-white flex items-center justify-center text-xs font-bold mt-0.5">2</div>
+                <div>
+                  <strong>Post & Share</strong> - Create grocery hauls, unboxing videos, and lifestyle posts featuring your code
+                </div>
               </li>
-              <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Automated payment processing
-              </li>
-              <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                24/7 creator support team
+              <li className="flex items-start gap-3 text-sm">
+                <div className="w-6 h-6 bg-orange-500 rounded-full text-white flex items-center justify-center text-xs font-bold mt-0.5">3</div>
+                <div>
+                  <strong>Earn 5%</strong> - Get paid bi-weekly on every grocery order made with your referral code
+                </div>
               </li>
             </ul>
           </div>
@@ -152,7 +150,7 @@ export default function WhySupportUs() {
 
           <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-2xl">
             <p className="font-semibold text-gray-900 text-center text-sm">
-              Join the platform that's helping creators build sustainable businesses and achieve financial freedom.
+              Start earning today with content you already create. We grow together, you earn as we grow.
             </p>
           </div>
           {/* Dynamic button based on auth state */}
@@ -167,7 +165,7 @@ export default function WhySupportUs() {
                 ) : (
               <Link href="/creator/auth/login">
               <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center gap-2">
-                Join Our Platform
+                Join Free Today
                 <ExternalLink className="w-4 h-4" />
                 
               </button>

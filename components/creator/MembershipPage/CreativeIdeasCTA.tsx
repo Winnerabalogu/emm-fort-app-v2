@@ -1,6 +1,7 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 import InfoModal from "@/components/modals/InfoModal"
-import { CheckCircle, ExternalLink, Star } from "lucide-react"
+import { CheckCircle, ExternalLink, ShoppingCart } from "lucide-react"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useState } from "react"
@@ -34,17 +35,16 @@ export function CreativeIdeasCTA() {
                 ${inView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
               `}
             >
-              Creative ideas that will help your brand soar.
+              Turn Your Grocery Shopping Into Viral TikTok Content
             </h2>
             <p className="text-white/90 text-lg mb-8 max-w-2xl mx-auto">
-              Ready to take your content to the next level? Join thousands of creators who are already building their
-              brand with us.
+              Join 10,000+ creators earning 5% commission through authentic grocery hauls, unboxing videos, and meal prep content. Free to start, unlimited earning potential.
             </p>
             <button 
               onClick={() => setShowModal(true)}
               className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
             >
-              Discover more
+              Get Content Ideas
             </button>
           </div>
         </div>
@@ -53,65 +53,65 @@ export function CreativeIdeasCTA() {
       <InfoModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
-        title="Brand Building Ideas"
-        icon={Star}
+        title="Viral Grocery Content Ideas"
+        icon={ShoppingCart}
       >
         <div className="space-y-6">
-          <p className="text-lg">Building a strong personal brand requires creativity, consistency, and authenticity. Our proven strategies help creators establish themselves as trusted authorities in their niche while growing their audience and revenue.</p>
+          <p className="text-lg">Transform your weekly grocery shopping into engaging TikTok content that drives sales and builds your audience. These proven content formats help creators earn $2,000+ monthly through authentic grocery content.</p>
           
           <div>
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-500" />
-              Brand Building Strategies
+              High-Converting Content Ideas
             </h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Develop a unique visual identity and color palette
+                Weekly grocery haul videos with budget breakdowns
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Create consistent messaging across all platforms
+                Grocery delivery unboxing and first impressions
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Share behind-the-scenes content to build authenticity
+                Meal prep using your grocery haul products
               </li>
               <li className="flex items-center gap-2 text-sm">
                 <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
-                Collaborate with other creators in your niche
+                Budget grocery challenges and money-saving tips
               </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <Star className="w-5 h-5 text-yellow-500" />
-              Creative Content Ideas
+              <ShoppingCart className="w-5 h-5 text-blue-500" />
+              TikTok-Optimized Formats
             </h4>
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                &quot;Day in the life&quot; vlogs featuring your routine
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                15-30 second grocery haul highlights with trending audio
               </li>
               <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                Educational tutorials in your area of expertise
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Price comparison videos ("grocery prices then vs now")
               </li>
               <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                Q&A sessions with your community
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                Quick recipe tutorials using featured products
               </li>
               <li className="flex items-center gap-2 text-sm">
-                <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                Challenge videos and trend participation
+                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                "Use my code [YOURCODE]" integrated naturally in content
               </li>
             </ul>
           </div>
 
           <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-2xl">
             <p className="font-semibold text-gray-900 text-center text-sm">
-              Our creators who follow these brand-building strategies see an average 250% increase in follower growth and engagement rates.
+              Creators following these content strategies see 400% higher engagement and earn an average of $2,500/month in commissions.
             </p>
           </div> {/* Dynamic button based on auth state */}
             {!isLoading && (
@@ -125,7 +125,7 @@ export function CreativeIdeasCTA() {
                 ) : (
           <Link href="/creator/auth/login">
           <button className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 px-6 rounded-2xl transition-all duration-300 hover:scale-105 shadow-lg flex items-center justify-center gap-2">
-            Access Brand Kit
+            Start Creating Today
             <ExternalLink className="w-4 h-4" />
           </button>
           </Link>

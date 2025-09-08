@@ -8,20 +8,20 @@ import Link from 'next/link'
 const imageData = [
   {
     src: "/creator-bg-webp/creator-hands.webp",
-    title: "Creator Community",
+    title: "Grocery Creator Community",
     description: "Join thousands of creators earning through authentic grocery hauls and lifestyle content sharing.",
   },
   {
     src: "/creator-bg-webp/creator-podcast.webp",
-    title: "Content Creation Tips",
+    title: "Content Creation Support",
     description:
-      "Learn from successful creators who share grocery hauls, cooking tips, and lifestyle content that converts.",
+      "Learn from successful grocery creators who share haul`s, cooking tips, and lifestyle content that converts to sales.",
   },
   {
     src: "/creator-bg-webp/content-creator-3.webp",
-    title: "Authentic Storytelling",
+    title: "Authentic Grocery Storytelling",
     description:
-      "Create genuine content around your grocery shopping, meal prep, and lifestyle that resonates with your audience.",
+      "Create genuine content around your grocery shopping, meal prep, and lifestyle that resonates with your audience and drives affiliate sales.",
   },
 ]
 

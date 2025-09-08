@@ -11,65 +11,65 @@ import InfoModal from "../modals/InfoModal"
 export default function LatestVideos() {
   const [selectedVideo, setSelectedVideo] = useState<(typeof videos)[0] | null>(null)
 
-  const videos = [
+ const videos = [
     {
       title: "Weekly Grocery Haul - $50 Budget Challenge",
-      description: "Watch me shop smart and save money with my weekly grocery haul using code EMMA50",
+      description: "Watch me shop smart and save money with my weekly grocery haul using code EMMA50 for 5% off",
       thumbnail: "/creator-bg-webp/content-creator-1.webp",
       details: {
-        overview: "Learn how to maximize your grocery budget with strategic shopping techniques. This comprehensive guide covers meal planning, coupon stacking, and bulk buying strategies.",
+        overview: "Learn how to create engaging budget grocery haul content that drives affiliate sales. This comprehensive guide covers strategic shopping, natural code placement, and audience engagement techniques.",
         benefits: [
-          "Save up to 40% on weekly grocery bills",
-          "Meal planning templates and shopping lists",
-          "Coupon and discount code strategies",
-          "Bulk buying guide for families"
+          "Budget grocery haul content strategies",
+          "Natural referral code integration techniques",
+          "TikTok-optimized filming and editing tips",
+          "Engagement tactics that convert viewers to customers"
         ],
-        cta: "Start saving money on your grocery bills today with our proven strategies."
+        cta: "Master budget haul content and start earning commission on every grocery order."
       }
     },
     {
       title: "Grocery Unboxing - Fresh Delivery Surprise",
-      description: "Unboxing my latest grocery delivery with fresh produce and pantry essentials",
+      description: "Unboxing my latest grocery delivery with fresh produce and pantry essentials - use my code for savings!",
       thumbnail: "/creator-bg-webp/content-creator-2.webp",
       details: {
-        overview: "Discover the excitement of grocery delivery unboxing content. Learn how to create engaging reveal videos that showcase product quality and freshness.",
+        overview: "Discover how to create exciting grocery delivery unboxing content that showcases product quality while driving affiliate sales. Perfect for building trust and encouraging first-time orders.",
         benefits: [
-          "Professional unboxing techniques",
-          "Product presentation tips",
-          "Lighting and camera angle guides",
-          "Audience engagement strategies"
+          "Professional unboxing techniques for groceries",
+          "Product presentation and storytelling tips",
+          "Camera angles and lighting for fresh produce",
+          "Call-to-action strategies that convert"
         ],
-        cta: "Create compelling unboxing content that drives sales and engagement."
+        cta: "Create compelling unboxing content that drives grocery sales and builds audience trust."
       }
     },
     {
       title: "Healthy Meal Prep with Budget Groceries",
-      description: "Creating 5 healthy meals from affordable grocery finds - use my code for 5% off",
+      description: "Creating 5 healthy meals from affordable grocery finds - use my code SARAH10 for 5% off your order",
       thumbnail: "/creator-bg-webp/content-creator-3.webp",
       details: {
-        overview: "Transform affordable ingredients into nutritious, delicious meals. This content format combines meal prep efficiency with budget-conscious shopping.",
+        overview: "Transform grocery haul products into engaging meal prep content. This format combines practical value with affiliate marketing, showing products in action while providing educational content.",
         benefits: [
-          "5 complete meal prep recipes",
-          "Nutritional breakdown for each meal",
-          "Cost analysis and savings tips",
-          "Storage and reheating instructions"
+          "5 complete meal prep recipes using haul products",
+          "Cost breakdown and savings calculations",
+          "Natural product placement and code integration",
+          "Nutritional information and storage tips"
         ],
-        cta: "Master meal prep content creation and help your audience eat healthy on a budget."
+        cta: "Master meal prep content that turns grocery hauls into multiple revenue streams."
       }
     },
     {
       title: "Budget Grocery Shopping Tips & Tricks",
-      description: "My top secrets for saving money on groceries while eating healthy and delicious food",
+      description: "My top secrets for saving money on groceries while discovering amazing products - code BUDGET5 saves you more!",
       thumbnail: "/creator-bg-webp/content-creator-4.webp",
       details: {
-        overview: "Share valuable money-saving tips that your audience will love. Educational content that positions you as a trusted advisor while promoting affiliate products.",
+        overview: "Create valuable educational content that positions you as a trusted grocery advisor. Share money-saving tips while naturally promoting your affiliate program and building audience loyalty.",
         benefits: [
-          "25+ proven money-saving techniques",
-          "Store comparison strategies",
-          "Seasonal shopping guides",
-          "Generic vs brand name analysis"
+          "25+ proven grocery money-saving techniques",
+          "Store comparison strategies and seasonal tips",
+          "Generic vs brand name analysis for better savings",
+          "Educational content that builds trust and drives affiliate sales"
         ],
-        cta: "Become the go-to source for grocery savings advice in your niche."
+        cta: "Become the go-to source for grocery savings advice while earning commission on every order."
       }
     },
   ]

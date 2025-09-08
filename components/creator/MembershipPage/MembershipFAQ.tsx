@@ -8,32 +8,32 @@ export default function MembershipFAQ() {
     {
       question: "How does EMM-FORT Creator Program work?",
       answer:
-        "Our creator program connects talented content creators with brands and opportunities. You create content, we provide the platform, resources, and partnerships to help you monetize your creativity effectively.",
+        "Sign up for free and get your unique referral code. Create grocery hauls, unboxing videos, and lifestyle content featuring your code. Earn 5% commission on every grocery order made through your content with bi-weekly payouts.",
     },
     {
-      question: "What are the requirements to join?",
+      question: "Do I need thousands of followers to join?",
       answer:
-        "We welcome creators of all sizes! Whether you have 1K or 1M followers, what matters most is your creativity, engagement, and passion for creating authentic content.",
+        "Not at all! We welcome creators of all sizes. Whether you have 100 or 100K followers, what matters most is your creativity, authenticity, and passion for creating engaging grocery content.",
     },
     {
       question: "How much commission can I earn?",
       answer:
-        "Commission rates vary by campaign and your performance tier, ranging from 15% to 30%. Top performers can earn additional bonuses and exclusive high-paying opportunities.",
+        "You earn 5% commission on every grocery order made with your referral code. Our top creators earn $5,000+ monthly, with the average active creator earning around $2,500/month through consistent posting.",
     },
     {
       question: "When do I receive payments?",
       answer:
-        "Payments are processed monthly, typically within the first week of each month. We support various payment methods including bank transfers and digital wallets.",
+        "Payments are processed bi-weekly with no minimum payout threshold. We support various payment methods including direct deposit, PayPal, and digital wallets for your convenience.",
     },
     {
-      question: "Can I promote multiple brands simultaneously?",
+      question: "Can I use my referral code on other platforms?",
       answer:
-        "Yes! You can work with multiple non-competing brands simultaneously. Our platform helps you manage multiple campaigns and track performance across all partnerships.",
+        "Absolutely! Your referral code works across all social media platforms. Whether you're posting on TikTok, Instagram, YouTube, or your blog, you'll earn commission on orders made through your code.",
     },
     {
       question: "What support do you provide to creators?",
       answer:
-        "We offer comprehensive support including content strategy guidance, technical assistance, marketing resources, and dedicated account management for our top-tier creators.",
+        "We offer comprehensive support including content creation guidelines, trending hashtag research, professional product images, video templates, and 24/7 creator support team assistance.",
     },
   ]
 

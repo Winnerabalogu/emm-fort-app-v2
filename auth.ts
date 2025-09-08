@@ -93,7 +93,11 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       
       // Define public creator routes (no auth required)
       const publicCreatorRoutes = [
-        '/creator', // Landing page
+        '/creator', 
+        '/creator/platform', 
+        '/creator/contact', 
+        '/creator/about', 
+        '/creator/membership', 
         '/creator/auth/login',
         '/creator/auth/register',
         '/creator/auth/verify',

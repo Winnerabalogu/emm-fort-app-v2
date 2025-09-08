@@ -1,7 +1,7 @@
 // app/creator/page.tsx
 import CreatorHero from '@/components/creator/CreatorHero';
 import FeaturedBrands from '@/components/creator/FeaturedBrands';
-import CreativeIdeas from '@/components/creator/CreativeIdeas';
+import {CreativeIdeasCTA} from '@/components/creator/CreativeIdeas';
 import WhySupportUs from '@/components/creator/WhySupportUs';
 import PartnershipCTA from '@/components/creator/PartnershipCTA';
 import NewsletterFooter from '@/components/creator/NewsletterFooter';
@@ -22,7 +22,7 @@ export default function CreatorProgramPage() {
         <FeaturedContent />
         <CommunityShowcase />
         <CreatorContent/>       
-        <CreativeIdeas />   
+        <CreativeIdeasCTA />   
         <VideoBlog/>
         <VideoContentSection />
         <FeaturedBrands />

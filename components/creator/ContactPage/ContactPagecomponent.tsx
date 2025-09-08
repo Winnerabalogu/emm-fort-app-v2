@@ -180,9 +180,9 @@ const ContactPageComponent = () => {
                       </svg>
                     </div>
                     <div>
-                      <h4 className="text-orange-500 font-semibold text-sm uppercase tracking-wide">LOCATIONS</h4>
-                      <p className="text-gray-900 font-semibold">Jalan Cempaka Wangi No 22</p>
-                      <p className="text-gray-600">Jakarta - Indonesia</p>
+                      <h4 className="text-orange-500 font-semibold text-sm uppercase tracking-wide">Head Office</h4>
+                      <p className="text-gray-900 font-semibold"> 21, Americana Street</p>
+                      <p className="text-gray-600"> Ikotun Lagos - Nigeria</p>
                     </div>
                   </div>
 
@@ -200,8 +200,8 @@ const ContactPageComponent = () => {
                     </div>
                     <div>
                       <h4 className="text-orange-500 font-semibold text-sm uppercase tracking-wide">EMAIL US</h4>
-                      <p className="text-gray-900 font-semibold">support@emm-fort.com</p>
-                      <p className="text-gray-600">creator@emm-fort.com</p>
+                      <p className="text-gray-900 font-semibold">admin@emmfortgroup.com</p>
+                      <p className="text-gray-600">admin@emmfortgroup.com</p>
                     </div>
                   </div>
 
@@ -219,8 +219,8 @@ const ContactPageComponent = () => {
                     </div>
                     <div>
                       <h4 className="text-orange-500 font-semibold text-sm uppercase tracking-wide">PHONE</h4>
-                      <p className="text-gray-900 font-semibold">+6221.2002.2012</p>
-                      <p className="text-gray-600">+6221.2002.2013 (Fax)</p>
+                      <p className="text-gray-900 font-semibold">+234 (7) 036 082 070</p>
+                      <p className="text-gray-600">+234 (7) 036 082 070 (whatsappNumber)</p>
                     </div>
                   </div>
                 </div>
@@ -404,9 +404,9 @@ const ContactPageComponent = () => {
         {/* Map Section */}
         <section className="h-96 relative">
           <div className="absolute inset-0 bg-gray-200">
-            {/* Google Maps Embed for Jalan Cempaka Wangi No 22, Jakarta */}
+            {/* Google Maps Embed for Jalan Cempaka Wangi No 22, Jakarta */}          
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3966.521260322283!2d106.8195613!3d-6.1944491!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69f5d2e764b12d%3A0x3d2ad6e1e0e9bce8!2sJl.%20Cempaka%20Wangi%20No.22%2C%20Menteng%2C%20Kec.%20Menteng%2C%20Kota%20Jakarta%20Pusat%2C%20Daerah%20Khusus%20Ibukota%20Jakarta!5e0!3m2!1sen!2sid!4v1635123456789"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3963.621701142833!2d3.233143075241352!3d6.569337993423988!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x103b9acb1fe2ffed%3A0x7d9ac1f74bbd7c81!2s21%20Americana%20St%2C%20Ikotun%2C%20Lagos%20102213%2C%20Lagos!5e0!3m2!1sen!2sng!4v1757290066854!5m2!1sen!2sng"
               width="100%"
               height="100%"
               style={{ border: 0 }}
@@ -421,11 +421,11 @@ const ContactPageComponent = () => {
           <div className="absolute bottom-6 left-6 bg-white/95 backdrop-blur-sm rounded-lg p-4 shadow-lg max-w-sm">
             <h4 className="font-bold text-gray-900 mb-2">Visit Our Office</h4>
             <p className="text-gray-600 text-sm mb-3">
-              Jalan Cempaka Wangi No 22
+              21, Americana Street
               <br />
-              Menteng, Jakarta Pusat
+              Ikotun Lagos
               <br />
-              Indonesia
+              Nigeria
             </p>
             <button className="text-orange-500 hover:text-orange-600 font-semibold text-sm flex items-center gap-1">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

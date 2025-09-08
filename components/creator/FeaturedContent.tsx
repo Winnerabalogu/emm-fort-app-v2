@@ -19,20 +19,20 @@ export default function FeaturedContent() {
       description: "Weekly grocery shopping videos showcasing fresh products and budget-friendly finds",
       icon: ShoppingCart,
       details: {
-        overview: "Grocery haul content is one of the most engaging formats for food and lifestyle creators. Learn how to create compelling shopping videos that drive affiliate sales.",
+        overview: "Grocery haul content is the highest-performing format for food and lifestyle creators. Learn how to create compelling shopping videos that naturally integrate your referral code and drive affiliate sales.",
         benefits: [
           "Weekly content format with consistent engagement",
-          "Easy to film with minimal equipment",
+          "Easy to film with minimal equipment needed",
           "Natural product placement opportunities",
           "High conversion rates for affiliate links"
         ],
         tips: [
-          "Film in good lighting for product visibility",
+          "Film in good lighting to showcase product quality",
           "Share prices and savings for transparency",
-          "Include variety in your selections",
-          "Add personality with shopping commentary"
+          "Include variety in your product selections",
+          "Add personality with authentic shopping commentary"
         ],
-        cta: "Start creating grocery haul content that converts viewers into customers."
+        cta: "Start creating grocery haul content that converts viewers into customers earning you 5% commission."
       }
     },
     {
@@ -40,20 +40,20 @@ export default function FeaturedContent() {
       description: "Exciting unboxing content featuring grocery deliveries and product reveals",
       icon: Package,
       details: {
-        overview: "Unboxing videos create anticipation and excitement around grocery deliveries. Perfect for showcasing product quality and freshness while building trust with your audience.",
+        overview: "Unboxing videos create anticipation and excitement around grocery deliveries. Perfect for showcasing product quality and freshness while building trust with your audience and driving first-time orders.",
         benefits: [
-          "High engagement and shareability",
+          "High engagement and shareability on TikTok",
           "Showcases product quality and packaging",
-          "Creates excitement around deliveries",
-          "Great for first impressions and reviews"
+          "Creates excitement around grocery deliveries",
+          "Great for first impressions and honest reviews"
         ],
         tips: [
-          "Create suspense with thoughtful reveals",
-          "Comment on packaging and presentation",
-          "Share first impressions honestly",
-          "Include close-ups of key products"
+          "Create suspense with thoughtful product reveals",
+          "Comment on packaging quality and freshness",
+          "Share genuine first impressions and reactions",
+          "Include close-ups of featured products"
         ],
-        cta: "Master the art of unboxing content that builds trust and drives sales."
+        cta: "Master unboxing content that builds trust and drives grocery orders with your affiliate code."
       }
     },
     {
@@ -61,20 +61,20 @@ export default function FeaturedContent() {
       description: "Recipe videos and meal prep content using groceries from our partner stores",
       icon: ChefHat,
       details: {
-        overview: "Cooking content allows you to showcase products in action while providing value to your audience. From quick recipes to meal prep, food content drives high engagement.",
+        overview: "Cooking content allows you to showcase grocery products in action while providing valuable recipes to your audience. From quick meals to meal prep, food content drives high engagement and affiliate conversions.",
         benefits: [
-          "Shows products in use and context",
+          "Shows grocery products in use and context",
           "Provides educational value to viewers",
           "High retention rates and engagement",
-          "Multiple monetization opportunities"
+          "Multiple opportunities for natural code placement"
         ],
         tips: [
-          "Keep recipes simple and achievable",
-          "Highlight featured ingredients clearly",
-          "Show the cooking process step by step",
-          "Include final presentation and taste test"
+          "Keep recipes simple and achievable for viewers",
+          "Highlight featured grocery ingredients clearly",
+          "Show the complete cooking process step by step",
+          "Include final presentation and taste reactions"
         ],
-        cta: "Turn your kitchen into a content studio and create recipes that sell."
+        cta: "Turn your kitchen into a content studio and create recipes that drive grocery sales."
       }
     },
     {
@@ -82,23 +82,24 @@ export default function FeaturedContent() {
       description: "Authentic lifestyle content featuring grocery shopping and healthy living",
       icon: Star,
       details: {
-        overview: "Lifestyle content integrates grocery and food products naturally into your daily routine, creating authentic touchpoints that resonate with your audience.",
+        overview: "Lifestyle content integrates grocery shopping and food products naturally into your daily routine, creating authentic touchpoints that resonate with your audience and drive consistent affiliate earnings.",
         benefits: [
           "Authentic and relatable content format",
-          "Natural product integration",
+          "Natural product integration opportunities",
           "Builds personal connection with audience",
-          "Versatile content opportunities"
+          "Versatile content opportunities across platforms"
         ],
         tips: [
-          "Share genuine moments and experiences",
+          "Share genuine moments and daily experiences",
           "Include family and friends when appropriate",
-          "Show products in real-life situations",
-          "Maintain authenticity in all content"
+          "Show grocery products in real-life situations",
+          "Maintain authenticity while promoting your code"
         ],
-        cta: "Create lifestyle content that feels natural while driving meaningful results."
+        cta: "Create lifestyle content that feels natural while driving meaningful affiliate commissions."
       }
     },
   ]
+
 
   return (
     <>

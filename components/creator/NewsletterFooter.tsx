@@ -107,15 +107,15 @@ const NewsletterFooter = () => {
               </div>
               
               <div className="text-gray-400">
-                <p className="mb-1">Jln Cempaka Wangi No 22</p>
-                <p className="mb-4">Jakarta - Indonesia</p>
+                <p className="mb-1">J21, Americana Street,</p>
+                <p className="mb-4"> Ikotun Lagos-Nigeria</p>
                 <div className="flex flex-wrap gap-4">
                   <a href="mailto:hello@emm-fort.com" className="text-red-400 hover:text-red-300 transition-colors">
-                    hello@emm-fort.com
+                    admin@emmfortgroup.com
                   </a>
                   <span className="text-gray-600">•</span>
-                  <a href="tel:+622120022012" className="text-red-400 hover:text-red-300 transition-colors">
-                    +6221.2002.2012
+                  <a href="tel:+2347036082070" className="text-red-400 hover:text-red-300 transition-colors">
+                    +234 (7) 036 082 070
                   </a>
                 </div>
               </div>
@@ -132,11 +132,11 @@ const NewsletterFooter = () => {
               <h6 className="text-white font-bold text-lg mb-6 uppercase tracking-wide">Contact Us</h6>
               <div className="space-y-4">
                 <div>
-                  <div className="text-white text-xl font-bold mb-2">+6221.2002.2012</div>
+                  <div className="text-white text-xl font-bold mb-2">+234 (7) 036 082 070</div>
                   <p className="text-gray-400 text-sm mb-3">Available 24/7 for support</p>
                 </div>
                 <Link 
-                  href="#"
+                  href="/contact"
                   className="inline-flex items-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-full transition-colors gap-2 group font-semibold"
                 >
                   General Inquiries
@@ -156,11 +156,11 @@ const NewsletterFooter = () => {
               <h6 className="text-white font-bold text-lg mb-6 uppercase tracking-wide">Business Manager</h6>
               <div className="space-y-4">
                 <div>
-                  <div className="text-white text-xl font-bold mb-2">Thomas Bradley</div>
+                  <div className="text-white text-xl font-bold mb-2">Moreen</div>
                   <p className="text-gray-400 text-sm mb-3">Partnership & Business Development</p>
                 </div>
                 <Link 
-                  href="#"
+                  href="/creator/contact"
                   className="inline-flex items-center bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-3 rounded-full transition-colors gap-2 group font-semibold"
                 >
                   Let&apos;s Talk
@@ -188,9 +188,9 @@ const NewsletterFooter = () => {
               <span className="text-red-400"> Nerdwave</span>.
             </p>
             <div className="flex flex-wrap gap-6 text-sm">
-              <Link href="#" className="hover:text-white transition-colors">Terms of Use</Link>
-              <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>
-              <Link href="#" className="hover:text-white transition-colors">Cookie Policy</Link>
+              <Link href="/terms" className="hover:text-white transition-colors">Terms of Use</Link>
+              <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link href="cookies" className="hover:text-white transition-colors">Cookie Policy</Link>
             </div>
           </div>
         </div>

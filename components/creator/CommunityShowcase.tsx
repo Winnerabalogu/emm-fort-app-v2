@@ -70,19 +70,19 @@ const showcaseData = [
     icon: Users,
     description: "Join thousands of grocery content creators earning 5% commission through authentic storytelling and lifestyle content.",
     details: {
-      overview: "Become part of a thriving community of over 10,000 active creators who are transforming their grocery shopping into profitable content. Our creators come from diverse backgrounds and niches, all united by their passion for authentic storytelling.",
+      overview: "Become part of a thriving community of over 10,000 active creators who are transforming their grocery shopping into profitable content. Our creators come from diverse backgrounds and niches, all united by their passion for authentic grocery hauls and lifestyle content.",
       benefits: [
         "Access to exclusive creator Discord community",
-        "Monthly virtual meetups and networking events",
+        "Weekly live Q&A sessions with top earners",
         "Peer mentorship and collaboration opportunities",
-        "Shared resources and best practice guides"
+        "Shared content templates and trending hashtags"
       ],
       stats: [
         "10,000+ active creators",
         "Average earning: $2,500/month",
         "98% creator satisfaction rate"
       ],
-      cta: "Join our community and start building meaningful connections with fellow creators today."
+      cta: "Join our community and start building meaningful connections with fellow grocery creators today."
     }
   },
   {
@@ -91,19 +91,19 @@ const showcaseData = [
     icon: Camera,
     description: "Access professional resources, content kits, and mentorship to create engaging grocery hauls and cooking content.",
     details: {
-      overview: "Get everything you need to create professional-quality content. From filming equipment recommendations to editing software tutorials, we provide comprehensive support to help you produce engaging grocery and lifestyle content.",
+      overview: "Get everything you need to create professional-quality grocery content. From TikTok-optimized filming techniques to trending audio suggestions, we provide comprehensive support to help you produce engaging grocery hauls and unboxing content.",
       benefits: [
-        "Professional content creation guidelines",
-        "Free access to premium editing software",
-        "Lighting and filming setup recommendations",
-        "One-on-one mentorship sessions"
+        "TikTok and Instagram content templates",
+        "Weekly trending hashtag research updates",
+        "Professional lighting setup guides for grocery content",
+        "One-on-one mentorship with top grocery creators"
       ],
       stats: [
         "500+ tutorial videos available",
         "24/7 creative support team",
-        "Average 300% engagement boost"
+        "Average 400% engagement boost"
       ],
-      cta: "Access our complete content creation toolkit and elevate your videos to professional quality."
+      cta: "Access our complete grocery content creation toolkit and elevate your videos to viral quality."
     }
   },
   {
@@ -112,22 +112,23 @@ const showcaseData = [
     icon: DollarSign,
     description: "Transform your grocery shopping into income with bi-weekly payouts and unlimited earning potential through our affiliate program.",
     details: {
-      overview: "Our affiliate program offers one of the highest commission rates in the industry. With bi-weekly payouts, performance bonuses, and unlimited earning potential, you can turn your content creation into a sustainable income stream.",
+      overview: "Our grocery affiliate program offers 5% commission on all orders made through your content. With bi-weekly payouts, performance bonuses for featured creators, and unlimited earning potential, you can turn your grocery content into a sustainable income stream.",
       benefits: [
-        "5% commission on all referred sales",
-        "Bi-weekly guaranteed payouts",
-        "Performance bonuses up to 30%",
-        "No minimum payout threshold"
+        "5% commission on all referred grocery orders",
+        "Bi-weekly guaranteed payouts with no minimum",
+        "Performance bonuses for featured creators",
+        "Featured opportunities on EMM-Fort's official channels"
       ],
       stats: [
         "$2M+ paid to creators",
         "Bi-weekly payout guarantee",
-        "Up to 30% bonus commission"
+        "Featured creator spotlights"
       ],
-      cta: "Start earning today with our industry-leading affiliate program and flexible payout options."
+      cta: "Start earning today with authentic grocery content and join thousands of successful creators."
     }
   },
 ]
+
 
 export default function CommunityShowcase() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
