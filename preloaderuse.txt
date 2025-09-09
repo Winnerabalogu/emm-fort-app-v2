@@ -1,0 +1,86 @@
+// app/layout.tsx
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Preloader from '@/components/Preloader';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Preloader 
+          finishLoading={!isLoading}
+          color1="#4F46E5" // Indigo
+          color2="#4B5563" // Cool Gray
+        />
+        
+        <div className="bg-gray-900">
+          {children}
+        </div>
+      </body>
+    </html>
+  );
+}
+
+
+advanced use case
+
+// app/layout.tsx
+"use client";
+
+import { useState, useEffect } from 'react';
+import { Inter } from 'next/font/google';
+import './globals.css';
+import Preloader from '@/components/Preloader';
+
+const inter = Inter({ subsets: ['latin'] });
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); 
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <html lang="en">
+      <body className={inter.className}>
+        <Preloader 
+          finishLoading={!isLoading}
+          color1="#4F46E5" // Indigo
+          color2="#4B5563" // Cool Gray
+        />
+        
+        <div className="bg-gray-900">
+          {children}
+        </div>
+      </body>
+    </html>
+  );
+}

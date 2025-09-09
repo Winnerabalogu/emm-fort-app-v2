@@ -164,3 +164,14 @@
 .mobile-backdrop {
   touch-action: none;
 }
+
+body.preloader-active {
+  overflow: hidden !important;
+}
+
+/* Keyframes for the "Whirlpool" animation */
+@keyframes cssload-spin {
+    100% {
+        transform: rotate(360deg)
+    }
+}

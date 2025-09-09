@@ -51,6 +51,16 @@ model User {
   templateRequests        TemplateRequest[]
   preferences             UserPreference[]
 
+   preferredPlatforms    String[] @default([]) // e.g., ['instagram', 'tiktok']
+    contentTypes          String[] @default([]) // e.g., ['reel', 'post']
+    postingFrequency      String?              // 'Daily', '3-4 times per week', etc.
+    niche                 String?              // 'Lifestyle', 'Fashion & Beauty', etc.
+    templatePreferences   String[] @default([]) // e.g., ['Unboxing Videos', 'Product Reviews']
+    autoSuggestContent    Boolean @default(true)
+    enableAnalytics       Boolean @default(true)
+    showEarningsPublicly  Boolean @default(false)
+
+
   @@index([email, emailVerified], map: "User_email_verified_idx")
   @@index([id, tier, subscriptionStartDate], map: "User_id_tier_subscription_idx")
   @@index([tier])
