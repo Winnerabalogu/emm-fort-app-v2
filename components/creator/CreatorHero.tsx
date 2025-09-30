@@ -7,13 +7,12 @@ export default function CreatorHero() {
   const { data: session, status } = useSession();
   const isCreator = session?.user?.isCreator;
   const isLoading = status === "loading";
-
+  
   return (
     <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32 pb-8 sm:pb-12 lg:pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center">
-          
-          {/* Left Content - Takes 4 columns on large screens */}
+                   
           <div className="lg:col-span-4 space-y-4 sm:space-y-6 order-1 lg:order-1">
             <div className="space-y-3 sm:space-y-4">
               <p className="text-red-500 text-2xl sm:text-3xl lg:text-3xl xl:text-4xl font-bold uppercase tracking-wide leading-tight">
@@ -27,8 +26,7 @@ export default function CreatorHero() {
                 unboxings, and lifestyle posts.
               </p>
             </div>
-
-            {/* Fixed height container to prevent layout shift */}
+           
             <div className="h-12 flex items-center">
               {!isLoading && (
                 <>
@@ -55,12 +53,10 @@ export default function CreatorHero() {
               )}
             </div>
           </div>
-
-          {/* Center Image - Takes 4 columns on large screens, optimized for mobile */}
+         
           <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center">
             <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-              
-              {/* Background decorative elements */}
+                           
               <div className="absolute inset-4 sm:inset-8 lg:inset-12 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60"></div>
               <div 
                 className="absolute inset-2 sm:inset-6 lg:inset-10 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
@@ -68,26 +64,23 @@ export default function CreatorHero() {
                   animation: "float 6s ease-in-out infinite",
                 }}
               ></div>
-
-              {/* Main Image Container - Responsive aspect ratio */}
+             
               <div className="relative aspect-square w-full z-10">
                 <Image
-                  src="/creator/img_4.png"
-                  fill
+                  src="/creator/img_4.webp"
                   alt="Content creator with finger to lips"
-                  className="w-full h-full  object-contain transition-transform duration-300 hover:scale-110"
-                  sizes="(max-width: 640px) 350px"
-                
+                  fill
+                  priority
+                  className="object-contain transition-transform duration-300 hover:scale-110"
+                  
                 />
               </div>
             </div>
           </div>
-
-          {/* Right Content - Takes 4 columns on large screens */}
+         
           <div className="lg:col-span-4 order-2 lg:order-3">
             <div className="space-y-4 sm:space-y-6">
-              
-              {/* YouTube Card */}
+                           
               <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 flex items-center space-x-3 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <div className="w-8 h-8 bg-red-600 rounded flex items-center justify-center flex-shrink-0">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
@@ -108,8 +101,7 @@ export default function CreatorHero() {
                   </button>
                 </div>
               </div>
-
-              {/* TikTok Card */}
+             
               <div className="bg-white rounded-lg shadow-lg p-3 sm:p-4 flex items-center space-x-3 transform transition-all duration-300 hover:scale-105 hover:shadow-xl">
                 <div className="w-8 h-8 bg-black rounded flex items-center justify-center flex-shrink-0">
                   <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="currentColor" viewBox="0 0 24 24">

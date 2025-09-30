@@ -10,7 +10,7 @@
     "prisma:generate": "npm run prisma:generate:app && npm run prisma:generate:wp",
     "prisma:generate:app": "prisma generate --schema=./prisma/schema.prisma",
     "prisma:generate:wp": "prisma generate --schema=./prisma/wordpress.prisma",
-     "db:seed-earnings": "ts-node --project tsconfig.seed.json prisma/seed-earnings.ts"  
+    "db:seed-earnings": "ts-node --project tsconfig.seed.json prisma/seed-earnings.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.12.0",
@@ -32,6 +32,7 @@
     "react-intersection-observer": "^9.16.0",
     "react-toast": "^1.0.3",
     "recharts": "^3.1.0",
+    "sharp": "^0.34.4",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "zod": "^4.0.11"

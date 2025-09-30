@@ -1,18 +1,27 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
-import React, { useState, useEffect ,useCallback} from 'react';
-import { Camera, Users, Edit, Calendar, Plus } from 'lucide-react';
-import { PreviewModal } from '@/components/modals/previewmodal';
-import { sharedUtils } from '@/utils/helpers';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Camera, Users, Edit, Calendar, Plus, BarChart3, Clock, TrendingUp } from 'lucide-react';
 
 // Import your existing components
 import ContentStatsGrid from './ContentStatsGrid';
-import TabButton from './TabButton';
 import MyContent from './MyContent';
-import  { EnhancedCaptionTemplates } from './CaptionTemplates';
 import ContentCalendar from './ContentCalendar';
+import EnhancedContentTemplates from './ContentTemplates';
+import MobileSliderNavigation from './MobileSliderNavigation';
+import EnhancedCaptionTemplates, { FlexibleCaptionTemplate } from './CaptionTemplates';
 
-// Import types
+// Import modals
+import { PreviewModal } from '@/components/modals/previewmodal';
+import SchedulePostModal from '@/components/modals/SchedulePostModal';
+import { AnalyticsModal } from '@/components/modals/AnalyticsModal';
+import ContentInsightsModal from '@/components/modals/ContentInsightsModal';
+import PostingTimesModal from '@/components/modals/PostingTimesModal';
+import CreateContentModal from '@/components/modals/CreateContentModal';
+
+// Import utilities and types
+import { sharedUtils } from '@/utils/helpers';
 import type {
   ContentTemplate,
   UserContent,
@@ -20,30 +29,38 @@ import type {
   ContentStats,
   ContentTabType
 } from '@/types/Creatortypes/contentHub';
-import { EnhancedContentTemplates } from './ContentTemplates';
 
+// Unified ContentTemplate interface to avoid type conflicts
+interface UnifiedContentTemplate {
+  id: string;
+  title: string;
+  description: string;
+  platform: 'Instagram' | 'TikTok' | 'Both' | string | string[];
+  type: string;
+  duration?: string;
+  tags: string[];
+  engagement: string;
+  difficulty: string;
+  captionTemplate?: string;
+  hashtags?: string[];
+  instructions?: string[];
+  tips?: string[];
+}
 
+// Modal state interface
+interface ModalStates {
+  preview: { isOpen: boolean; template: UnifiedContentTemplate | null };
+  schedule: boolean;
+  analytics: boolean;
+  insights: boolean;
+  postingTimes: boolean;
+  createContent: { isOpen: boolean; template: UnifiedContentTemplate | null };
+}
 
-
-
+// API Service
 class ContentHubAPI {
   private static baseURL = '/api/creator/content';
- static async saveCaptionOrder(captions: CaptionTemplate[]): Promise<void> {
-    try {
-      const response = await fetch(`${this.baseURL}/captions/reorder`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          captionOrder: captions.map((c, index) => ({ id: c.id, order: index }))
-        })
-      });
-      
-      if (!response.ok) throw new Error('Failed to save caption order');
-    } catch (error) {
-      console.error('Error saving caption order:', error);
-      throw error;
-    }
-  }
+
   static async getContentStats(): Promise<ContentStats> {
     try {
       const response = await fetch(`${this.baseURL}?type=stats`);
@@ -61,40 +78,41 @@ class ContentHubAPI {
     }
   }
 
- static async getContentTemplates(): Promise<ContentTemplate[]> {
-  try {
-    // Add type=templates parameter
-    const response = await fetch(`${this.baseURL}/templates?type=templates`);
-    if (!response.ok) throw new Error('Failed to fetch templates');
-    
-    const result = await response.json();
-    
-    // Handle the API response structure
-    if (result.success && result.data && result.data.templates) {
-      return result.data.templates;
-    }
-    
-    // Fallback if structure is different
-    if (Array.isArray(result)) {
-      return result;
-    }
-    
-    throw new Error('Invalid response structure');
-  } catch (error) {
-    console.error('Error fetching templates:', error);
-    // Return mock data if API fails
-    return [
-      {
-        id: '1',
-        title: 'Grocery Haul Unboxing',
-        description: 'Show off your fresh groceries with this engaging unboxing format',
-        platform: 'Instagram',
-        type: 'video',
-        duration: '30s',
-        tags: ['groceries', 'unboxing', 'fresh', 'haul'],
-        engagement: 'High',
-        difficulty: 'Easy'
-      },
+  static async getContentTemplates(): Promise<UnifiedContentTemplate[]> {
+    try {
+      const response = await fetch(`${this.baseURL}/templates?type=templates`);
+      if (!response.ok) throw new Error('Failed to fetch templates');
+      
+      const result = await response.json();
+      
+      if (result.success && result.data && result.data.templates) {
+        return result.data.templates;
+      }
+      
+      if (Array.isArray(result)) {
+        return result;
+      }
+      
+      throw new Error('Invalid response structure');
+    } catch (error) {
+      console.error('Error fetching templates:', error);
+      // Return mock data if API fails
+      return [
+        {
+          id: '1',
+          title: 'Grocery Haul Unboxing',
+          description: 'Show off your fresh groceries with this engaging unboxing format',
+          platform: 'Instagram',
+          type: 'video',
+          duration: '30s',
+          tags: ['groceries', 'unboxing', 'fresh', 'haul'],
+          engagement: 'High',
+          difficulty: 'Easy',
+          captionTemplate: 'Fresh groceries for the week! Check out what made it into my cart 🛒',
+          hashtags: ['#groceryhaul', '#fresh', '#shopping'],
+          instructions: ['Film yourself unpacking groceries', 'Show each item clearly', 'Share prices if comfortable'],
+          tips: ['Use good lighting', 'Keep it authentic', 'Engage with comments quickly']
+        },
         {
           id: '2',
           title: 'Recipe Prep Tutorial',
@@ -104,7 +122,11 @@ class ContentHubAPI {
           duration: '60s',
           tags: ['recipe', 'cooking', 'tutorial', 'ingredients'],
           engagement: 'Very High',
-          difficulty: 'Medium'
+          difficulty: 'Medium',
+          captionTemplate: 'Easy weeknight dinner recipe! All ingredients linked in bio 👩‍🍳',
+          hashtags: ['#recipe', '#cooking', '#easymeals'],
+          instructions: ['Prep all ingredients first', 'Film each step clearly', 'Show the final result'],
+          tips: ['Use trending audio', 'Keep transitions smooth', 'Add text overlays for clarity']
         },
         {
           id: '3',
@@ -115,36 +137,30 @@ class ContentHubAPI {
           duration: '15s',
           tags: ['review', 'product', 'story', 'recommendation'],
           engagement: 'Medium',
-          difficulty: 'Easy'
-        },
-        {
-          id: '4',
-          title: 'Family Meal Prep',
-          description: 'Show how you prep meals for the whole family',
-          platform: 'Both',
-          type: 'video',
-          duration: '90s',
-          tags: ['family', 'meal-prep', 'lifestyle', 'organization'],
-          engagement: 'High',
-          difficulty: 'Medium'
+          difficulty: 'Easy',
+          captionTemplate: 'Honest review of this amazing product! Link in stories 📝',
+          hashtags: ['#review', '#productreview', '#honest'],
+          instructions: ['Show product in use', 'Share pros and cons', 'Add swipe-up link'],
+          tips: ['Be authentic', 'Use polls and questions', 'Save to highlights']
         }
       ];
     }
   }
 
-  static async saveTemplateOrder(templates: ContentTemplate[]): Promise<void> {
+  static async getCaptionTemplates(): Promise<FlexibleCaptionTemplate[]> {
     try {
-      const response = await fetch(`${this.baseURL}/templates/reorder`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          templateOrder: templates.map((t, index) => ({ id: t.id, order: index }))
-        })
-      });
+      const response = await fetch(`${this.baseURL}/captions`);
+      if (!response.ok) throw new Error('Failed to fetch captions');
       
-      if (!response.ok) throw new Error('Failed to save template order');
+      const result = await response.json();
+      
+      if (result.captions && Array.isArray(result.captions)) {
+        return result.captions;
+      }
+      
+      throw new Error('Invalid response structure');
     } catch (error) {
-      console.error('Error saving template order:', error);
+      console.error('Error fetching captions:', error);
       throw error;
     }
   }
@@ -156,7 +172,7 @@ class ContentHubAPI {
       const data = await response.json();
       
       return {
-        content: data.content?.map((item: { id: string; title: string; platform: string; type: string; createdAt: string; views: string; likes: string; comments: string; shares: string; earnings: number; postUrl: string; }) => ({
+        content: data.content?.map((item: any) => ({
           id: item.id,
           title: item.title,
           platform: item.platform,
@@ -177,25 +193,75 @@ class ContentHubAPI {
     }
   }
 
- static async getCaptionTemplates(): Promise<CaptionTemplate[]> {
-  try {
-    // Use the captions endpoint which returns the correct structure
-    const response = await fetch(`${this.baseURL}/captions`);
-    if (!response.ok) throw new Error('Failed to fetch captions');
-    
-    const result = await response.json();
-    
-    // Handle the response structure from captions route
-    if (result.captions && Array.isArray(result.captions)) {
-      return result.captions;
+  static async schedulePost(postData: any): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseURL}/schedule`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(postData)
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to schedule post');
+      }
+    } catch (error) {
+      console.error('Error scheduling post:', error);
+      throw error;
     }
-    
-    throw new Error('Invalid response structure');
-  } catch (error) {
-    console.error('Error fetching captions:', error);
-    throw error;
   }
-}
+
+  static async createContent(contentData: any): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseURL}/create`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(contentData)
+      });
+      
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create content');
+      }
+    } catch (error) {
+      console.error('Error creating content:', error);
+      throw error;
+    }
+  }
+
+  static async saveTemplateOrder(templates: UnifiedContentTemplate[]): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseURL}/templates/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          templateOrder: templates.map((t, index) => ({ id: t.id, order: index }))
+        })
+      });
+      
+      if (!response.ok) throw new Error('Failed to save template order');
+    } catch (error) {
+      console.error('Error saving template order:', error);
+      throw error;
+    }
+  }
+
+  static async saveCaptionOrder(captions: FlexibleCaptionTemplate[]): Promise<void> {
+    try {
+      const response = await fetch(`${this.baseURL}/captions/reorder`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          captionOrder: captions.map((c, index) => ({ id: c.id, order: index }))
+        })
+      });
+      
+      if (!response.ok) throw new Error('Failed to save caption order');
+    } catch (error) {
+      console.error('Error saving caption order:', error);
+      throw error;
+    }
+  }
 
   private static formatNumber(num: number): string {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
@@ -221,15 +287,18 @@ const CreatorContentHub: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ContentTabType>('templates');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [previewModal, setPreviewModal] = useState<{
-    isOpen: boolean;
-    template: ContentTemplate | null;
-  }>({
-    isOpen: false,
-    template: null
+
+  // Modal states with proper typing
+  const [modals, setModals] = useState<ModalStates>({
+    preview: { isOpen: false, template: null },
+    schedule: false,
+    analytics: false,
+    insights: false,
+    postingTimes: false,
+    createContent: { isOpen: false, template: null }
   });
 
-  // State for content data
+  // Content data state
   const [contentStats, setContentStats] = useState<ContentStats>({
     totalPosts: 0,
     totalViews: '0',
@@ -237,179 +306,212 @@ const CreatorContentHub: React.FC = () => {
     contentEarnings: '₦0'
   });
 
+  const [contentTemplates, setContentTemplates] = useState<UnifiedContentTemplate[]>([]);
+  const [captionTemplates, setCaptionTemplates] = useState<FlexibleCaptionTemplate[]>([]);
+  const [myContent, setMyContent] = useState<UserContent[]>([]);
   
-const [contentTemplates, setContentTemplates] = useState<ContentTemplate[]>([]);
-  const [captionTemplates, setCaptionTemplates] = useState<CaptionTemplate[]>([]);
-  const [templatesLoaded, setTemplatesLoaded] = useState(false);
-  const [templatesLoading, setTemplatesLoading] = useState(false);
-  const [captionsLoaded, setCaptionsLoaded] = useState(false);
+  // Loading state tracking
+  const [loadingStates, setLoadingStates] = useState({
+    templates: false,
+    captions: false,
+    content: false,
+    stats: false
+  });
 
-const loadContentTemplates = useCallback(async () => {
-  if (templatesLoading) return;
-  
-  try {
-    setTemplatesLoading(true);
-    const templates = await ContentHubAPI.getContentTemplates();
-    setContentTemplates(Array.isArray(templates) ? templates : []);
-    setTemplatesLoaded(true);
-  } catch (err) {
-    console.error('Failed to load templates:', err);
-    setContentTemplates([]);
-    setError('Failed to load templates');
-  } finally {
-    setTemplatesLoading(false);
-  }
-}, [templatesLoading]); // Only re-create if templatesLoading changes
+  const [dataLoaded, setDataLoaded] = useState({
+    templates: false,
+    captions: false,
+    content: false,
+    stats: false
+  });
 
+  // Modal handlers with improved type safety
+  const openModal = (type: keyof ModalStates, template?: UnifiedContentTemplate) => {
+    setModals(prev => ({
+      ...prev,
+      [type]: template !== undefined 
+        ? { isOpen: true, template } 
+        : type === 'preview' || type === 'createContent'
+          ? { isOpen: true, template: null }
+          : true
+    }));
+  };
 
- const loadCaptionTemplates = useCallback(async () => {
-  try {
-    const captions = await ContentHubAPI.getCaptionTemplates();
-    setCaptionTemplates(captions);
-    setCaptionsLoaded(true);
-  } catch (err) {
-    console.error('Failed to load captions:', err);
-    setError('Failed to load captions');
-  }
-}, []);
-  // Load data when component mounts or tab changes
-useEffect(() => {
-  if (activeTab === 'templates') {
-    loadContentStats();
-    if (!templatesLoaded && !templatesLoading) {
-      loadContentTemplates();
-    }
-  } else if (activeTab === 'captions') {
-    if (!captionsLoaded) {
-      loadCaptionTemplates();
-    }
-  }
-}, [activeTab, templatesLoaded, captionsLoaded, templatesLoading, loadContentTemplates, loadCaptionTemplates]);
-  const loadContentStats = async () => {
+  const closeModal = (type: keyof ModalStates) => {
+    setModals(prev => ({
+      ...prev,
+      [type]: type === 'preview' || type === 'createContent' 
+        ? { isOpen: false, template: null } 
+        : false
+    }));
+  };
+
+  // Data loading functions
+  const loadContentStats = useCallback(async () => {
+    if (loadingStates.stats || dataLoaded.stats) return;
+    
     try {
-      setLoading(true);
+      setLoadingStates(prev => ({ ...prev, stats: true }));
       setError(null);
       const stats = await ContentHubAPI.getContentStats();
       setContentStats(stats);
+      setDataLoaded(prev => ({ ...prev, stats: true }));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load stats');
     } finally {
-      setLoading(false);
+      setLoadingStates(prev => ({ ...prev, stats: false }));
+    }
+  }, [loadingStates.stats, dataLoaded.stats]);
+
+  const loadContentTemplates = useCallback(async () => {
+    if (loadingStates.templates || dataLoaded.templates) return;
+    
+    try {
+      setLoadingStates(prev => ({ ...prev, templates: true }));
+      const templates = await ContentHubAPI.getContentTemplates();
+      setContentTemplates(Array.isArray(templates) ? templates : []);
+      setDataLoaded(prev => ({ ...prev, templates: true }));
+    } catch (err) {
+      console.error('Failed to load templates:', err);
+      setContentTemplates([]);
+      setError('Failed to load templates');
+    } finally {
+      setLoadingStates(prev => ({ ...prev, templates: false }));
+    }
+  }, [loadingStates.templates, dataLoaded.templates]);
+
+  const loadCaptionTemplates = useCallback(async () => {
+    if (loadingStates.captions || dataLoaded.captions) return;
+    
+    try {
+      setLoadingStates(prev => ({ ...prev, captions: true }));
+      const captions = await ContentHubAPI.getCaptionTemplates();
+      setCaptionTemplates(captions);
+      setDataLoaded(prev => ({ ...prev, captions: true }));
+    } catch (err) {
+      console.error('Failed to load captions:', err);
+      setError('Failed to load captions');
+    } finally {
+      setLoadingStates(prev => ({ ...prev, captions: false }));
+    }
+  }, [loadingStates.captions, dataLoaded.captions]);
+
+  const loadMyContent = useCallback(async () => {
+    if (loadingStates.content || dataLoaded.content) return;
+    
+    try {
+      setLoadingStates(prev => ({ ...prev, content: true }));
+      const { content } = await ContentHubAPI.getMyContent();
+      setMyContent(content);
+      setDataLoaded(prev => ({ ...prev, content: true }));
+    } catch (err) {
+      console.error('Failed to load my content:', err);
+      setError('Failed to load your content');
+    } finally {
+      setLoadingStates(prev => ({ ...prev, content: false }));
+    }
+  }, [loadingStates.content, dataLoaded.content]);
+
+  // Load data when component mounts or tab changes
+  useEffect(() => {
+    setError(null);
+    
+    switch (activeTab) {
+      case 'templates':
+        loadContentStats();
+        loadContentTemplates();
+        break;
+      case 'my-content':
+        loadMyContent();
+        break;
+      case 'captions':
+        loadCaptionTemplates();
+        break;
+      case 'schedule':
+        // Schedule tab doesn't need initial data loading
+        break;
+    }
+  }, [activeTab, loadContentStats, loadContentTemplates, loadCaptionTemplates, loadMyContent]);
+
+  // Event handlers
+  const handleUseTemplate = async (template: UnifiedContentTemplate) => {
+    openModal('createContent', template);
+  };
+
+  const handlePreviewTemplate = (template: UnifiedContentTemplate) => {
+    openModal('preview', template);
+  };
+
+  const handleCreateContent = async (contentData: any) => {
+    try {
+      if (contentData.publishNow) {
+        await ContentHubAPI.createContent(contentData);
+        sharedUtils.showNotification('Content created successfully!', 'success');
+      } else {
+        await ContentHubAPI.schedulePost(contentData);
+        sharedUtils.showNotification('Content scheduled successfully!', 'success');
+      }
+      closeModal('createContent');
+      
+      // Refresh content if on my-content tab
+      if (activeTab === 'my-content') {
+        setDataLoaded(prev => ({ ...prev, content: false }));
+        loadMyContent();
+      }
+    } catch (error) {
+      sharedUtils.showNotification('Failed to create content', 'error');
+      throw error;
     }
   };
 
+  const handleSchedulePost = async (postData: any) => {
+    try {
+      await ContentHubAPI.schedulePost(postData);
+      sharedUtils.showNotification('Post scheduled successfully!', 'success');
+      closeModal('schedule');
+    } catch (error) {
+      sharedUtils.showNotification('Failed to schedule post', 'error');
+      throw error;
+    }
+  };
 
+  const handleCopyCaption = async (caption: FlexibleCaptionTemplate) => {
+    const fullCaption = `${caption.content}\n\n${caption.hashtags.join(' ')}`;
+    const success = await sharedUtils.copyToClipboard(fullCaption);
+    if (success) {
+      sharedUtils.showNotification('Caption copied to clipboard', 'success');
+    } else {
+      sharedUtils.showNotification('Failed to copy caption', 'error');
+    }
+  };
 
-  // Enhanced reordering handlers with API persistence
-  const handleReorderTemplates = async (newOrder: ContentTemplate[]) => {
+  const handleReorderTemplates = async (newOrder: UnifiedContentTemplate[]) => {
     const previousOrder = [...contentTemplates];
-    
-    // Optimistically update UI
     setContentTemplates(newOrder);
     
     try {
       await ContentHubAPI.saveTemplateOrder(newOrder);
       sharedUtils.showNotification('Template order updated', 'success');
     } catch (error) {
-      // Revert on failure
       setContentTemplates(previousOrder);
       sharedUtils.showNotification('Failed to update template order', 'error');
     }
   };
 
-  const handleReorderCaptions = async (newOrder: CaptionTemplate[]) => {
+  const handleReorderCaptions = async (newOrder: FlexibleCaptionTemplate[]) => {
     const previousOrder = [...captionTemplates];
-    
-    // Optimistically update UI
     setCaptionTemplates(newOrder);
     
     try {
       await ContentHubAPI.saveCaptionOrder(newOrder);
       sharedUtils.showNotification('Caption order updated', 'success');
     } catch (error) {
-      // Revert on failure
       setCaptionTemplates(previousOrder);
       sharedUtils.showNotification('Failed to update caption order', 'error');
     }
   };
 
-  // Shared event handlers that get passed to components
-  const handlers = {
-    // Template handlers
-    onUseTemplate: async (template: ContentTemplate) => {
-      try {
-        const response = await fetch('/api/creator/content/use-template', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ templateId: template.id })
-        });
-        
-        if (response.ok) {
-          sharedUtils.showNotification(`Template "${template.title}" is ready to use!`, 'success');
-          setPreviewModal({ isOpen: false, template: null }); 
-          sharedUtils.navigateToCreateContent();
-        } else {
-          throw new Error('Failed to use template');
-        }
-      } catch (error) {
-        sharedUtils.showNotification('Failed to use template', 'error');
-      }
-    },
-
-    onPreviewTemplate: (template: ContentTemplate) => {
-      setPreviewModal({ isOpen: true, template });
-    },
-
-    // Content handlers
-    onAddNewPost: () => {
-      sharedUtils.navigateToCreateContent();
-    },
-
-    onEditPost: (postId: string) => {
-      window.location.href = `/creator/dashboard/content/edit/${postId}`;
-    },
-
-    onDeletePost: async (postId: string) => {
-      if (window.confirm('Are you sure you want to delete this post?')) {
-        try {
-          const response = await fetch(`/api/creator/content?id=${postId}`, {
-            method: 'DELETE'
-          });
-          
-          if (response.ok) {
-            sharedUtils.showNotification('Post deleted successfully', 'success');
-            window.location.reload();
-          } else {
-            throw new Error('Failed to delete post');
-          }
-        } catch (error) {
-          sharedUtils.showNotification('Failed to delete post', 'error');
-        }
-      }
-    },
-
-    // Caption handlers
-    onCopyCaption: async (caption: CaptionTemplate) => {
-      const fullCaption = `${caption.content}\n\n${caption.hashtags.join(' ')}`;
-      const success = await sharedUtils.copyToClipboard(fullCaption);
-      if (success) {
-        sharedUtils.showNotification('Caption copied to clipboard', 'success');
-      } else {
-        sharedUtils.showNotification('Failed to copy caption', 'error');
-      }
-    },
-
-    // Calendar handlers
-    onSchedulePost: () => {
-      sharedUtils.navigateToSchedule();
-    },
-
-    // General handlers
-    onCreateContent: () => {
-      sharedUtils.navigateToCreateContent();
-    }
-  };
-
+  // Tab configuration
   const tabs = [
     { id: 'templates' as ContentTabType, label: 'Content Templates', icon: Camera },
     { id: 'my-content' as ContentTabType, label: 'My Content', icon: Users },
@@ -417,59 +519,70 @@ useEffect(() => {
     { id: 'schedule' as ContentTabType, label: 'Content Calendar', icon: Calendar }
   ];
 
+  // Tab content renderer
   const renderTabContent = () => {
     switch (activeTab) {
       case 'templates':
-       case 'templates':
-  return (
-    <div className="p-6">
-      {loading && <LoadingSpinner />}
-      {error && <ErrorState message={error} onRetry={loadContentStats} />}
-      {!loading && !error && (
-        <>
-          <ContentStatsGrid stats={contentStats} />
-          <div className="mt-6">
-            <EnhancedContentTemplates 
-              templates={contentTemplates || []} // Extra safety
-              onUseTemplate={handlers.onUseTemplate}
-              onPreviewTemplate={handlers.onPreviewTemplate}
-              onReorderTemplates={handleReorderTemplates}
-            />
+        return (
+          <div className="p-4 md:p-6">
+            {loadingStates.stats && <LoadingSpinner message="Loading stats..." />}
+            {error && <ErrorState message={error} onRetry={() => {
+              setError(null);
+              setDataLoaded(prev => ({ ...prev, stats: false, templates: false }));
+              loadContentStats();
+              loadContentTemplates();
+            }} />}
+            {!loadingStates.stats && !error && (
+              <>
+                <ContentStatsGrid stats={contentStats} />
+                <div className="mt-6">
+                  <EnhancedContentTemplates 
+                    templates={contentTemplates as any}
+                    onUseTemplate={handleUseTemplate}
+                    onPreviewTemplate={handlePreviewTemplate}
+                    onReorderTemplates={handleReorderTemplates as any}
+                  />
+                </div>
+              </>
+            )}
           </div>
-        </>
-      )}
-    </div>
-  );
+        );
 
       case 'my-content':
         return (
-          <div className="p-6">
-            <MyContent 
-              content={[]}
-              onAddNewPost={handlers.onAddNewPost}
-            />
+          <div className="p-4 md:p-6">
+            {loadingStates.content && <LoadingSpinner message="Loading your content..." />}
+            {!loadingStates.content && (
+              <MyContent 
+                content={myContent}
+                onAddNewPost={() => openModal('createContent')}
+              />
+            )}
           </div>
         );
 
       case 'captions':
         return (
-          <div className="p-6">
-            <EnhancedCaptionTemplates 
-              captions={captionTemplates}
-              onCopyCaption={handlers.onCopyCaption}
-              onReorderCaptions={handleReorderCaptions}
-            />
+          <div className="p-4 md:p-6">
+            {loadingStates.captions && <LoadingSpinner message="Loading captions..." />}
+            {!loadingStates.captions && (
+             <EnhancedCaptionTemplates 
+                  captions={captionTemplates}
+                  onCopyCaption={handleCopyCaption}
+                  onReorderCaptions={handleReorderCaptions} // Optional - enables drag and drop
+                />
+            )}
           </div>
         );
 
       case 'schedule':
         return (
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             <ContentCalendar               
-            onSchedulePost={handlers.onSchedulePost}
-            scheduledContent={[]} // Add empty array for now
-            onEditScheduled={(post) => handlers.onEditPost(post)}
-            onDeleteScheduled={handlers.onDeletePost}
+              onSchedulePost={() => openModal('schedule')}
+              scheduledContent={[]}
+              onEditScheduled={(postId) => console.log('Edit:', postId)}
+              onDeleteScheduled={(postId) => console.log('Delete:', postId)}
             />
           </div>
         );
@@ -482,55 +595,100 @@ useEffect(() => {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Content Hub</h2>
           <p className="text-gray-600">Manage your content templates, posts, and scheduling</p>
         </div>
-        <button 
-          onClick={handlers.onCreateContent}
-          className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors flex items-center gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          Create Content
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button 
+            onClick={() => openModal('insights')}
+            className="bg-purple-500 text-white px-4 py-2 rounded-lg hover:bg-purple-600 transition-colors flex items-center gap-2 justify-center sm:justify-start"
+          >
+            <TrendingUp className="h-4 w-4" />
+            Insights
+          </button>
+          <button 
+            onClick={() => openModal('postingTimes')}
+            className="bg-indigo-500 text-white px-4 py-2 rounded-lg hover:bg-indigo-600 transition-colors flex items-center gap-2 justify-center sm:justify-start"
+          >
+            <Clock className="h-4 w-4" />
+            Best Times
+          </button>
+          <button 
+            onClick={() => openModal('analytics')}
+            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2 justify-center sm:justify-start"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </button>
+          <button 
+            onClick={() => openModal('createContent')}
+            className="bg-gradient-to-r from-orange-500 to-amber-500 text-white px-4 py-2 rounded-lg hover:shadow-lg transition-all duration-200 flex items-center gap-2 justify-center sm:justify-start"
+          >
+            <Plus className="h-4 w-4" />
+            Create Content
+          </button>
+        </div>
       </div>
 
       {/* Main Content Area */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200">
         {/* Tab Navigation */}
-        <div className="flex flex-wrap gap-2 border-b border-gray-200 px-6 pt-6">
-          {tabs.map((tab) => (
-            <TabButton
-              key={tab.id}
-              id={tab.id}
-              label={tab.label}
-              isActive={activeTab === tab.id}
-              onClick={setActiveTab}
-            />
-          ))}
-        </div>
+        <MobileSliderNavigation 
+          tabs={tabs}
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
 
         {/* Tab Content */}
         {renderTabContent()}
       </div>
 
-      {/* Preview Modal */}
+      {/* Modals */}
       <PreviewModal
-        template={previewModal.template}
-        isOpen={previewModal.isOpen}
-        onClose={() => setPreviewModal({ isOpen: false, template: null })}
-        onUse={handlers.onUseTemplate}
+        template={modals.preview.template as any}
+        isOpen={modals.preview.isOpen}
+        onClose={() => closeModal('preview')}
+        onUse={handleUseTemplate}
+      />
+
+      <SchedulePostModal
+        isOpen={modals.schedule}
+        onClose={() => closeModal('schedule')}
+        onSchedule={handleSchedulePost}
+      />
+
+      <AnalyticsModal
+        isOpen={modals.analytics}
+        onClose={() => closeModal('analytics')}
+      />
+
+      <ContentInsightsModal
+        isOpen={modals.insights}
+        onClose={() => closeModal('insights')}
+      />
+
+      <PostingTimesModal
+        isOpen={modals.postingTimes}
+        onClose={() => closeModal('postingTimes')}
+      />
+
+      <CreateContentModal
+        isOpen={modals.createContent.isOpen}
+        onClose={() => closeModal('createContent')}
+        onCreate={handleCreateContent}
+        selectedTemplate={modals.createContent.template as any}
       />
     </div>
   );
 };
 
 // Loading and Error Components
-const LoadingSpinner: React.FC = () => (
+const LoadingSpinner: React.FC<{ message?: string }> = ({ message = 'Loading...' }) => (
   <div className="flex items-center justify-center py-8">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
-    <span className="ml-3 text-gray-600">Loading...</span>
+    <span className="ml-3 text-gray-600">{message}</span>
   </div>
 );
 

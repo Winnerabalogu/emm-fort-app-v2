@@ -1,4 +1,5 @@
 "use client"
+
 import React from 'react';
 import { DollarSign, Download } from 'lucide-react';
 import { TransactionRowProps } from '@/types/Creatortypes/earnings';

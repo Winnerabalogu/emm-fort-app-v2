@@ -1,4 +1,5 @@
 "use client"
+
 // Main component export
 export { default as CreatorEarningsDashboard } from './CreatorEarningsDashboard';
 

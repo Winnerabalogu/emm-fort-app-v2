@@ -1,14 +1,13 @@
 /* eslint-disable jsx-a11y/alt-text */
 "use client"
 import React, { useState, ReactNode } from 'react';
-import { Copy, Eye, GripVertical, Instagram, Music, Play, Video , Image} from 'lucide-react';
+import { Eye, GripVertical, Instagram, Music, Play, Video, Image, Hash } from 'lucide-react';
 import { ContentTemplate, CaptionTemplate } from '@/types/Creatortypes/contentHub';
 import { EngagementBadge, DifficultyBadge } from '../creator/Dashboard/content';
 
-// Generic drag and drop interfaces - simplified to just require id
+// Generic drag and drop interfaces
 interface DragDropItem {
   id: string;
-  // Removed index signature to allow more complex types
 }
 
 interface DragDropContainerProps<T extends DragDropItem> {
@@ -16,7 +15,7 @@ interface DragDropContainerProps<T extends DragDropItem> {
   onReorder: (newOrder: T[]) => Promise<void> | void;
   renderItem: (item: T, index: number, dragProps: DragItemProps) => ReactNode;
   className?: string;
-  gridCols?: 'grid-cols-1' | 'grid-cols-2' | 'grid-cols-3' | 'grid-cols-4';
+  gridCols?: string;
   disabled?: boolean;
   showReorderHint?: boolean;
 }
@@ -77,7 +76,6 @@ const DragDropContainer = <T extends DragDropItem>({
 
   const handleDragLeave = () => {
     if (disabled) return;
-    // Small delay to prevent flickering
     setTimeout(() => setDragOverItem(null), 50);
   };
 
@@ -257,14 +255,70 @@ const DraggableTemplateCard: React.FC<{
   );
 };
 
-// Draggable Caption Card
+// Enhanced Draggable Caption Card with better features
 const DraggableCaptionCard: React.FC<{
-  caption: CaptionTemplate;
+  caption:  CaptionTemplate & { category?: string }; // Allow additional properties
   onCopy: (caption: CaptionTemplate) => void;
   dragProps: DragItemProps;
 }> = ({ caption, onCopy, dragProps }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
   const { isDragging, isDragOver, dragHandleProps } = dragProps;
+
+  const handleCopy = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    try {
+      const fullCaption = `${caption.content}\n\n${caption.hashtags.join(' ')}`;
+      await navigator.clipboard.writeText(fullCaption);
+      
+      setIsCopied(true);
+      onCopy(caption);
+      
+      setTimeout(() => {
+        setIsCopied(false);
+      }, 2000);
+    } catch (error) {
+      console.error('Failed to copy caption:', error);
+      onCopy(caption);
+    }
+  };
+
+  const getPlatformIcon = (platform: "Instagram" | "TikTok" | "Both" | string) => {
+    const platformStr = typeof platform === 'string' ? platform.toLowerCase() : platform;
+    
+    switch (platformStr) {
+      case 'instagram':
+        return <Instagram className="h-4 w-4 text-pink-600" />;
+      case 'tiktok':
+        return <Music className="h-4 w-4 text-gray-900" />;
+      case 'both':
+        return (
+          <div className="flex gap-1">
+            <Instagram className="h-3 w-3 text-pink-600" />
+            <Music className="h-3 w-3 text-gray-900" />
+          </div>
+        );
+      default:
+        return <Hash className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getCategoryColor = (category?: string) => {
+    if (!category) return 'bg-gray-100 text-gray-700';
+    
+    const colors = {
+      'lifestyle': 'bg-purple-100 text-purple-700',
+      'recipe': 'bg-green-100 text-green-700',
+      'tutorial': 'bg-blue-100 text-blue-700',
+      'review': 'bg-yellow-100 text-yellow-700',
+      'promotional': 'bg-red-100 text-red-700',
+      'educational': 'bg-indigo-100 text-indigo-700',
+      'entertainment': 'bg-pink-100 text-pink-700'
+    };
+    
+    return colors[category.toLowerCase() as keyof typeof colors] || 'bg-gray-100 text-gray-700';
+  };
 
   return (
     <div 
@@ -278,54 +332,72 @@ const DraggableCaptionCard: React.FC<{
       }`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <GripVertical className={`h-4 w-4 transition-colors ${isDragging ? 'text-orange-500' : 'text-gray-400'}`} />
-          <h4 className="font-semibold text-gray-900">{caption.title}</h4>
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
+          <GripVertical className={`h-4 w-4 flex-shrink-0 transition-colors ${isDragging ? 'text-orange-500' : 'text-gray-400'}`} />
+          {getPlatformIcon(caption.platform)}
+          <h4 className="font-semibold text-gray-900 truncate">{caption.title}</h4>
         </div>
-        <span className="bg-gray-100 text-gray-700 px-3 py-1 text-sm rounded-full">
-          {caption.platform}
-        </span>
+        {caption.category && (
+          <span className={`px-2 py-1 text-xs rounded-full flex-shrink-0 ml-2 ${getCategoryColor(caption.category)}`}>
+            {caption.category}
+          </span>
+        )}
       </div>
       
-      {/* Caption Content */}
-      <div className="bg-gray-50 rounded-lg p-4 mb-4">
-        <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
+      {/* Caption Content Preview */}
+      <div className="bg-gray-50 rounded-lg p-4 mb-4 relative">
+        <p className="text-sm text-gray-700 leading-relaxed line-clamp-3">
           {caption.content}
         </p>
+        {caption.content.length > 150 && (
+          <div className="absolute bottom-0 right-0 bg-gradient-to-l from-gray-50 via-gray-50 to-transparent px-2 py-1">
+            <span className="text-xs text-gray-500">...</span>
+          </div>
+        )}
       </div>
       
       {/* Hashtags */}
       <div className="flex flex-wrap gap-1 mb-4">
-        {caption.hashtags.map((tag, index) => (
-          <span key={index} className="bg-blue-100 text-blue-700 px-2 py-1 text-xs rounded">
+        {caption.hashtags.slice(0, 5).map((tag, index) => (
+          <span key={index} className="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
             {tag}
           </span>
         ))}
+        {caption.hashtags.length > 5 && (
+          <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
+            +{caption.hashtags.length - 5} more
+          </span>
+        )}
       </div>
       
       {/* Copy Button */}
       <button 
-        onClick={(e) => {
-          e.stopPropagation();
-          onCopy(caption);
-        }}
-        className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+        onClick={handleCopy}
+        disabled={isCopied}
+        className={`w-full px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium flex items-center justify-center gap-2 ${
+          isCopied
+            ? 'bg-green-500 text-white'
+            : 'bg-orange-500 text-white hover:bg-orange-600'
+        }`}
       >
-        <Copy className="h-4 w-4" />
-        Copy Caption
+        <Hash className="h-4 w-4" />
+        {isCopied ? 'Copied!' : 'Copy Caption'}
       </button>
+
+      {/* Word Count */}
+      <div className="mt-2 text-xs text-gray-500 text-center">
+        {caption.content.split(' ').length} words • {caption.hashtags.length} hashtags
+      </div>
     </div>
   );
 };
-
 
 // Export the components
 export { 
   DragDropContainer, 
   DraggableTemplateCard, 
   DraggableCaptionCard,
-
 };
 
 export type { DragDropItem, DragDropContainerProps, DragItemProps };
