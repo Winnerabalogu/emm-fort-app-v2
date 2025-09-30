@@ -5,9 +5,8 @@ export { default as CreatorContentHub } from './CreatorContentHub';
 export { default as ContentHubHeader } from './ContentHubHeader';
 export { default as ContentStatsGrid } from './ContentStatsGrid';
 export { default as TabButton } from './TabButton';
-export {  EnhancedContentTemplates } from './ContentTemplates';
+export { default as EnhancedContentTemplates } from './ContentTemplates';
 export { default as MyContent } from './MyContent';
-export {  EnhancedCaptionTemplates } from './CaptionTemplates';
 export { default as ContentCalendar } from './ContentCalendar';
 
 // Badge components
