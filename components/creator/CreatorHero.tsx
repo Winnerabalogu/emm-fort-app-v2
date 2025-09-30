@@ -68,7 +68,7 @@ export default function CreatorHero() {
 
               <div className="relative z-10">
                 <Image
-                  src="/creator/img_3.png"
+                  src="/creator/img_4.webp"
                   alt="Content creator with finger to lips"
                   width={600}
                   height={719}
