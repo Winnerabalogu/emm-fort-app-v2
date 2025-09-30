@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
+
 "use client"
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { Camera, Users, Edit, Calendar, Plus, BarChart3, Clock, TrendingUp } from 'lucide-react';
 
