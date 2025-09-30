@@ -55,25 +55,25 @@ export default function CreatorHero() {
             </div>
           </div>
          
-          <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl aspect-square">
+          <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center py-8">
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md">
 
-              <div className="absolute inset-4 sm:inset-8 lg:inset-12 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60"></div>
+              <div className="absolute inset-0 -inset-8 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60 blur-2xl"></div>
               <div
-                className="absolute inset-2 sm:inset-6 lg:inset-10 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
+                className="absolute inset-0 -inset-4 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80 blur-xl"
                 style={{
                   animation: "float 6s ease-in-out infinite",
                 }}
               ></div>
 
-              <div className="relative w-full h-full z-10 flex items-center justify-center">
+              <div className="relative z-10">
                 <Image
-                  src="/creator/img_4.webp"
+                  src="/creator/img_3.png"
                   alt="Content creator with finger to lips"
-                  width={800}
-                  height={800}
+                  width={600}
+                  height={719}
                   priority
-                  className="w-full h-auto object-contain transition-transform duration-300 hover:scale-105"
+                  className="w-full h-auto drop-shadow-2xl transition-transform duration-300 hover:scale-105"
                   unoptimized
                 />
               </div>
