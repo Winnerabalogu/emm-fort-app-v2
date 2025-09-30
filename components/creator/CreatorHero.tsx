@@ -1,4 +1,5 @@
 'use client';
+
 import Image from "next/image";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
@@ -8,7 +9,7 @@ export default function CreatorHero() {
   const isCreator = session?.user?.isCreator;
   const isLoading = status === "loading";
   
-  return (
+  return (    
     <section className="py-12 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 sm:pt-24 lg:pt-32 pb-8 sm:pb-12 lg:pb-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-12 items-center">
@@ -55,24 +56,25 @@ export default function CreatorHero() {
           </div>
          
           <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl">
-                           
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl aspect-square">
+
               <div className="absolute inset-4 sm:inset-8 lg:inset-12 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60"></div>
-              <div 
+              <div
                 className="absolute inset-2 sm:inset-6 lg:inset-10 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
                 style={{
                   animation: "float 6s ease-in-out infinite",
                 }}
               ></div>
-             
-              <div className="relative aspect-square w-full z-10">
+
+              <div className="relative w-full h-full z-10">
                 <Image
-                  src="/creator/img_4.webp"
+                  src="/creator/img_4main.png"
                   alt="Content creator with finger to lips"
                   fill
                   priority
-                  className="object-contain transition-transform duration-300 hover:scale-110"
-                  
+                  className="object-contain transition-transform duration-300 hover:scale-105"
+                  sizes="(max-width: 640px) 320px, (max-width: 768px) 384px, (max-width: 1024px) 448px, 512px"
+                  unoptimized
                 />
               </div>
             </div>
@@ -136,5 +138,6 @@ export default function CreatorHero() {
         }
       `}</style>
     </section>
+
   );
 } 
