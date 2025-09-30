@@ -66,14 +66,14 @@ export default function CreatorHero() {
                 }}
               ></div>
 
-              <div className="relative w-full h-full z-10">
+              <div className="relative w-full h-full z-10 flex items-center justify-center">
                 <Image
-                  src="/creator/img_4main.png"
+                  src="/creator/img_4.webp"
                   alt="Content creator with finger to lips"
-                  fill
+                  width={800}
+                  height={800}
                   priority
-                  className="object-contain transition-transform duration-300 hover:scale-105"
-                  sizes="(max-width: 640px) 320px, (max-width: 768px) 384px, (max-width: 1024px) 448px, 512px"
+                  className="w-full h-auto object-contain transition-transform duration-300 hover:scale-105"
                   unoptimized
                 />
               </div>
