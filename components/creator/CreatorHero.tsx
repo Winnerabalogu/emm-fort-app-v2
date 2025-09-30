@@ -55,25 +55,25 @@ export default function CreatorHero() {
             </div>
           </div>
          
-          <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center py-8">
-            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md">
+          <div className="lg:col-span-4 order-2 lg:order-2 flex justify-center items-center">
+            <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl aspect-square">
 
-              <div className="absolute inset-0 -inset-8 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60 blur-2xl"></div>
+              <div className="absolute inset-4 sm:inset-8 lg:inset-12 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full animate-pulse opacity-60"></div>
               <div
-                className="absolute inset-0 -inset-4 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80 blur-xl"
+                className="absolute inset-2 sm:inset-6 lg:inset-10 bg-gradient-to-br from-orange-400 via-pink-400 to-red-500 rounded-full opacity-80"
                 style={{
                   animation: "float 6s ease-in-out infinite",
                 }}
               ></div>
 
-              <div className="relative z-10">
+              <div className="relative w-full h-full z-10">
                 <Image
-                  src="/creator/img_4.webp"
+                  src="/creator/img-4.png"
                   alt="Content creator with finger to lips"
-                  width={600}
-                  height={719}
+                  fill
                   priority
-                  className="w-full h-auto drop-shadow-2xl transition-transform duration-300 hover:scale-105"
+                  className="object-contain transition-transform duration-300 hover:scale-105"
+                  sizes="(max-width: 640px) 320px, (max-width: 768px) 384px, (max-width: 1024px) 448px, 512px"
                   unoptimized
                 />
               </div>
@@ -125,18 +125,7 @@ export default function CreatorHero() {
             </div>
           </div>
         </div>
-      </div>
-
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% {
-            transform: translateY(0) scale(1.05);
-          }
-          50% {
-            transform: translateY(-10px) scale(1.05);
-          }
-        }
-      `}</style>
+      </div>   
     </section>
 
   );

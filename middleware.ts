@@ -70,8 +70,7 @@ export default auth(function middleware(request: NextRequest) {
 });
 
 export const config = {
-  matcher: [
-    // Match all routes except static files and NextAuth API routes
+  matcher: [    
     "/((?!api/auth|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml).*)",
   ],
 };
