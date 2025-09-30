@@ -64,12 +64,12 @@ export async function POST(request: NextRequest) {
       data: {
         userId,
         title,
-        platform: platform.toLowerCase(),
+        platform: platform === 'Both' ? 'instagram' : platform.toLowerCase(),
         type: type.toLowerCase(),
         content: caption,
         description: description || null,
         hashtags: hashtags || [],
-        status: 'scheduled',
+        status: 'SCHEDULED',
         publishedAt: scheduledDateTime,
         views: 0,
         likes: 0,
@@ -122,8 +122,12 @@ export async function GET(request: NextRequest) {
     }
 
     // Build filter
-    const where: any = { userId };
-    
+    const where: {
+      userId: string;
+      status?: string;
+      publishedAt?: { gte: Date; lte: Date };
+    } = { userId };
+
     if (status && status !== 'all') {
       where.status = status;
     }
@@ -131,7 +135,7 @@ export async function GET(request: NextRequest) {
     if (month) {
       const startDate = new Date(`${month}-01`);
       const endDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, 0);
-      
+
       where.publishedAt = {
         gte: startDate,
         lte: endDate
@@ -231,8 +235,16 @@ export async function PUT(request: NextRequest) {
     }
 
     // Prepare update data
-    const updateData: any = { updatedAt: new Date() };
-    const { scheduledDate, scheduledTime, caption, ...otherFields } = validationResult.data;
+    const updateData: {
+      publishedAt?: Date;
+      content?: string;
+      platform?: string;
+      type?: string;
+      title?: string;
+      description?: string;
+      hashtags?: string[];
+    } = {};
+    const { scheduledDate, scheduledTime, caption, platform, type, ...otherFields } = validationResult.data;
 
     // Handle scheduled date/time
     if (scheduledDate && scheduledTime) {
@@ -247,6 +259,8 @@ export async function PUT(request: NextRequest) {
 
     // Handle other fields
     if (caption) updateData.content = caption;
+    if (platform) updateData.platform = platform === 'Both' ? 'instagram' : platform.toLowerCase();
+    if (type) updateData.type = type.toLowerCase();
     Object.assign(updateData, otherFields);
 
     // Update post

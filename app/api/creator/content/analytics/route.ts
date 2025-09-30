@@ -127,11 +127,11 @@ export async function GET(request: NextRequest) {
 
     const processedPlatformBreakdown = platformBreakdown.map(platform => ({
       platform: platform.platform,
-      percentage: totalPlatformViews > 0 ? (platform._sum.views|| 0 / totalPlatformViews * 100) : 0,
+      percentage: totalPlatformViews > 0 ? ((platform._sum.views || 0) / totalPlatformViews * 100) : 0,
       posts: platform._count,
       views: platform._sum.views || 0,
       earnings: platform._sum.earnings || 0,
-      likes: platform._sum.likes || 0,      
+      likes: platform._sum.likes || 0,
     }));
 
     return NextResponse.json({
