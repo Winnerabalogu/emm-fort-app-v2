@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { z } from 'zod';
-import bcrypt from 'bcryptjs';
-import { prisma } from '@/lib/prisma';
-import { authConfig } from './auth.config';
-import { Tier, Role } from '@prisma/client'; 
-import { CachedUserData } from './lib/types';
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
+import { prisma } from "@/lib/prisma";
+import { authConfig } from "./auth.config";
+import { Tier, Role } from "@prisma/client";
+import { CachedUserData } from "./lib/types";
 
 type ExtendedCachedUserData = CachedUserData & {
   role: Role;
@@ -21,14 +21,17 @@ type ExtendedCachedUserData = CachedUserData & {
 const userCache = new Map<string, { data: ExtendedCachedUserData; timestamp: number }>();
 const CACHE_DURATION = 5 * 60 * 1000;
 
+/* ------------------------------------------------------------------ */
+/*  CACHE HELPERS                                                     */
+/* ------------------------------------------------------------------ */
 async function getCachedUser(userId: string) {
   const cached = userCache.get(userId);
   const now = Date.now();
-    
-  if (cached && (now - cached.timestamp) < CACHE_DURATION) {
+
+  if (cached && now - cached.timestamp < CACHE_DURATION) {
     return cached.data;
   }
-  
+
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: {
@@ -39,18 +42,16 @@ async function getCachedUser(userId: string) {
       fullName: true,
       emailVerified: true,
       role: true,
-      // Creator fields
       isCreator: true,
       instagramHandle: true,
       tiktokHandle: true,
       whatsappNumber: true,
       contentStyle: true,
-      followersCount: true
-    }
+      followersCount: true,
+    },
   });
-  
+
   if (user) {
-    // Normalize null → undefined
     const normalizedUser: ExtendedCachedUserData = {
       ...user,
       instagramHandle: user.instagramHandle ?? undefined,
@@ -59,11 +60,10 @@ async function getCachedUser(userId: string) {
       contentStyle: user.contentStyle ?? undefined,
       followersCount: user.followersCount ?? undefined,
     };
-
     userCache.set(userId, { data: normalizedUser, timestamp: now });
     return normalizedUser;
   }
-  
+
   return user;
 }
 
@@ -71,137 +71,147 @@ export function clearUserCache(userId: string) {
   userCache.delete(userId);
 }
 
+/* ------------------------------------------------------------------ */
+/*  HELPER – validate internal callback URLs                          */
+/* ------------------------------------------------------------------ */
+function isValidInternalUrl(url: string): boolean {
+  try {
+    const { pathname } = new URL(url, "http://localhost");
+    return (
+      pathname.startsWith("/dashboard") ||
+      pathname.startsWith("/creator/dashboard")
+    );
+  } catch {
+    return false;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  NEXT-AUTH CONFIG                                                  */
+/* ------------------------------------------------------------------ */
 export const { auth, signIn, signOut, handlers } = NextAuth({
-  ...authConfig, 
-  session: { 
+  ...authConfig,
+  session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60,
   },
-  callbacks: {    
-    // Authorization logic - moved back from auth.config.ts to prevent conflicts
+
+  /* -------------------------------------------------------------- */
+  /*  CALLBACKS                                                     */
+  /* -------------------------------------------------------------- */
+  callbacks: {
+    /* ------------------- REDIRECT ------------------- */
+    async redirect({ url, baseUrl }) {
+      // Allow relative URLs
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // Allow same-origin absolute URLs
+      if (new URL(url).origin === baseUrl) return url;
+      return baseUrl;
+    },
+
+    /* ------------------- AUTHORIZED ------------------- */
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;
-      const userRole = auth?.user?.role;
-      const isCreator = auth?.user?.isCreator;
-      
-     
-      
-      // Route analysis
-      const isOnAdminRoute = nextUrl.pathname.startsWith('/admin');
-      const isOnAdminLogin = nextUrl.pathname === '/admin/auth/login';
-      const isOnAdminAccessDenied = nextUrl.pathname === '/admin/access-denied';
-      
-      // Define public creator routes (no auth required)
+      const userRole = auth?.user?.role as Role | undefined;
+      const isCreator = auth?.user?.isCreator as boolean | undefined;
+
+      /* ------------------- ROUTE FLAGS ------------------- */
+      const isOnAdminRoute = nextUrl.pathname.startsWith("/admin");
+      const isOnAdminLogin = nextUrl.pathname === "/admin/auth/login";
+      const isOnAdminAccessDenied = nextUrl.pathname === "/admin/access-denied";
+
       const publicCreatorRoutes = [
-        '/creator', 
-        '/creator/platform', 
-        '/creator/contact', 
-        '/creator/about', 
-        '/creator/membership', 
-        '/creator/auth/login',
-        '/creator/auth/register',
-        '/creator/auth/verify',
-        '/creator/auth/check-your-email',
-        '/creator/auth/access-denied'
+        "/creator",
+        "/creator/platform",
+        "/creator/contact",
+        "/creator/about",
+        "/creator/membership",
+        "/creator/auth/login",
+        "/creator/auth/register",
+        "/creator/auth/verify",
+        "/creator/auth/check-your-email",
+        "/creator/auth/access-denied",
       ];
-      
-      // Define protected creator routes (auth required)
-      const isOnProtectedCreatorRoute = nextUrl.pathname.startsWith('/creator/') && 
-        !publicCreatorRoutes.includes(nextUrl.pathname);
-      
-      const isOnCreatorLogin = nextUrl.pathname === '/creator/auth/login';
-      const isOnCreatorRegister = nextUrl.pathname === '/creator/auth/register';
-      const isOnRegularDashboard = nextUrl.pathname.startsWith('/dashboard');
-      const isOnAuthRoute = nextUrl.pathname.startsWith('/auth');
 
-      // Admin route protection
+      const isOnProtectedCreatorRoute =
+        nextUrl.pathname.startsWith("/creator/") &&
+        !publicCreatorRoutes.includes(nextUrl.pathname) &&
+        !nextUrl.pathname.startsWith("/creator/auth/");
+
+      const isOnCreatorAuthPage = nextUrl.pathname.startsWith("/creator/auth/");
+      const isOnRegularDashboard = nextUrl.pathname.startsWith("/dashboard");
+      const isOnRegularAuthPage =
+        nextUrl.pathname.startsWith("/auth/") &&
+        !nextUrl.pathname.startsWith("/auth/tier-selection") &&
+        !nextUrl.pathname.startsWith("/auth/verify");
+
+      /* ------------------- ADMIN ------------------- */
       if (isOnAdminAccessDenied) {
-        if (!isLoggedIn) {
-          return Response.redirect(new URL('/admin/auth/login', nextUrl));
-        }
-        if (userRole === 'ADMIN') {
-          return Response.redirect(new URL('/admin/overview', nextUrl));
-        }
-        return true; 
-      }            
-      
-      if (isOnAdminRoute && !isOnAdminLogin && !isOnAdminAccessDenied) {
-        if (!isLoggedIn) {          
-          return Response.redirect(new URL('/admin/auth/login', nextUrl));
-        }
-        if (userRole !== 'ADMIN') {          
-          return Response.redirect(new URL('/admin/access-denied', nextUrl));
-        }
-        return true; 
-      }            
-      
-      if (isOnAdminLogin) {
-        if (isLoggedIn && userRole === 'ADMIN') {          
-          return Response.redirect(new URL('/admin/overview', nextUrl));
-        }
-        if (isLoggedIn && userRole === 'USER') {          
-          return Response.redirect(new URL('/admin/access-denied', nextUrl));
-        }
-        return true; 
-      }
-
-      // Allow public creator routes (including landing page)
-      if (publicCreatorRoutes.includes(nextUrl.pathname)) {
-        // If already logged in as creator and trying to access auth pages, redirect to dashboard
-        if ((isOnCreatorLogin || isOnCreatorRegister) && isLoggedIn && isCreator) {
-         
-          return Response.redirect(new URL('/creator/dashboard', nextUrl));
-        }
-        return true; // Allow access to public creator routes
-      }
-
-      // Protected creator routes - require authentication and creator status
-      if (isOnProtectedCreatorRoute) {
-     
-        // Must be logged in
-        if (!isLoggedIn) {        
-          return Response.redirect(new URL('/creator/auth/login', nextUrl));
-        }
-        // Must be a creator
-        if (!isCreator) {         
-          return Response.redirect(new URL('/creator/auth/access-denied', nextUrl));
-        }     
+        if (!isLoggedIn) return Response.redirect(new URL("/admin/auth/login", nextUrl));
+        if (userRole === "ADMIN") return Response.redirect(new URL("/admin/overview", nextUrl));
         return true;
       }
 
-      // Regular dashboard protection
+      if (isOnAdminRoute && !isOnAdminLogin && !isOnAdminAccessDenied) {
+        if (!isLoggedIn) return Response.redirect(new URL("/admin/auth/login", nextUrl));
+        if (userRole !== "ADMIN") return Response.redirect(new URL("/admin/access-denied", nextUrl));
+        return true;
+      }
+
+      if (isOnAdminLogin) {
+        if (isLoggedIn && userRole === "ADMIN") return Response.redirect(new URL("/admin/overview", nextUrl));
+        if (isLoggedIn && userRole === "USER") return Response.redirect(new URL("/admin/access-denied", nextUrl));
+        return true;
+      }
+
+      /* ------------------- CREATOR PUBLIC ------------------- */
+      if (publicCreatorRoutes.includes(nextUrl.pathname)) {
+        if (isOnCreatorAuthPage && isLoggedIn && isCreator) {
+          return Response.redirect(new URL("/creator/dashboard", nextUrl));
+        }
+        return true;
+      }
+
+      /* ------------------- CREATOR PROTECTED ------------------- */
+      if (isOnProtectedCreatorRoute) {
+        if (!isLoggedIn) return Response.redirect(new URL("/creator/auth/login", nextUrl));
+        if (!isCreator) return Response.redirect(new URL("/creator/auth/access-denied", nextUrl));
+        return true;
+      }
+
+      /* ------------------- REGULAR DASHBOARD ------------------- */
       if (isOnRegularDashboard) {
-        if (!isLoggedIn) {
-          return Response.redirect(new URL('/auth/login', nextUrl));
-        }
-        // Redirect creators to their dashboard
-        if (isCreator) {
-          return Response.redirect(new URL('/creator/dashboard', nextUrl));
-        }
-        return true; 
+        if (!isLoggedIn) return Response.redirect(new URL("/auth/login", nextUrl));
+        // FIXED: Allow creators to access regular dashboard (they can access both)
+        // Creators who are also affiliates should be able to see both dashboards
+        return true;
       }
-      
-      // Handle logged-in users accessing auth routes
-      if (isLoggedIn && isOnAuthRoute) {
-        const allowedAuthPagesWhenLoggedIn = ['/auth/tier-selection', '/auth/verify'];
-        if (allowedAuthPagesWhenLoggedIn.includes(nextUrl.pathname)) {
-          return true;
-        }
-        if ((isOnCreatorLogin || isOnCreatorRegister) && isLoggedIn && isCreator) {       
-        return Response.redirect(new URL('/creator/dashboard', nextUrl));
-      }
-        // Redirect based on user type
-        if (isCreator) {
-          return Response.redirect(new URL('/creator/dashboard', nextUrl));
+
+      /* ------------------- REGULAR AUTH PAGES ------------------- */
+      if (isLoggedIn && isOnRegularAuthPage) {
+        const callbackUrl = nextUrl.searchParams.get("callbackUrl");
+        
+        // FIXED: Use callbackUrl or default to /dashboard (not creator dashboard)
+        // This allows the login page to control where users go
+        let redirectTo: string;
+        
+        if (callbackUrl && isValidInternalUrl(callbackUrl)) {
+          redirectTo = callbackUrl;
         } else {
-          return Response.redirect(new URL('/dashboard', nextUrl));
+          // Default to regular dashboard even for creators
+          // They can navigate to creator dashboard via the UI
+          redirectTo = "/dashboard";
         }
+        
+        return Response.redirect(new URL(redirectTo, nextUrl));
       }
-      
+
+      /* ------------------- DEFAULT ------------------- */
       return true;
     },
 
-    async jwt({ token, user, trigger }) {      
+    /* ------------------- JWT ------------------- */
+    async jwt({ token, user, trigger }) {
       if (user) {
         token.id = user.id;
         token.name = user.fullName;
@@ -210,7 +220,6 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.username = user.username;
         token.emailVerified = user.emailVerified;
         token.role = user.role;
-        // Creator fields
         token.isCreator = user.isCreator;
         token.instagramHandle = user.instagramHandle;
         token.tiktokHandle = user.tiktokHandle;
@@ -218,20 +227,19 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
         token.contentStyle = user.contentStyle;
         token.followersCount = user.followersCount;
         token.lastUpdated = Date.now();
-      }            
-      
+      }
+
       if (trigger === "update" && token.id) {
-        clearUserCache(token.id as string); 
+        clearUserCache(token.id as string);
         try {
           const dbUser = await getCachedUser(token.id as string);
-          if (dbUser) {          
+          if (dbUser) {
             token.tier = dbUser.tier;
             token.subscriptionStartDate = dbUser.subscriptionStartDate;
             token.username = dbUser.username;
             token.name = dbUser.fullName;
             token.emailVerified = dbUser.emailVerified;
             token.role = dbUser.role;
-            // Creator fields
             token.isCreator = dbUser.isCreator;
             token.instagramHandle = dbUser.instagramHandle;
             token.tiktokHandle = dbUser.tiktokHandle;
@@ -241,24 +249,24 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
             token.lastUpdated = Date.now();
           }
         } catch (error) {
-          console.error('JWT update error:', error);          
+          console.error("JWT update error:", error);
         }
       }
-      
+
       return token;
     },
-    
+
+    /* ------------------- SESSION ------------------- */
     session({ session, token }) {
       if (token && session.user) {
         session.user.id = token.id as string;
         session.user.tier = token.tier as Tier;
         session.user.username = token.username as string;
         session.user.emailVerified = token.emailVerified as Date | null;
-        session.user.subscriptionStartDate = token.subscriptionStartDate 
+        session.user.subscriptionStartDate = token.subscriptionStartDate
           ? new Date(token.subscriptionStartDate as string | Date)
           : null;
         session.user.role = token.role as Role;
-        // Creator fields
         session.user.isCreator = token.isCreator as boolean;
         session.user.instagramHandle = token.instagramHandle as string | undefined;
         session.user.tiktokHandle = token.tiktokHandle as string | undefined;
@@ -269,20 +277,27 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
       return session;
     },
   },
+
+  /* -------------------------------------------------------------- */
+  /*  PROVIDERS                                                     */
+  /* -------------------------------------------------------------- */
   providers: [
-    Credentials({      
+    Credentials({
       async authorize(credentials) {
         try {
-          const parsedCredentials = z.object({ 
-            email: z.string().email().toLowerCase().trim(), 
-            password: z.string().min(1, "Password is required")
-          }).safeParse(credentials);
+          const parsed = z
+            .object({
+              email: z.string().email().toLowerCase().trim(),
+              password: z.string().min(1, "Password is required"),
+            })
+            .safeParse(credentials);
 
-          if (!parsedCredentials.success) return null;
+          if (!parsed.success) return null;
 
-          const { email, password } = parsedCredentials.data;
+          const { email, password } = parsed.data;
+
           const user = await prisma.user.findFirst({
-            where: { email: { equals: email, mode: 'insensitive' } },
+            where: { email: { equals: email, mode: "insensitive" } },
             select: {
               id: true,
               email: true,
@@ -293,44 +308,39 @@ export const { auth, signIn, signOut, handlers } = NextAuth({
               subscriptionStartDate: true,
               emailVerified: true,
               role: true,
-              // Creator fields
               isCreator: true,
               instagramHandle: true,
               tiktokHandle: true,
               whatsappNumber: true,
               contentStyle: true,
-              followersCount: true
-            }
+              followersCount: true,
+            },
           });
 
           if (!user || !user.emailVerified) return null;
-          
-          const passwordsMatch = await bcrypt.compare(password, user.password);
-          if (passwordsMatch) {
-            const { password: _, ...userWithoutPassword } = user;
-            return {
-              ...userWithoutPassword,
-              instagramHandle: user.instagramHandle ?? undefined,
-              tiktokHandle: user.tiktokHandle ?? undefined,
-              whatsappNumber: user.whatsappNumber ?? undefined,
-              contentStyle: user.contentStyle ?? undefined,
-              followersCount: user.followersCount ?? undefined,
-            };
-          }
+
+          const match = await bcrypt.compare(password, user.password);
+          if (!match) return null;
+
+          const { password: _, ...safeUser } = user;
+          return {
+            ...safeUser,
+            instagramHandle: safeUser.instagramHandle ?? undefined,
+            tiktokHandle: safeUser.tiktokHandle ?? undefined,
+            whatsappNumber: safeUser.whatsappNumber ?? undefined,
+            contentStyle: safeUser.contentStyle ?? undefined,
+            followersCount: safeUser.followersCount ?? undefined,
+          };
         } catch (error) {
-          console.error('Auth error:', error);
+          console.error("Auth error:", error);
           return null;
         }
-        
-        return null;
       },
     }),
-  ],    
+  ],
+
   pages: {
-    signIn: '/auth/login',
-    error: '/auth/error',
-  },    
-  events: {
-    // Event logging remains the same - add your event handlers here if needed
-  }
+    signIn: "/auth/login",
+    error: "/auth/error",
+  },
 });

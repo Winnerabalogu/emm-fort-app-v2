@@ -1,10 +1,10 @@
 // app/api/creator/auth/login/route.ts
 export const runtime = 'nodejs';
 import { NextRequest, NextResponse } from 'next/server';
-import bcrypt from 'bcryptjs';
-import { SignJWT } from 'jose';
 import { z } from 'zod';
+import bcrypt from 'bcryptjs';
 import { prisma } from '@/lib/prisma';
+import { signIn } from '@/auth';
 
 // Validation schema
 const LoginSchema = z.object({
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     if (!validationResult.success) {
       return NextResponse.json({
         error: 'Validation failed',
-        details: validationResult.error
+        details: validationResult.error.flatten()
       }, { status: 400 });
     }
 
@@ -30,27 +30,21 @@ export async function POST(request: NextRequest) {
     // Find creator user
     const user = await prisma.user.findFirst({
       where: { 
-        email: email.toLowerCase(),
+        email: { equals: email.toLowerCase(), mode: 'insensitive' },
         isCreator: true // Only allow creator accounts
       },
       select: {
         id: true,
-        fullName: true,
-        username: true,
         email: true,
         password: true,
         emailVerified: true,
         isCreator: true,
-        instagramHandle: true,
-        tiktokHandle: true,
-        contentStyle: true,
-        createdAt: true
       }
     });
 
     if (!user) {
       return NextResponse.json({ 
-        error: 'Invalid credentials or creator account not found' 
+        error: 'Invalid credentials or not a creator account' 
       }, { status: 401 });
     }
 
@@ -71,45 +65,26 @@ export async function POST(request: NextRequest) {
       }, { status: 401 });
     }
 
-    // Create JWT token
-    const secret = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret');
-    const token = await new SignJWT({ 
-      userId: user.id,
-      email: user.email,
-      isCreator: true
-    })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('7d')
-      .sign(secret);
+    // Use NextAuth signIn - this will create the proper session
+    try {
+      await signIn('credentials', {
+        email: email.toLowerCase(),
+        password: password,
+        redirect: false,
+      });
 
-    // Create response with cookie
-    const response = NextResponse.json({
-      message: 'Login successful',
-      user: {
-        id: user.id,
-        fullName: user.fullName,
-        username: user.username,
-        email: user.email,
-        isCreator: user.isCreator,
-        instagramHandle: user.instagramHandle,
-        tiktokHandle: user.tiktokHandle,
-        contentStyle: user.contentStyle,
-        createdAt: user.createdAt.toISOString()
-      },
-      redirectTo: '/creator/dashboard'
-    }, { status: 200 });
+      return NextResponse.json({
+        success: true,
+        message: 'Login successful',
+        redirectTo: '/creator/dashboard'
+      }, { status: 200 });
 
-    // Set HTTP-only cookie
-    response.cookies.set('creator-auth-token', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60, // 7 days
-      path: '/'
-    });
-
-    return response;
+    } catch (signInError) {
+      console.error('NextAuth signIn error:', signInError);
+      return NextResponse.json({ 
+        error: 'Authentication failed' 
+      }, { status: 401 });
+    }
 
   } catch (error) {
     console.error('CREATOR_LOGIN_ERROR:', error);

@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, Suspense } from 'react';
+import DashboardSwitcher from '@/components/DashboardSwitcher';
 import { useSession } from 'next-auth/react';
 import { UserProfile } from '@/lib/types';
 import dynamic from 'next/dynamic';
@@ -173,8 +174,10 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 fade-in">
+    
       {/* Main Content Column */}
       <div className="flex-1 space-y-6 lg:space-y-8">
+            <DashboardSwitcher />
         <Suspense fallback={<TierCardSkeleton />}>
           <TierCard tier={profileData.tier} imageUrl={tierImage} />
         </Suspense>

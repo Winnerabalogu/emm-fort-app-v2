@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
+import { useSearchParams } from 'next/navigation';
 import { authenticate } from '@/actions/auth.actions';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button'; 
@@ -18,6 +19,8 @@ function LoginButton() {
 }
 
 export default function LoginForm() {  
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
   const [errorMessage, dispatch] = useActionState(authenticate, undefined);
 
   return (
@@ -28,6 +31,7 @@ export default function LoginForm() {
       </div>      
       
       <form action={dispatch} className="space-y-6">
+        <input type="hidden" name="callbackUrl" value={callbackUrl} />
         <Input 
           label="EMAIL" 
           type="email" 

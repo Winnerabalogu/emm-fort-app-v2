@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { StatsGrid, QuickActions, RecentActivity } from '@/components/creator/Dashboard';
 import { User, DashboardData } from '@/types/Creatortypes/dashboard';
 import { DashboardSkeleton } from './Skeletons';
+import DashboardSwitcher from '@/components/DashboardSwitcher';
 
 interface CreatorDashboardProps {
   className?: string;
@@ -100,6 +101,7 @@ export default function CreatorDashboard({ className = '' }: CreatorDashboardPro
   if (error || !user || !dashboardData) {
     return (
       <div className={`creator-dashboard ${className}`}>
+
         <div className="flex items-center justify-center py-12">
           <div className="text-center max-w-md mx-auto">
             <div className="bg-red-50 border border-red-200 rounded-xl p-6">
@@ -140,6 +142,7 @@ export default function CreatorDashboard({ className = '' }: CreatorDashboardPro
   
   return (
     <div className={`creator-dashboard space-y-6 ${className}`}>
+        <DashboardSwitcher />
       {/* Stats Grid with real data */}
       <StatsGrid 
         user={user} 

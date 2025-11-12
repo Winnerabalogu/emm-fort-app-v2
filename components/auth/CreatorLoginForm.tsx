@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Eye, EyeOff, Mail, Lock, ArrowRight, Sparkles } from 'lucide-react';
-import { signIn } from 'next-auth/react';
 import Link from 'next/link';
+import { signIn } from 'next-auth/react';
 
 export default function CreatorLoginForm() {
   const router = useRouter();
@@ -16,7 +16,7 @@ export default function CreatorLoginForm() {
   });
   const [error, setError] = useState('');
 
-  const handleInputChange = (e: { target: { name: string; value: string; }; }) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -24,7 +24,7 @@ export default function CreatorLoginForm() {
     }));
   };
 
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (!formData.email.trim() || !formData.password.trim()) {
@@ -36,42 +36,29 @@ export default function CreatorLoginForm() {
     setError('');
     
     try {
-      // First check if user exists and is a creator
-      const checkResponse = await fetch('/api/creator/auth/check-user', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email }),
-      });
-
-      const checkData = await checkResponse.json();
-
-      if (!checkResponse.ok) {
-        if (checkResponse.status === 403 && checkData.needsVerification) {
-          router.push(`/creator/auth/check-your-email?email=${encodeURIComponent(checkData.email)}`);
-          return;
-        }
-        throw new Error(checkData.error || 'User validation failed');
-      }
-
-      // Use NextAuth signIn
+      // Use NextAuth signIn directly
       const result = await signIn('credentials', {
-        email: formData.email,
+        email: formData.email.toLowerCase().trim(),
         password: formData.password,
         redirect: false,
+        callbackUrl: '/creator/dashboard',
       });
 
       if (result?.error) {
-        throw new Error('Invalid credentials');
+        setError('Invalid email or password');
+        setIsLoading(false);
+        return;
       }
 
       if (result?.ok) {
+        // Success - redirect to creator dashboard
         router.push('/creator/dashboard');
         router.refresh();
       }
 
     } catch (error) {
-      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-    } finally {
+      console.error('Login error:', error);
+      setError('An unexpected error occurred. Please try again.');
       setIsLoading(false);
     }
   };
@@ -237,21 +224,21 @@ export default function CreatorLoginForm() {
           {/* Sign Up Link */}
           <div className="mt-8 text-center pt-6 border-t border-gray-200">
             <Link href={'/creator/auth/register'}>
-            <p className="text-sm text-gray-600">            
-              New to the creator program?{' '}
-              <button className="font-semibold text-orange-600 hover:text-orange-700 transition-colors">
-                Join today and start earning
-              </button>
-            </p>
+              <p className="text-sm text-gray-600">            
+                New to the creator program?{' '}
+                <span className="font-semibold text-orange-600 hover:text-orange-700 transition-colors">
+                  Join today and start earning
+                </span>
+              </p>
             </Link>
           </div>
 
           {/* Back to main site */}
           <div className="mt-6 text-center">
             <Link href={'/'}>
-            <button className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
-              ← Back to EMM-FORT
-            </button>
+              <button type="button" className="text-xs text-gray-500 hover:text-gray-700 transition-colors">
+                ← Back to EMM-FORT
+              </button>
             </Link>
           </div>
         </div>
