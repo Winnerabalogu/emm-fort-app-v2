@@ -88,6 +88,10 @@ export interface DashboardStats {
   thisWeekReferrals: number;
   totalContentPosts: number;
   thisWeekContentPosts: number;
+  affiliateEarnings?: number
+  affiliateCommissionCount?: number
+  creatorEarnings?: number
+  creatorCommissionCount?: number
 }
 
 export interface DailyEarning {

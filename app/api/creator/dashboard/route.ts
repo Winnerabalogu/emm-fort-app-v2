@@ -31,6 +31,7 @@ export async function GET() {
         username: true,
         email: true,
         phone: true,
+        tier: true,
         isCreator: true,
         instagramHandle: true,
         tiktokHandle: true,
@@ -45,20 +46,120 @@ export async function GET() {
       return NextResponse.json({ error: 'Access denied. Creator account required.' }, { status: 403 });
     }
 
-    // Parallel queries for performance
+    // ====================================================================
+    // ENHANCED: Parallel queries with BOTH commission types separated
+    // ====================================================================
     const [
+      // ===== AFFILIATE COMMISSIONS (from tier subscriptions) =====
+      affiliateTotalEarnings,
+      affiliateThisWeekEarnings,
+      affiliateThisMonthEarnings,
+      
+      // ===== CREATOR COMMISSIONS (from grocery sales) =====
+      creatorTotalEarnings,
+      creatorThisWeekEarnings,
+      creatorThisMonthEarnings,
+      
+      // ===== COMBINED DATA =====
       totalEarningsData,
       thisWeekEarningsData,
       thisMonthEarningsData,
       pendingEarningsData,
+      
+      // ===== REFERRALS & CONTENT =====
       totalReferralsCount,
       thisWeekReferralsCount,
       contentPostsCount,
       thisWeekContentCount,
+      
+      // ===== RECENT DATA =====
       recentTransactions,
-      recentActivity
+      recentActivity,
+      
+      // ===== LAST 30 DAYS FOR CHART =====
+      transactionsLast30Days
     ] = await Promise.all([
-      // Total earnings from commissions
+      // === AFFILIATE COMMISSIONS ===
+      // Total affiliate earnings (tier subscriptions)
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: { not: null }, // Has sourceUserId = affiliate
+          referralOrderId: null         // No orderId = affiliate
+        },
+        _sum: { amount: true },
+        _count: true
+      }),
+
+      // This week affiliate earnings
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: { not: null },
+          referralOrderId: null,
+          createdAt: { gte: weekStart }
+        },
+        _sum: { amount: true }
+      }),
+
+      // This month affiliate earnings
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: { not: null },
+          referralOrderId: null,
+          createdAt: { gte: monthStart }
+        },
+        _sum: { amount: true }
+      }),
+
+      // === CREATOR COMMISSIONS ===
+      // Total creator earnings (grocery sales)
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: null,               // No sourceUserId = creator
+          referralOrderId: { not: null }    // Has orderId = creator
+        },
+        _sum: { amount: true },
+        _count: true
+      }),
+
+      // This week creator earnings
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: null,
+          referralOrderId: { not: null },
+          createdAt: { gte: weekStart }
+        },
+        _sum: { amount: true }
+      }),
+
+      // This month creator earnings
+      prisma.transaction.aggregate({
+        where: {
+          userId: userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          sourceUserId: null,
+          referralOrderId: { not: null },
+          createdAt: { gte: monthStart }
+        },
+        _sum: { amount: true }
+      }),
+
+      // === COMBINED TOTALS (preserve original behavior) ===
       prisma.transaction.aggregate({
         where: {
           userId: userId,
@@ -68,7 +169,6 @@ export async function GET() {
         _sum: { amount: true }
       }),
 
-      // This week earnings
       prisma.transaction.aggregate({
         where: {
           userId: userId,
@@ -79,7 +179,6 @@ export async function GET() {
         _sum: { amount: true }
       }),
 
-      // This month earnings
       prisma.transaction.aggregate({
         where: {
           userId: userId,
@@ -90,7 +189,6 @@ export async function GET() {
         _sum: { amount: true }
       }),
 
-      // Pending earnings
       prisma.transaction.aggregate({
         where: {
           userId: userId,
@@ -100,7 +198,7 @@ export async function GET() {
         _sum: { amount: true }
       }),
 
-      // Total referrals count
+      // === REFERRALS & CONTENT (unchanged) ===
       prisma.user.count({
         where: { 
           uplinerId: userId,
@@ -108,7 +206,6 @@ export async function GET() {
         }
       }),
 
-      // This week referrals
       prisma.user.count({
         where: { 
           uplinerId: userId,
@@ -117,12 +214,10 @@ export async function GET() {
         }
       }),
 
-      // Total content posts
       prisma.contentPost.count({
         where: { userId: userId }
       }),
 
-      // This week content posts
       prisma.contentPost.count({
         where: { 
           userId: userId,
@@ -130,7 +225,7 @@ export async function GET() {
         }
       }),
 
-      // Recent transactions
+      // === RECENT TRANSACTIONS (enhanced with commission type) ===
       prisma.transaction.findMany({
         where: { userId: userId },
         select: {
@@ -139,13 +234,15 @@ export async function GET() {
           amount: true,
           status: true,
           description: true,
-          createdAt: true
+          createdAt: true,
+          sourceUserId: true,      // NEW: to identify affiliate
+          referralOrderId: true    // NEW: to identify creator
         },
         orderBy: { createdAt: 'desc' },
-        take: 5
+        take: 10 // Increased from 5 to show more
       }),
 
-      // Recent activity (mix of content posts and transactions)
+      // === RECENT ACTIVITY (unchanged) ===
       prisma.contentPost.findMany({
         where: { userId: userId },
         select: {
@@ -160,55 +257,100 @@ export async function GET() {
         },
         orderBy: { createdAt: 'desc' },
         take: 3
+      }),
+
+      // === LAST 30 DAYS TRANSACTIONS ===
+      prisma.transaction.findMany({
+        where: {
+          userId,
+          type: 'COMMISSION',
+          status: 'COMPLETED',
+          createdAt: { gte: monthStart }
+        },
+        select: {
+          amount: true,
+          createdAt: true,
+          sourceUserId: true,
+          referralOrderId: true
+        }
       })
     ]);
 
-    // Calculate summary data
+    // ====================================================================
+    // CALCULATE SUMMARY DATA
+    // ====================================================================
+    
+    // Affiliate earnings
+    const affiliateTotal = affiliateTotalEarnings._sum.amount || 0;
+    const affiliateWeek = affiliateThisWeekEarnings._sum.amount || 0;
+    const affiliateMonth = affiliateThisMonthEarnings._sum.amount || 0;
+    const affiliateCount = affiliateTotalEarnings._count;
+
+    // Creator earnings
+    const creatorTotal = creatorTotalEarnings._sum.amount || 0;
+    const creatorWeek = creatorThisWeekEarnings._sum.amount || 0;
+    const creatorMonth = creatorThisMonthEarnings._sum.amount || 0;
+    const creatorCount = creatorTotalEarnings._count;
+
+    // Combined (preserve original behavior)
     const totalEarnings = totalEarningsData._sum.amount || 0;
     const thisWeekEarnings = thisWeekEarningsData._sum.amount || 0;
     const thisMonthEarnings = thisMonthEarningsData._sum.amount || 0;
     const pendingEarnings = pendingEarningsData._sum.amount || 0;
 
-    // Generate last 30 days earnings trend
-    const dailyEarningsMap = new Map<string, number>();
+    // ====================================================================
+    // GENERATE DAILY EARNINGS CHART (last 30 days)
+    // ====================================================================
+    const dailyEarningsMap = new Map<string, { 
+      total: number, 
+      affiliate: number, 
+      creator: number 
+    }>();
 
     eachDayOfInterval({ start: monthStart, end: now }).forEach(date => {
-      const dayKey = format(date, 'MMM d'); // e.g. "Aug 25"
-      dailyEarningsMap.set(dayKey, 0);
-    });
-
-    const transactionsLast30Days = await prisma.transaction.findMany({
-      where: {
-        userId,
-        type: 'COMMISSION',
-        status: 'COMPLETED',
-        createdAt: { gte: monthStart }
-      },
-      select: {
-        amount: true,
-        createdAt: true
-      }
+      const dayKey = format(date, 'MMM d');
+      dailyEarningsMap.set(dayKey, { total: 0, affiliate: 0, creator: 0 });
     });
 
     transactionsLast30Days.forEach(tx => {
       const dayKey = format(tx.createdAt, 'MMM d');
-      dailyEarningsMap.set(dayKey, (dailyEarningsMap.get(dayKey) || 0) + Number(tx.amount));
+      const day = dailyEarningsMap.get(dayKey);
+      if (day) {
+        const amount = Number(tx.amount);
+        day.total += amount;
+        
+        // Categorize by commission type
+        if (tx.sourceUserId && !tx.referralOrderId) {
+          day.affiliate += amount;
+        } else if (!tx.sourceUserId && tx.referralOrderId) {
+          day.creator += amount;
+        }
+      }
     });
 
-    // Convert to array for charting
-    const dailyEarnings = Array.from(dailyEarningsMap, ([date, earnings]) => ({
+    const dailyEarnings = Array.from(dailyEarningsMap, ([date, data]) => ({
       date,
-      earnings: Number(earnings.toFixed(2))
+      earnings: Number(data.total.toFixed(2)),
+      affiliateEarnings: Number(data.affiliate.toFixed(2)),
+      creatorEarnings: Number(data.creator.toFixed(2))
     }));
 
-    // Calculate growth percentages
+    // ====================================================================
+    // CALCULATE GROWTH PERCENTAGES
+    // ====================================================================
     const earningsGrowth = thisMonthEarnings > 0 ? 
       ((thisWeekEarnings * 4 - thisMonthEarnings) / thisMonthEarnings * 100) : 0;
 
-    // Generate referral code (using username with current year)
-    const referralCode = `${user.username?.toUpperCase()}${new Date().getFullYear()}`;
+    // ====================================================================
+    // GENERATE REFERRAL CODE
+    // ====================================================================
+    const referralCode = `${user.username?.toUpperCase() || 'USER'}${new Date().getFullYear()}`;
 
-    // Transform content posts to activity format
+    // ====================================================================
+    // TRANSFORM ACTIVITIES WITH COMMISSION TYPE LABELS
+    // ====================================================================
+    
+    // Content activities (unchanged)
     const contentActivities = recentActivity.map(content => ({
       id: content.id,
       type: 'content' as const,
@@ -222,24 +364,44 @@ export async function GET() {
       }
     }));
 
-    // Transform transactions to activity format
+    // Transaction activities with enhanced labels
     const transactionActivities = recentTransactions
-      .filter(tx => tx.amount > 50) // Only show significant transactions
-      .slice(0, 3)
-      .map(tx => ({
-        id: tx.id,
-        type: 'earning' as const,
-        description: tx.description || `${tx.type.toLowerCase()} received`,
-        timestamp: tx.createdAt.toISOString(),
-        amount: tx.amount
-      }));
+      .filter(tx => tx.amount > 50)
+      .slice(0, 5)
+      .map(tx => {
+        let commissionType = '';
+        let description = tx.description || '';
 
-    // Combine and sort activities
+        if (tx.type === 'COMMISSION') {
+          if (tx.sourceUserId && !tx.referralOrderId) {
+            commissionType = 'Affiliate';
+            description = description || 'Commission from tier subscription referral';
+          } else if (!tx.sourceUserId && tx.referralOrderId) {
+            commissionType = 'Creator';
+            description = description || 'Commission from grocery product sale';
+          } else {
+            commissionType = 'General';
+          }
+        }
+
+        return {
+          id: tx.id,
+          type: 'earning' as const,
+          description: commissionType ? `${commissionType} - ${description}` : description,
+          timestamp: tx.createdAt.toISOString(),
+          amount: tx.amount,
+          commissionType: commissionType || null
+        };
+      });
+
+    // Combine and sort
     const allActivities = [...contentActivities, ...transactionActivities]
       .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, 10);
 
-    // Construct response
+    // ====================================================================
+    // CONSTRUCT ENHANCED RESPONSE
+    // ====================================================================
     const dashboardData = {
       user: {
         id: user.id,
@@ -247,6 +409,7 @@ export async function GET() {
         username: user.username,
         email: user.email,
         phone: user.phone,
+        tier: user.tier,
         instagramHandle: user.instagramHandle,
         tiktokHandle: user.tiktokHandle,
         whatsappNumber: user.whatsappNumber,
@@ -257,28 +420,63 @@ export async function GET() {
         joinDate: user.createdAt.toISOString()
       },
       stats: {
+        // === COMBINED TOTALS (original behavior) ===
         totalEarnings: Number(totalEarnings),
         thisWeekEarnings: Number(thisWeekEarnings),
         thisMonthEarnings: Number(thisMonthEarnings),
         pendingEarnings: Number(pendingEarnings),
+        
+        // === NEW: AFFILIATE BREAKDOWN ===
+        affiliateEarnings: Number(affiliateTotal),
+        affiliateWeekEarnings: Number(affiliateWeek),
+        affiliateMonthEarnings: Number(affiliateMonth),
+        affiliateCommissionCount: affiliateCount,
+        
+        // === NEW: CREATOR BREAKDOWN ===
+        creatorEarnings: Number(creatorTotal),
+        creatorWeekEarnings: Number(creatorWeek),
+        creatorMonthEarnings: Number(creatorMonth),
+        creatorCommissionCount: creatorCount,
+        
+        // === EXISTING METRICS ===
         totalReferrals: totalReferralsCount,
         thisWeekReferrals: thisWeekReferralsCount,
         totalContentPosts: contentPostsCount,
         thisWeekContentPosts: thisWeekContentCount,
         earningsGrowth: Number(earningsGrowth.toFixed(1)),
         conversionRate: totalReferralsCount > 0 ? 
-          ((totalReferralsCount / (totalReferralsCount + 50)) * 100).toFixed(1) : '0.0' // Example calculation
+          ((totalReferralsCount / (totalReferralsCount + 50)) * 100).toFixed(1) : '0.0'
       },
+      
+      // Enhanced daily earnings with breakdown
       dailyEarnings: dailyEarnings,
-      recentTransactions: recentTransactions.map(tx => ({
-        id: tx.id,
-        type: tx.type,
-        amount: Number(tx.amount),
-        date: tx.createdAt.toISOString(),
-        status: tx.status,
-        description: tx.description
-      })),
+      
+      // Recent transactions with commission type
+      recentTransactions: recentTransactions.map(tx => {
+        let commissionType = null;
+        if (tx.type === 'COMMISSION') {
+          if (tx.sourceUserId && !tx.referralOrderId) {
+            commissionType = 'affiliate';
+          } else if (!tx.sourceUserId && tx.referralOrderId) {
+            commissionType = 'creator';
+          }
+        }
+
+        return {
+          id: tx.id,
+          type: tx.type,
+          amount: Number(tx.amount),
+          date: tx.createdAt.toISOString(),
+          status: tx.status,
+          description: tx.description,
+          commissionType: commissionType
+        };
+      }),
+      
+      // Enhanced activity feed
       recentActivity: allActivities,
+      
+      // Content performance (unchanged)
       contentPerformance: recentActivity.map(content => ({
         id: content.id,
         title: content.title,
